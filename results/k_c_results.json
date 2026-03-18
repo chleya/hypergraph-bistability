@@ -1,0 +1,34 @@
+{
+  "k_c": 2.3,
+  "results": {
+    "2.0": {
+      "M": 0.26417598646658746,
+      "tau_HL": 28.375,
+      "tau_LH": NaN,
+      "ratio": 0,
+      "dV": 0,
+      "has_bistability": false
+    },
+    "2.1": {
+      "M": 0.4390931179866808,
+      "tau_HL": 23.5,
+      "tau_LH": NaN,
+      "ratio": 0,
+      "dV": 0,
+      "has_bistability": false
+    },
+    "2.2": {
+      "M": 0.5595251754075283,
+      "tau_HL": 33.8,
+      "tau_LH": NaN,
+      "ratio": 0,
+      "dV": 0,
+      "has_bistability": false
+    },
+    "2.3": {
+      "M": 0.6749368451709532,
+      "tau_HL": 30.5,
+      "tau_LH": 94.0,
+      "ratio": 3.081967213114754,
+      "dV": 1.1255680986566379,
+      "has_bistability": 
