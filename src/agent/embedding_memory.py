@@ -31,21 +31,44 @@ try:
 except ImportError:
     HAS_OPENAI = False
 
+try:
+    from sentence_transformers import SentenceTransformer
+    HAS_SENTENCE_TRANSFORMERS = True
+except ImportError:
+    HAS_SENTENCE_TRANSFORMERS = False
+
 
 class EmbeddingGenerator:
     """
-    Generates embeddings using OpenAI's text-embedding-3-small model.
-    Falls back to random vectors if no API key.
+    Generates embeddings using OpenAI or sentence-transformers.
+    
+    Provider priority:
+    1. sentence-transformers (local, no API key needed) — if installed
+    2. OpenAI text-embedding-3-small — if API key available
+    3. Random vectors (fallback)
     """
     
-    def __init__(self, api_key: Optional[str] = None, model: str = "text-embedding-3-small"):
+    def __init__(self, api_key: Optional[str] = None, 
+                 model: str = "text-embedding-3-small",
+                 provider: str = "auto"):
         self.api_key = api_key or os.environ.get("OPENAI_API_KEY")
         self.model = model
+        self.provider = provider
         self.client = None
+        self.st_model = None
         self.embedding_dim = 1536
         
-        if self.api_key and HAS_OPENAI:
+        if provider == "sentence_transformers" and HAS_SENTENCE_TRANSFORMERS:
+            self.st_model = SentenceTransformer("all-MiniLM-L6-v2")
+            self.embedding_dim = 384
+        elif provider == "openai" and self.api_key and HAS_OPENAI:
             self.client = OpenAI(api_key=self.api_key)
+        elif provider == "auto":
+            if HAS_SENTENCE_TRANSFORMERS:
+                self.st_model = SentenceTransformer("all-MiniLM-L6-v2")
+                self.embedding_dim = 384
+            elif self.api_key and HAS_OPENAI:
+                self.client = OpenAI(api_key=self.api_key)
     
     def embed(self, texts: List[str]) -> List[List[float]]:
         """
@@ -61,18 +84,27 @@ class EmbeddingGenerator:
         List[List[float]]
             List of embedding vectors
         """
-        if self.client is None:
-            return [self._random_embedding() for _ in texts]
+        if self.st_model is not None:
+            embeddings = self.st_model.encode(texts, normalize_embeddings=True)
+            return embeddings.tolist()
         
-        try:
-            response = self.client.embeddings.create(
-                model=self.model,
-                input=texts
-            )
-            return [item.embedding for item in response.data]
-        except Exception as e:
-            print(f"Embedding generation failed: {e}, using random vectors")
-            return [self._random_embedding() for _ in texts]
+        if self.client is not None:
+            try:
+                response = self.client.embeddings.create(
+                    model=self.model,
+                    input=texts
+                )
+                return [item.embedding for item in response.data]
+            except Exception as e:
+                print(f"OpenAI embedding failed: {e}, trying sentence-transformers")
+        
+        if HAS_SENTENCE_TRANSFORMERS:
+            self.st_model = SentenceTransformer("all-MiniLM-L6-v2")
+            self.embedding_dim = 384
+            embeddings = self.st_model.encode(texts, normalize_embeddings=True)
+            return embeddings.tolist()
+        
+        return [self._random_embedding() for _ in texts]
     
     def _random_embedding(self) -> List[float]:
         vec = np.random.randn(self.embedding_dim)

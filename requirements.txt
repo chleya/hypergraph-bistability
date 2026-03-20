@@ -4,10 +4,11 @@ matplotlib>=3.5.0
 gymnasium>=0.26.0
 pytest>=7.0.0
 openai>=1.0.0
+sentence-transformers>=2.2.0
 
 # Optional: vector storage for cold memory
-# chromadb>=0.4.0
+chromadb>=0.4.0
 
 # Optional: LangChain integration
-# langchain>=0.1.0
-# langchain-openai>=0.0.5
+langchain>=0.1.0
+langchain-openai>=0.0.5
