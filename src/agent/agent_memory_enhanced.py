@@ -1,11 +1,12 @@
 """
 Enhanced Agent Memory Module with LLM-based Conflict Detection
-==============================================================
+=============================================================
 
 Features:
 - LLM-based semantic conflict detection
 - Contextual memory retrieval
 - Enhanced mode switching with learned patterns
+- Physics-based λ_c control (CollapsController)
 """
 
 import numpy as np
@@ -13,6 +14,8 @@ from typing import Optional, List, Tuple, Dict, Callable
 from dataclasses import dataclass, field
 import json
 import os
+
+from agent.agent_memory import CollapsController, _regime_name
 
 
 HIGH_THRESHOLD = 0.7
@@ -308,7 +311,8 @@ class AgentMemoryEnhanced:
         name: str = "default",
         use_llm_detector: bool = False,
         use_llm_mapper: bool = False,
-        api_key: Optional[str] = None
+        api_key: Optional[str] = None,
+        use_physics_control: bool = True
     ):
         self.k = k
         self.L = L
@@ -317,6 +321,7 @@ class AgentMemoryEnhanced:
         self.lambda_ = lambda_
         self.mu = mu
         self.name = name
+        self.use_physics_control = use_physics_control
         
         self.M = np.full((k, L), 0.5)
         self.group_labels = [f"group_{i}" for i in range(k)]
@@ -345,23 +350,51 @@ class AgentMemoryEnhanced:
             self._compute_lambda_c = compute_lambda_c
         except ImportError:
             self._compute_lambda_c = None
+        
+        self._has_scipy = True
+        try:
+            from scipy.integrate import odeint
+        except ImportError:
+            self._has_scipy = False
     
     def bistable_dynamics(self, m: np.ndarray) -> np.ndarray:
         return m * (1 - m) * (2 * m - 1)
     
+    def _compute_dMdt(self, M_flat: np.ndarray, t: float) -> np.ndarray:
+        M = M_flat.reshape((self.k, self.L))
+        dM = np.zeros_like(M)
+        for i in range(self.k):
+            for l in range(self.L):
+                m = M[i, l]
+                bistable = self.bistable_dynamics(m)
+                gc = self.lambda_ * (np.mean(M[:, l]) - m)
+                ol = [M[i, j] for j in range(self.L) if j != l]
+                om = np.mean(ol) if ol else 0.0
+                dM[i, l] = bistable + gc + self.mu * (om - m)
+        return dM.flatten()
+    
     def step(self, dt: float = 0.1, n_steps: int = 1) -> None:
-        for _ in range(n_steps):
-            dM = np.zeros_like(self.M)
-            for i in range(self.k):
-                for l in range(self.L):
-                    m = self.M[i, l]
-                    bistable = self.bistable_dynamics(m)
-                    gc = self.lambda_ * (np.mean(self.M[:, l]) - m)
-                    other_layers = [self.M[i, j] for j in range(self.L) if j != l]
-                    other_mean = np.mean(other_layers) if other_layers else 0.0
-                    lc = self.mu * (other_mean - m)
-                    dM[i, l] = bistable + gc + lc
-            self.M = np.clip(self.M + dM * dt, 0, 1)
+        if self._has_scipy and n_steps >= 10:
+            total_t = dt * n_steps
+            t = np.linspace(0, total_t, min(n_steps + 1, 50))
+            M0_flat = self.M.flatten()
+            sol = __import__('scipy.integrate', fromlist=['odeint']).odeint(
+                self._compute_dMdt, M0_flat, t
+            )
+            self.M = np.clip(sol[-1].reshape((self.k, self.L)), 0, 1)
+        else:
+            for _ in range(n_steps):
+                dM = np.zeros_like(self.M)
+                for i in range(self.k):
+                    for l in range(self.L):
+                        m = self.M[i, l]
+                        bistable = self.bistable_dynamics(m)
+                        gc = self.lambda_ * (np.mean(self.M[:, l]) - m)
+                        other_layers = [self.M[i, j] for j in range(self.L) if j != l]
+                        other_mean = np.mean(other_layers) if other_layers else 0.0
+                        lc = self.mu * (other_mean - m)
+                        dM[i, l] = bistable + gc + lc
+                self.M = np.clip(self.M + dM * dt, 0, 1)
     
     def read(self, query: Optional[str] = None) -> MemoryState:
         pattern = self._binarize()
@@ -407,54 +440,71 @@ class AgentMemoryEnhanced:
     def process_prompt(
         self,
         prompt: str,
-        use_llm: Optional[bool] = None
+        use_llm: Optional[bool] = None,
+        target_r: float = None
     ) -> Dict:
         """
-        Process prompt with optional LLM-based conflict detection.
+        Process prompt via physics-based λ_c control.
+        
+        Optionally uses LLM for semantic conflict detection (if use_llm=True
+        and api_key provided), but λ adjustment always uses r = λ/λ_c.
         """
-        from agent.agent_memory import ConflictDetector
-        
-        if use_llm is None:
-            use_llm = self.use_llm_detector
-        
-        if use_llm and hasattr(self.detector, 'detect_conflict'):
-            conflict_level, reasoning = self.detector.detect_conflict(prompt)
-        else:
-            conflict_level = ConflictDetector.detect_conflict_level(prompt)
-            reasoning = "Keyword-based detection"
-        
-        suggested_lambda, lambda_reasoning = ConflictDetector.suggest_lambda(conflict_level)
-        
         old_lambda = self.lambda_
-        self.lambda_ = suggested_lambda
+        
+        if self.use_physics_control and self._compute_lambda_c is not None:
+            if target_r is None:
+                complexity = min(1.0, len(prompt.split()) / 50.0)
+                target_r = 0.4 + 0.5 * complexity
+            else:
+                target_r = min(1.0, max(0.1, target_r))
+            
+            suggested_lambda, reasoning = CollapsController.suggest_lambda(target_r, self.k)
+            self.lambda_ = suggested_lambda
+            
+            regime = _regime_name(target_r)
+            result = {
+                "prompt": prompt,
+                "conflict_level": target_r,
+                "reasoning": f"Physics-based: target r={target_r:.2f} → {reasoning}",
+                "old_lambda": old_lambda,
+                "new_lambda": self.lambda_,
+                "regime": regime
+            }
+        else:
+            self.lambda_ = 0.05
+            result = {
+                "prompt": prompt,
+                "conflict_level": 0.0,
+                "reasoning": "Fallback: no physics control",
+                "old_lambda": old_lambda,
+                "new_lambda": self.lambda_
+            }
+        
         self.step(dt=DEFAULT_DT, n_steps=20)
-        
-        result = {
-            "prompt": prompt,
-            "conflict_level": conflict_level,
-            "reasoning": reasoning,
-            "suggested_lambda": suggested_lambda,
-            "lambda_reasoning": lambda_reasoning,
-            "old_lambda": old_lambda,
-            "new_lambda": self.lambda_
-        }
-        
-        self.conflict_history.append(conflict_level)
+        self.conflict_history.append(result["conflict_level"])
         return result
     
     def switch_mode(self, mode: str) -> None:
-        presets = {
+        proximity_presets = {
             "neutral": (0.0, 0.0),
-            "exploratory": (0.01, 0.0),
-            "focused": (0.15, 0.0),
-            "sync": (0.05, 0.3),
-            "creative": (0.05, -0.3),
-            "professional": (0.08, 0.0),
-            "casual": (0.02, 0.1),
+            "exploratory": (0.3, 0.0),
+            "focused": (0.85, 0.0),
+            "sync": (0.5, 0.3),
+            "creative": (0.5, -0.3),
+            "professional": (0.65, 0.0),
+            "casual": (0.4, 0.1),
         }
         
-        if mode in presets:
-            self.lambda_, self.mu = presets[mode]
+        lc = self.get_lambda_c()
+        
+        if mode in proximity_presets:
+            r, mu_val = proximity_presets[mode]
+            if lc is not None and self.use_physics_control:
+                lam = r * lc
+            else:
+                lam = r * 0.1
+            self.lambda_ = lam
+            self.mu = mu_val
         else:
             raise ValueError(f"Unknown mode: {mode}")
         
@@ -501,20 +551,84 @@ class AgentMemoryEnhanced:
         
         lc = self.get_lambda_c()
         if lc:
-            ctx_lines.append(f"(Focus λ_c≈{lc:.3f}, current λ={self.lambda_:.3f})")
+            r = CollapsController.compute_collapse_ratio(self.lambda_, self.k)
+            regime = _regime_name(r)
+            ctx_lines.append(
+                f"(λ={self.lambda_:.3f}, λ_c≈{lc:.3f}, r={r:.2f}, regime={regime})"
+            )
         
         return "\n".join(ctx_lines)
     
     def _binarize(self) -> np.ndarray:
+        if self.use_physics_control and self._compute_lambda_c is not None:
+            high_t, low_t = CollapsController.get_dynamic_thresholds(
+                self.lambda_, self.k, HIGH_THRESHOLD, LOW_THRESHOLD
+            )
+        else:
+            high_t, low_t = HIGH_THRESHOLD, LOW_THRESHOLD
+        
         binary = np.full((self.k, self.L), 0.5)
-        binary[self.M > HIGH_THRESHOLD] = 1.0
-        binary[self.M < LOW_THRESHOLD] = 0.0
+        binary[self.M > high_t] = 1.0
+        binary[self.M < low_t] = 0.0
         return binary
     
     def get_lambda_c(self) -> Optional[float]:
         if self._compute_lambda_c is None:
             return None
         return self._compute_lambda_c(self.k, n_high=1)
+    
+    def get_n_high_groups(self) -> int:
+        state = self.read()
+        return int(np.sum(state.groups > 0.5))
+    
+    def set_n_high(self, n_high: int, n_steps: int = 100) -> Dict:
+        if not (0 <= n_high <= self.k):
+            raise ValueError(f"n_high must be between 0 and {self.k}")
+        
+        lc = self.get_lambda_c()
+        if lc is None or not self.use_physics_control:
+            lc = 0.1
+        
+        lo, hi = 0.0, lc * 0.99
+        best_lambda = 0.0
+        best_nh = 0
+        best_diff = self.k
+        
+        for _ in range(8):
+            test_lambdas = np.linspace(lo, hi, 5)
+            for lam_test in test_lambdas:
+                old_lambda = self.lambda_
+                self.lambda_ = lam_test
+                self.step(dt=DEFAULT_DT, n_steps=n_steps // 4)
+                nh_achieved = self.get_n_high_groups()
+                diff = abs(nh_achieved - n_high)
+                
+                if diff < best_diff:
+                    best_diff = diff
+                    best_lambda = lam_test
+                    best_nh = nh_achieved
+                
+                self.lambda_ = old_lambda
+            
+            if best_diff <= 0:
+                break
+            
+            if best_nh < n_high:
+                lo = best_lambda
+            else:
+                hi = best_lambda
+        
+        self.lambda_ = best_lambda
+        self.step(dt=DEFAULT_DT, n_steps=n_steps)
+        final_nh = self.get_n_high_groups()
+        
+        return {
+            "lambda_used": best_lambda,
+            "n_high_achieved": final_nh,
+            "n_high_target": n_high,
+            "converged": abs(final_nh - n_high) <= 1,
+            "lambda_c": lc
+        }
     
     def save(self, filepath: Optional[str] = None) -> str:
         if filepath is None:
