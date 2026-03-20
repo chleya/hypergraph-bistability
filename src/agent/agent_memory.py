@@ -157,7 +157,7 @@ class CollapsController:
         return high_t, low_t
     
     @classmethod
-    def suggest_lambda_for_n_high(cls, n_high: int, k: int, 
+    def suggest_lambda_for_n_high(cls, n_high: int, k: int, L: int = 2,
                                   tolerance: float = 0.5) -> Tuple[float, List[float]]:
         """
         Estimate λ that produces approximately n_high groups in HIGH state.
@@ -174,6 +174,8 @@ class CollapsController:
             Desired number of HIGH groups (0 to k)
         k : int
             Number of groups
+        L : int
+            Number of layers (default 2)
         tolerance : float
             Acceptable error in n_high
             
@@ -191,26 +193,26 @@ class CollapsController:
         def count_high_groups(lambda_val: float, mu: float = 0.0) -> int:
             """Simulate and count HIGH groups using deterministic ICs."""
             rng = np.random.default_rng(42)
-            M0 = np.full((self.k, self.L), 0.5) + rng.normal(0, 0.005, (self.k, self.L))
+            M0 = np.full((k, L), 0.5) + rng.normal(0, 0.005, (k, L))
             M0 = np.clip(M0, 0.01, 0.99)
             M0_flat = M0.flatten()
             
             def dM_flat(M_flat, t):
-                M = M_flat.reshape((self.k, self.L))
+                M = M_flat.reshape((k, L))
                 dM_arr = np.zeros_like(M)
-                for i in range(self.k):
-                    for l in range(self.L):
+                for i in range(k):
+                    for l in range(L):
                         m = M[i, l]
                         bistable = m * (1 - m) * (2 * m - 1)
                         gc = lambda_val * (np.mean(M[:, l]) - m)
-                        ol = [M[i, j] for j in range(self.L) if j != l]
+                        ol = [M[i, j] for j in range(L) if j != l]
                         om = np.mean(ol) if ol else 0.0
                         lc_coup = mu * (om - m)
                         dM_arr[i, l] = bistable + gc + lc_coup
                 return dM_arr.flatten()
             
             sol = odeint(dM_flat, M0_flat, [0, 50])
-            M_final = sol[-1].reshape((self.k, self.L))
+            M_final = sol[-1].reshape((k, L))
             return int(np.sum(np.mean(M_final, axis=1) > 0.5))
         
         lo, hi = 0.0, lc * 1.5
@@ -377,18 +379,25 @@ class AgentMemory:
         return m * (1 - m) * (2 * m - 1)
     
     def _compute_dMdt(self, M_flat: np.ndarray, t: float) -> np.ndarray:
-        """ODE right-hand side for scipy odeint."""
+        """ODE right-hand side for scipy odeint (vectorized)."""
         M = M_flat.reshape((self.k, self.L))
-        dM = np.zeros_like(M)
-        for i in range(self.k):
-            for l in range(self.L):
-                m = M[i, l]
-                bistable = self.bistable_dynamics(m)
-                gc = self.lambda_ * (np.mean(M[:, l]) - m)
-                other_layers = [M[i, j] for j in range(self.L) if j != l]
-                other_mean = np.mean(other_layers) if other_layers else 0.0
-                lc = self.mu * (other_mean - m)
-                dM[i, l] = bistable + gc + lc
+        
+        # 1. Bistable term (vectorized)
+        bistable = M * (1 - M) * (2 * M - 1)
+        
+        # 2. Lambda global coupling (per column mean)
+        layer_means = np.mean(M, axis=0)
+        gc = self.lambda_ * (layer_means - M)
+        
+        # 3. Mu local coupling (per row, other layers mean)
+        if self.L > 1:
+            row_sums = np.sum(M, axis=1, keepdims=True)
+            other_means = (row_sums - M) / (self.L - 1)
+            lc = self.mu * (other_means - M)
+        else:
+            lc = np.zeros_like(M)
+        
+        dM = bistable + gc + lc
         return dM.flatten()
     
     def step(self, dt: float = 0.1, n_steps: int = 1) -> None:

@@ -108,8 +108,7 @@ Rate conflict level:
 - 0.6-0.8: Strong conflict (e.g., "I want to exercise but I'm too tired")
 - 0.9-1.0: Very high conflict or paralysis (multiple equally weighted competing goals)
 
-Respond ONLY with JSON:
-{"level": 0.0-1.0, "reasoning": "brief explanation"}"""
+Respond with JSON object containing "level" (number 0.0-1.0) and "reasoning" (string)."""
         
         try:
             response = self._client.chat.completions.create(
@@ -119,21 +118,16 @@ Respond ONLY with JSON:
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.0,
-                max_tokens=100
+                max_tokens=100,
+                response_format={"type": "json_object"}
             )
             
-            result_text = response.choices[0].message.content.strip()
+            import json
+            result_data = json.loads(response.choices[0].message.content)
             
-            import re
-            match = re.search(r'"level":\s*([0-9.]+)', result_text)
-            level_match = re.search(r'"reasoning":\s*"([^"]+)"', result_text)
-            
-            if match:
-                level = float(match.group(1))
-                reasoning = level_match.group(1) if level_match else "No reasoning provided"
-                return level, reasoning
-            else:
-                return self._detect_fallback(prompt)
+            level = float(result_data.get("level", 0.0))
+            reasoning = str(result_data.get("reasoning", "No reasoning"))
+            return level, reasoning
                 
         except Exception as e:
             print(f"LLM detection failed: {e}, falling back to keyword method")
@@ -194,6 +188,7 @@ class SemanticMemoryMapper:
     def __init__(self, k: int, L: int, api_key: Optional[str] = None, model: str = "gpt-4o-mini"):
         self.k = k
         self.L = L
+        self.model = model
         self.group_labels = [f"group_{i}" for i in range(k)]
         self.layer_labels = [f"layer_{l}" for l in range(L)]
         self.content_map: Dict[str, str] = {}
@@ -237,8 +232,7 @@ class SemanticMemoryMapper:
 Groups represent: personas, roles, or contexts (e.g., "work", "personal", "technical")
 Layers represent: aspects or dimensions (e.g., "preferences", "context", "goals")
 
-Given content to store or retrieve, output ONLY JSON:
-{{"group": 0-{self.k-1}, "layer": 0-{self.L-1}, "reasoning": "brief"}}"""
+Respond with JSON object containing "group" (integer 0-{self.k-1}), "layer" (integer 0-{self.L-1}), and "reasoning" (string)."""
         
         try:
             response = self._client.chat.completions.create(
@@ -248,21 +242,16 @@ Given content to store or retrieve, output ONLY JSON:
                     {"role": "user", "content": f"{action.upper()}: {content}"}
                 ],
                 temperature=0.0,
-                max_tokens=100
+                max_tokens=100,
+                response_format={"type": "json_object"}
             )
             
-            result_text = response.choices[0].message.content.strip()
+            import json
+            result_data = json.loads(response.choices[0].message.content)
             
-            import re
-            group_match = re.search(r'"group":\s*([0-9]+)', result_text)
-            layer_match = re.search(r'"layer":\s*([0-9]+)', result_text)
-            
-            if group_match and layer_match:
-                g = int(group_match.group(1))
-                l = int(layer_match.group(1))
-                return min(g, self.k-1), min(l, self.L-1)
-            
-            return self._find_slot_keyword(content, action)
+            g = int(result_data.get("group", 0))
+            l = int(result_data.get("layer", 0))
+            return min(g, self.k-1), min(l, self.L-1)
             
         except Exception as e:
             print(f"LLM slot finding failed: {e}")
@@ -367,16 +356,25 @@ class AgentMemoryEnhanced:
         return m * (1 - m) * (2 * m - 1)
     
     def _compute_dMdt(self, M_flat: np.ndarray, t: float) -> np.ndarray:
+        """ODE right-hand side for scipy odeint (vectorized)."""
         M = M_flat.reshape((self.k, self.L))
-        dM = np.zeros_like(M)
-        for i in range(self.k):
-            for l in range(self.L):
-                m = M[i, l]
-                bistable = self.bistable_dynamics(m)
-                gc = self.lambda_ * (np.mean(M[:, l]) - m)
-                ol = [M[i, j] for j in range(self.L) if j != l]
-                om = np.mean(ol) if ol else 0.0
-                dM[i, l] = bistable + gc + self.mu * (om - m)
+        
+        # 1. Bistable term (vectorized)
+        bistable = M * (1 - M) * (2 * M - 1)
+        
+        # 2. Lambda global coupling (per column mean)
+        layer_means = np.mean(M, axis=0)
+        gc = self.lambda_ * (layer_means - M)
+        
+        # 3. Mu local coupling (per row, other layers mean)
+        if self.L > 1:
+            row_sums = np.sum(M, axis=1, keepdims=True)
+            other_means = (row_sums - M) / (self.L - 1)
+            lc = self.mu * (other_means - M)
+        else:
+            lc = np.zeros_like(M)
+        
+        dM = bistable + gc + lc
         return dM.flatten()
     
     def step(self, dt: float = 0.1, n_steps: int = 1) -> None:
@@ -552,7 +550,7 @@ class AgentMemoryEnhanced:
         lines.append(f"Total active: {state.n_active}/{self.k*self.L}")
         return "\n".join(lines)
     
-    def get_context_for_llm(self) -> str:
+    def get_context_for_llm(self, max_per_group: int = 3) -> str:
         state = self.read()
         ctx_lines = [f"[Memory State: {self.current_mode}]"]
         
@@ -562,7 +560,8 @@ class AgentMemoryEnhanced:
                 key_prefix = f"({i},"
                 memories = [v for k, v in self.content_map.items() if k.startswith(key_prefix)]
                 if memories:
-                    active_groups.append(f"{self.group_labels[i]}: {', '.join(memories[:2])}")
+                    truncated = memories[:max_per_group]
+                    active_groups.append(f"{self.group_labels[i]}: {', '.join(truncated)}")
                 else:
                     active_groups.append(self.group_labels[i])
         
