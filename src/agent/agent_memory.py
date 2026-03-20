@@ -711,13 +711,16 @@ class AgentMemory:
         state = self.read()
         return int(np.sum(state.groups > 0.5))
     
-    def set_n_high(self, n_high: int, n_steps: int = 100) -> Dict:
+    def set_n_high(self, n_high: int, n_steps: int = 100, 
+                   max_iterations: int = 15, tolerance: int = 1) -> Dict:
         """
         Set the memory to a configuration with approximately n_high HIGH groups.
         
-        Uses iterative λ search to converge on the desired n_high.
-        At λ=0: initial conditions determine n_high
-        At λ=λ_c: WTA → n_high = k (all synchronized HIGH)
+        Uses binary search on λ ∈ [0, λ_c × 1.5] to find λ that produces
+        the target n_high after convergence.
+        
+        At λ=0: initial conditions determine n_high (groups independent)
+        At λ=λ_c: WTA collapse → n_high = k (all synchronized HIGH)
         At λ >> λ_c: n_high = 0 (all LOW)
         
         Parameters
@@ -726,11 +729,15 @@ class AgentMemory:
             Desired number of HIGH groups (0 to k)
         n_steps : int
             Integration steps per λ iteration
+        max_iterations : int
+            Maximum binary search iterations (default 15)
+        tolerance : int
+            Acceptable error in n_high (default 1)
         
         Returns
         -------
         dict
-            {lambda_used, n_high_achieved, n_high_target, converged}
+            {lambda_used, n_high_achieved, n_high_target, converged, iterations}
         """
         if not (0 <= n_high <= self.k):
             raise ValueError(f"n_high must be between 0 and {self.k}")
@@ -740,34 +747,32 @@ class AgentMemory:
         if lc is None or not self.use_physics_control:
             lc = 0.1
         
-        lo, hi = 0.0, lc * 0.99
+        lo, hi = 0.0, lc * 1.5
         best_lambda = 0.0
         best_nh = 0
         best_diff = self.k
+        iteration = 0
         
-        for _ in range(8):
-            test_lambdas = np.linspace(lo, hi, 5)
-            for lam_test in test_lambdas:
-                old_lambda = self.lambda_
-                self.lambda_ = lam_test
-                self.step(dt=DEFAULT_DT, n_steps=n_steps // 4)
-                nh_achieved = self.get_n_high_groups()
-                diff = abs(nh_achieved - n_high)
-                
-                if diff < best_diff:
-                    best_diff = diff
-                    best_lambda = lam_test
-                    best_nh = nh_achieved
-                
-                self.lambda_ = old_lambda
+        for iteration in range(max_iterations):
+            mid = (lo + hi) / 2.0
             
-            if best_diff <= 0:
+            self.lambda_ = mid
+            self.step(dt=DEFAULT_DT, n_steps=n_steps // 2)
+            nh_achieved = self.get_n_high_groups()
+            diff = abs(nh_achieved - n_high)
+            
+            if diff < best_diff:
+                best_diff = diff
+                best_lambda = mid
+                best_nh = nh_achieved
+            
+            if diff <= tolerance:
                 break
             
-            if best_nh < n_high:
-                lo = best_lambda
+            if nh_achieved < n_high:
+                hi = mid
             else:
-                hi = best_lambda
+                lo = mid
         
         self.lambda_ = best_lambda
         self.step(dt=DEFAULT_DT, n_steps=n_steps)
@@ -777,8 +782,8 @@ class AgentMemory:
             "lambda_used": best_lambda,
             "n_high_achieved": final_nh,
             "n_high_target": n_high,
-            "n_high_profile": [self.get_n_high_groups() for _ in range(3)],
-            "converged": abs(final_nh - n_high) <= 1,
+            "converged": abs(final_nh - n_high) <= tolerance,
+            "iterations": iteration + 1,
             "lambda_c": lc
         }
     
@@ -887,88 +892,16 @@ class AgentMemory:
 
 
 def demo():
-    print("=" * 60)
-    print("Agent Memory Module - Physics-Based Demo")
-    print("=" * 60)
-    
-    CollapsController.clear_cache()
-    
-    mem = AgentMemory(k=3, L=2, name="assistant", use_physics_control=True)
-    mem.group_labels = ["professional", "friendly", "technical"]
-    mem.layer_labels = ["preferences", "context"]
-    
-    print("\n1. Initial state:")
-    print(mem.status())
-    lc = mem.get_lambda_c()
-    print(f"   λ_c = {lc:.4f}" if lc else "   λ_c = N/A (hypergraph_control not available)")
-    
-    print("\n2. Writing memories:")
-    mem.write("Short responses preferred", group=0, layer=0)
-    mem.write("Like analogies", group=1, layer=0)
-    mem.write("Tech industry", group=2, layer=1)
-    print(mem.get_active_pattern())
-    
-    print("\n3. Physics-based λ adjustment (r = λ/λ_c):")
-    
-    prompts = [
-        ("Short prompt", "Tell me about the weather"),
-        ("Medium prompt", "I want to learn coding but I'm also tired"),
-        ("Long complex prompt", "Both options seem good, actually wait no, let me focus on the first one exactly, I need to be very precise about this decision"),
-    ]
-    
-    for label, prompt in prompts:
-        result = mem.process_prompt(prompt)
-        print(f"\n  [{label}]")
-        regime = result.get('regime', 'n/a')
-        print(f"  r={result['conflict_level']:.2f} (regime={regime})")
-        print(f"  λ: {result['old_lambda']:.4f} → {result['new_lambda']:.4f}")
-        print(f"  {result['reasoning']}")
-    
-    print("\n4. Memory context for LLM:")
-    print(mem.get_context_for_llm())
-    
-    print("\n5. Regime examples (λ_c scaling):")
-    for k in [2, 3, 4]:
-        try:
-            lc = CollapsController.get_lambda_c(k)
-            for r in [0.3, 0.7, 0.95]:
-                lam = r * lc
-                print(f"  k={k}, r={r:.2f}: λ={lam:.4f}, regime={_regime_name(r)}")
-        except Exception:
-            print(f"  k={k}: λ_c unavailable (hypergraph_control not installed)")
-    
-    print("\n6. Save/Load test:")
-    path = mem.save()
-    print(f"  Saved to: {path}")
-    
-    mem2 = AgentMemory.load(path)
-    
-    print("\n4. Memory context for LLM:")
-    print(mem.get_context_for_llm())
-    
-    print("\n5. Save/Load test:")
-    path = mem.save()
-    print(f"Saved to: {path}")
-    
-    mem2 = AgentMemory.load(path)
-    print(f"Loaded: {mem2.status()}")
-    
-    print("\n" + "=" * 60)
-    print("Demo complete")
-
-
-def physics_demo():
     """
-    One-click physics-based memory control demonstration.
+    Physics-based memory control demonstration.
     
-    Shows:
-    1. Multi-attractor regime at r=0 (λ=0)
-    2. r-based λ adjustment via process_prompt
-    3. λ_c formula verification across k values
-    4. scipy odeint dynamics convergence
-    5. Context string with physics metadata
+    Shows the complete physics-controlled memory lifecycle:
+    1. Multi-attractor regime (r=0, independent groups)
+    2. Moderate coupling (r=0.6, partial synchronization)
+    3. Near-WTA collapse (r=0.95, strong selection)
+    4. Recovery via set_n_high(2)
     
-    Run: python -c "import sys; sys.path.insert(0,'src'); from agent.agent_memory import physics_demo; physics_demo()"
+    Run: python -c "from agent.agent_memory import demo; demo()"
     """
     import sys
     from pathlib import Path
@@ -987,24 +920,11 @@ def physics_demo():
     mem = AgentMemory(k=k, L=L, use_physics_control=True)
     lc = mem.get_lambda_c() or 0.0437
     
-    print(f"\nSystem: k={k} groups, L={L} layers")
+    print(f"\nSystem: k={k} groups, L={L} layers, λ_c={lc:.4f}")
     print("-" * 70)
     
-    # 1. λ_c verification across k values
-    print("\n[1] λ_c FORMULA VERIFICATION")
-    print(f"    λ_c(k=2) = {CollapsController.get_lambda_c(2):.5f}")
-    print(f"    λ_c(k=3) = {CollapsController.get_lambda_c(3):.5f}")
-    print(f"    λ_c(k=4) = {CollapsController.get_lambda_c(4):.5f}")
-    print(f"    Formula: lambda_c = 3*h^2*l^2 / (h^2 + (k-1)*l^2), h=l=0.5")
-    
-    # 2. r-based λ adjustment
-    print("\n[2] r-BASED λ ADJUSTMENT")
-    for target_r in [0.3, 0.5, 0.7, 0.85, 0.95]:
-        lam, reason = CollapsController.suggest_lambda(target_r, k)
-        print(f"    r={target_r:.2f} → λ={lam:.5f} [{_regime_name(target_r)}]")
-    
-    # 3. Multi-attractor at r=0
-    print("\n[3] MULTI-ATTRACTOR STATE (r=0)")
+    # Step 1: Multi-attractor at r=0
+    print("\n[1] MULTI-ATTRACTOR REGIME (r=0)")
     mem.lambda_ = 0.0
     rng = np.random.default_rng(42)
     mem.M = np.full((k, L), 0.5) + rng.normal(0, 0.005, (k, L))
@@ -1013,32 +933,43 @@ def physics_demo():
     state = mem.read()
     print(f"    λ={mem.lambda_:.4f}, r={0.0:.2f}, regime={_regime_name(0.0)}")
     print(f"    Group means: {state.groups.round(2)}")
-    print(f"    -> Groups diverge to independent attractors (0 or 1)")
+    print(f"    -> Groups diverge to independent attractors")
     
-    # 4. Near-WTA at r=0.95
-    print("\n[4] NEAR-WTA STATE (r=0.95)")
+    # Step 2: Moderate coupling at r=0.6
+    print("\n[2] MODERATE COUPLING (r=0.6)")
+    lam, _ = CollapsController.suggest_lambda(0.6, k)
+    mem.lambda_ = lam
+    mem.step(dt=0.5, n_steps=100)
+    state = mem.read()
+    print(f"    λ={lam:.5f}, r={lam/lc:.2f}, regime={_regime_name(0.6)}")
+    print(f"    Group means: {state.groups.round(2)}")
+    print(f"    -> Partial synchronization emerging")
+    
+    # Step 3: Near-WTA collapse at r=0.95
+    print("\n[3] NEAR-WTA COLLAPSE (r=0.95)")
     lam, _ = CollapsController.suggest_lambda(0.95, k)
     mem.lambda_ = lam
     mem.step(dt=0.5, n_steps=100)
     state = mem.read()
-    print(f"    lambda={lam:.5f}, r={lam/lc:.2f}, regime={_regime_name(0.95)}")
+    print(f"    λ={lam:.5f}, r={lam/lc:.2f}, regime={_regime_name(0.95)}")
     print(f"    Group means: {state.groups.round(2)}")
-    print(f"    → Groups synchronize to common attractor")
+    print(f"    -> Strong selection, most groups synchronized")
     
-    # 5. Dynamics convergence (scipy odeint)
-    print("\n[5] DYNAMICS CONVERGENCE (scipy odeint)")
-    print(f"    Using scipy.integrate.odeint: {mem._has_scipy}")
-    print(f"    Method: t=linspace(0, total_t, max(n_steps*2, 50))")
-    
-    # 6. Context string
-    print("\n[6] CONTEXT STRING FOR LLM")
-    ctx = mem.get_context_for_llm()
-    for line in ctx.split('\n'):
-        print(f"    {line}")
+    # Step 4: set_n_high(2) recovery
+    print("\n[4] SET_N_HIGH(2) - TARGETING 2 HIGH GROUPS")
+    result = mem.set_n_high(2, n_steps=100)
+    print(f"    Target: {result['n_high_target']} HIGH groups")
+    print(f"    Achieved: {result['n_high_achieved']} HIGH groups")
+    print(f"    λ used: {result['lambda_used']:.5f}")
+    print(f"    Converged: {result['converged']}")
+    print(f"    Iterations: {result.get('iterations', 'N/A')}")
+    state = mem.read()
+    print(f"    Group means: {state.groups.round(2)}")
     
     print("\n" + "=" * 70)
-    print("Key insight: λ = r × λ_c(k) gives physics-grounded control.")
+    print("KEY INSIGHT: λ = r × λ_c(k) gives physics-grounded control.")
     print("r < 0.5: multi-attractor | r > 0.85: near-WTA collapse")
+    print("set_n_high(n) uses binary search to find λ for n HIGH groups")
     print("=" * 70)
 
 

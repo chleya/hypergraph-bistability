@@ -134,48 +134,21 @@ Respond with JSON object containing "level" (number 0.0-1.0) and "reasoning" (st
             return self._detect_fallback(prompt)
     
     def _detect_fallback(self, prompt: str) -> Tuple[float, str]:
-        """Fallback keyword-based detection."""
+        """Simple keyword-based conflict detection."""
         prompt_lower = prompt.lower()
         
         conflict_keywords = [
             "but", "however", "although", "despite", "instead",
-            "contradict", "opposite", "different", "unfortunately",
-            "actually", "wait", "no wait", "on the other hand",
-            "either", "or", "neither", "vs", "versus"
-        ]
-        
-        focus_keywords = [
-            "exactly", "precisely", "specifically", "only",
-            "must", "need", "focus", "strict"
-        ]
-        
-        multi_keywords = [
-            "both", "and", "also", "additionally", "moreover"
+            "actually", "wait", "on the other hand",
+            "or", "either", "neither"
         ]
         
         conflict_count = sum(1 for kw in conflict_keywords if kw in prompt_lower)
-        focus_count = sum(1 for kw in focus_keywords if kw in prompt_lower)
-        multi_count = sum(1 for kw in multi_keywords if kw in prompt_lower)
+        word_count = len(prompt.split())
         
-        level = min(1.0, conflict_count * 0.15 + focus_count * 0.05)
+        level = min(1.0, conflict_count * 0.15 + word_count * 0.005)
         
-        if multi_count > 1:
-            level = max(0, level - multi_count * 0.05)
-        
-        if conflict_count >= 3:
-            level = min(1.0, level + 0.3)
-        
-        reasoning_parts = []
-        if conflict_count > 0:
-            reasoning_parts.append(f"{conflict_count} conflict keywords")
-        if focus_count > 0:
-            reasoning_parts.append(f"{focus_count} focus keywords")
-        if multi_count > 0:
-            reasoning_parts.append(f"{multi_count} multi-context keywords")
-        
-        reasoning = "; ".join(reasoning_parts) if reasoning_parts else "No specific signals"
-        
-        return level, reasoning
+        return level, f"Simple: {conflict_count} conflict keywords"
 
 
 class SemanticMemoryMapper:
@@ -258,34 +231,21 @@ Respond with JSON object containing "group" (integer 0-{self.k-1}), "layer" (int
             return self._find_slot_keyword(content, action)
     
     def _find_slot_keyword(self, content: str, action: str) -> Tuple[int, int]:
-        """Fallback keyword-based slot finding."""
+        """Simple keyword-based slot finding."""
         content_lower = content.lower()
         
-        group_map = {
-            "work": 0, "professional": 0, "job": 0, "business": 0,
-            "personal": 1, "friend": 1, "casual": 1, "social": 1,
-            "technical": 2, "code": 2, "programming": 2, "science": 2
-        }
+        if any(w in content_lower for w in ["work", "job", "career", "project"]):
+            group = 0
+        elif any(w in content_lower for w in ["personal", "family", "friend", "home"]):
+            group = 1
+        elif any(w in content_lower for w in ["code", "technical", "bug", "program"]):
+            group = 2
+        else:
+            group = 0
         
-        layer_map = {
-            "prefer": 0, "preference": 0, "like": 0, "want": 0,
-            "context": 1, "situation": 1, "background": 1,
-            "goal": 2, "aim": 2, "objective": 2
-        }
+        layer = 0 if any(w in content_lower for w in ["want", "prefer", "like", "need"]) else 1
         
-        best_group, best_layer = 0, 0
-        
-        for keyword, idx in group_map.items():
-            if keyword in content_lower:
-                best_group = idx
-                break
-        
-        for keyword, idx in layer_map.items():
-            if keyword in content_lower:
-                best_layer = idx
-                break
-        
-        return best_group, best_layer
+        return min(group, self.k-1), min(layer, self.L-1)
 
 
 class AgentMemoryEnhanced:
@@ -328,12 +288,6 @@ class AgentMemoryEnhanced:
         
         self.use_llm_detector = use_llm_detector
         self.use_llm_mapper = use_llm_mapper
-        
-        if use_llm_detector:
-            self.detector = LLMConflictDetector(api_key=api_key)
-        else:
-            from agent.agent_memory import ConflictDetector
-            self.detector = ConflictDetector()
         
         if use_llm_mapper:
             self.mapper = SemanticMemoryMapper(k, L, api_key=api_key)
