@@ -305,7 +305,8 @@ class AgentMemoryEnhanced:
         use_llm_detector: bool = False,
         use_llm_mapper: bool = False,
         api_key: Optional[str] = None,
-        use_physics_control: bool = True
+        use_physics_control: bool = True,
+        gamma: float = 0.0
     ):
         self.k = k
         self.L = L
@@ -313,6 +314,7 @@ class AgentMemoryEnhanced:
         self.a = a_bistable
         self.lambda_ = lambda_
         self.mu = mu
+        self.gamma = gamma
         self.name = name
         self.use_physics_control = use_physics_control
         
@@ -356,7 +358,15 @@ class AgentMemoryEnhanced:
         return m * (1 - m) * (2 * m - 1)
     
     def _compute_dMdt(self, M_flat: np.ndarray, t: float) -> np.ndarray:
-        """ODE right-hand side for scipy odeint (vectorized)."""
+        """ODE right-hand side for scipy odeint (vectorized).
+        
+        Dynamics: dm/dt = bistable + lambda*(m_col_mean - m) + mu*(m_row_other - m) - gamma*m
+        
+        - Bistable: m(1-m)(2m-1) attracts to 0 or 1
+        - Lambda: global coupling (column-wise mean)
+        - Mu: local coupling (row-wise, other layers)
+        - Gamma: decay/ forgetting term (pulls toward 0)
+        """
         M = M_flat.reshape((self.k, self.L))
         
         # 1. Bistable term (vectorized)
@@ -374,7 +384,10 @@ class AgentMemoryEnhanced:
         else:
             lc = np.zeros_like(M)
         
-        dM = bistable + gc + lc
+        # 4. Gamma decay/ forgetting term
+        decay = self.gamma * M
+        
+        dM = bistable + gc + lc - decay
         return dM.flatten()
     
     def step(self, dt: float = 0.1, n_steps: int = 1) -> None:
@@ -388,17 +401,28 @@ class AgentMemoryEnhanced:
             self.M = np.clip(sol[-1].reshape((self.k, self.L)), 0, 1)
         else:
             for _ in range(n_steps):
-                dM = np.zeros_like(self.M)
-                for i in range(self.k):
-                    for l in range(self.L):
-                        m = self.M[i, l]
-                        bistable = self.bistable_dynamics(m)
-                        gc = self.lambda_ * (np.mean(self.M[:, l]) - m)
-                        other_layers = [self.M[i, j] for j in range(self.L) if j != l]
-                        other_mean = np.mean(other_layers) if other_layers else 0.0
-                        lc = self.mu * (other_mean - m)
-                        dM[i, l] = bistable + gc + lc
-                self.M = np.clip(self.M + dM * dt, 0, 1)
+                M = self.M
+                
+                # 1. Bistable term
+                bistable = M * (1 - M) * (2 * M - 1)
+                
+                # 2. Lambda global coupling (per column mean)
+                layer_means = np.mean(M, axis=0)
+                gc = self.lambda_ * (layer_means - M)
+                
+                # 3. Mu local coupling (per row, other layers mean)
+                if self.L > 1:
+                    row_sums = np.sum(M, axis=1, keepdims=True)
+                    other_means = (row_sums - M) / (self.L - 1)
+                    lc = self.mu * (other_means - M)
+                else:
+                    lc = np.zeros_like(M)
+                
+                # 4. Gamma decay
+                decay = self.gamma * M
+                
+                dM = bistable + gc + lc - decay
+                self.M = np.clip(M + dM * dt, 0, 1)
     
     def read(self, query: Optional[str] = None) -> MemoryState:
         pattern = self._binarize()
@@ -661,6 +685,7 @@ class AgentMemoryEnhanced:
             "L": self.L,
             "lambda_": float(self.lambda_),
             "mu": float(self.mu),
+            "gamma": float(self.gamma),
             "current_mode": self.current_mode,
             "mode_history": self.mode_history,
             "M": self.M.tolist(),
@@ -684,6 +709,7 @@ class AgentMemoryEnhanced:
             L=data["L"],
             lambda_=data["lambda_"],
             mu=data["mu"],
+            gamma=data.get("gamma", 0.0),
             name=data["name"]
         )
         mem.M = np.array(data["M"])
@@ -701,10 +727,51 @@ class AgentMemoryEnhanced:
         
         return (
             f"AgentMemoryEnhanced '{self.name}'\n"
-            f"  k={self.k}, L={self.L} | λ={self.lambda_:.3f} (λ_c≈{lc_str}), μ={self.mu:.3f}\n"
+            f"  k={self.k}, L={self.L} | λ={self.lambda_:.3f} (λ_c≈{lc_str}), μ={self.mu:.3f}, γ={self.gamma:.4f}\n"
             f"  Mode: {self.current_mode} | Active: {self.read().n_active}/{self.k*self.L}\n"
             f"  LLM detector: {self.use_llm_detector} | LLM mapper: {self.use_llm_mapper}"
         )
+    
+    def set_decay(self, gamma: float) -> None:
+        """
+        Set the decay/forgetting rate γ.
+        
+        Parameters
+        ----------
+        gamma : float
+            Decay rate. 0 = no decay (permanent memory).
+            Typical values: 0.001-0.01 for slow forgetting.
+        """
+        self.gamma = max(0.0, float(gamma))
+    
+    def boost_slot(self, group: int, layer: int, boost: float = 0.1) -> None:
+        """
+        Boost a specific memory slot's activation.
+        
+        Parameters
+        ----------
+        group : int
+            Group index
+        layer : int
+            Layer index
+        boost : float
+            Amount to add to M[group, layer]
+        """
+        if 0 <= group < self.k and 0 <= layer < self.L:
+            self.M[group, layer] = min(1.0, self.M[group, layer] + boost)
+            self.step(dt=0.1, n_steps=5)
+    
+    def decay_all(self, amount: float = 0.01) -> None:
+        """
+        Apply uniform decay to all memory slots.
+        
+        Parameters
+        ----------
+        amount : float
+            Amount to subtract from all M values
+        """
+        self.M = np.clip(self.M - amount, 0.0, 1.0)
+        self.step(dt=0.1, n_steps=5)
 
 
 def demo():

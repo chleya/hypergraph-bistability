@@ -38,6 +38,9 @@ llm = [
     "langchain-openai>=0.0.5",
     "langchain-core>=0.1.0",
 ]
+vector = [
+    "chromadb>=0.4.0",
+]
 dev = [
     "pytest>=7.0.0",
     "matplotlib>=3.5.0",
