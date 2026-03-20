@@ -1,0 +1,32 @@
+{
+  "finding": "Stochastic vs Deterministic Multistability",
+  "key_insight": "Microscopic rules produce stochastic path-dependent M values, not discrete attractors",
+  "details": {
+    "designed_drift": {
+      "type": "Deterministic bistability",
+      "attractors": "M = 0 and M = 1 (discrete)",
+      "mechanism": "Forced by explicit F(M) = alpha*M*(1-M)*(M-a)"
+    },
+    "microscopic_rules": {
+      "type": "Stochastic fragmentation",
+      "M_range": "0.0 to 0.56 (continuous)",
+      "mechanism": "Growth/split/fusion produces random edge configurations"
+    }
+  },
+  "spectrum_analysis": {
+    "M_min_typical": 0.014,
+    "M_max_typical": 0.56,
+    "interpretation": "Spectrum is stochastic, not multi-stable in dynamical systems sense"
+  },
+  "implications": {
+    "tensor_product_N_att_2kL": "DOES NOT HOLD for microscopic rules",
+    "emergence_claim": "NOT SUPPORTED - bistability does not emerge from microscopic rules",
+    "alternative": "Consider studying the stochastic fragmentation as a phenomenon itself"
+  },
+  "new_directions": [
+    "Study the statistics of the stochastic M distribution",
+    "Characterize the fragmentation process",
+    "Consider if hysteresis/path-dependence is the emergent property",
+    "Accept that the theory is based on designed dynamics, not emergence"
+  ]
+}

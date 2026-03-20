@@ -1,0 +1,110 @@
+{
+  "k2_lam0.0": {
+    "k": 2,
+    "lambda": 0.0,
+    "ode_N_att": 4,
+    "micro_M_mean": 0.07512132419842467,
+    "micro_M_std": 0.012097795105407282,
+    "micro_n_samples": 60,
+    "p_pair": 0.3
+  },
+  "k2_lam0.05": {
+    "k": 2,
+    "lambda": 0.05,
+    "ode_N_att": 4,
+    "micro_M_mean": 0.07512132419842467,
+    "micro_M_std": 0.012097795105407282,
+    "micro_n_samples": 60,
+    "p_pair": 0.3
+  },
+  "k2_lam0.1": {
+    "k": 2,
+    "lambda": 0.1,
+    "ode_N_att": 4,
+    "micro_M_mean": 0.07512132419842467,
+    "micro_M_std": 0.012097795105407282,
+    "micro_n_samples": 60,
+    "p_pair": 0.3
+  },
+  "k2_lam0.2": {
+    "k": 2,
+    "lambda": 0.2,
+    "ode_N_att": 2,
+    "micro_M_mean": 0.07512132419842467,
+    "micro_M_std": 0.012097795105407282,
+    "micro_n_samples": 60,
+    "p_pair": 0.3
+  },
+  "k3_lam0.0": {
+    "k": 3,
+    "lambda": 0.0,
+    "ode_N_att": 8,
+    "micro_M_mean": 0.07945616594453297,
+    "micro_M_std": 0.011525721060652439,
+    "micro_n_samples": 90,
+    "p_pair": 0.3
+  },
+  "k3_lam0.05": {
+    "k": 3,
+    "lambda": 0.05,
+    "ode_N_att": 8,
+    "micro_M_mean": 0.07945616594453297,
+    "micro_M_std": 0.011525721060652439,
+    "micro_n_samples": 90,
+    "p_pair": 0.3
+  },
+  "k3_lam0.1": {
+    "k": 3,
+    "lambda": 0.1,
+    "ode_N_att": 2,
+    "micro_M_mean": 0.07945616594453297,
+    "micro_M_std": 0.011525721060652439,
+    "micro_n_samples": 90,
+    "p_pair": 0.3
+  },
+  "k3_lam0.2": {
+    "k": 3,
+    "lambda": 0.2,
+    "ode_N_att": 2,
+    "micro_M_mean": 0.07945616594453297,
+    "micro_M_std": 0.011525721060652439,
+    "micro_n_samples": 90,
+    "p_pair": 0.3
+  },
+  "k4_lam0.0": {
+    "k": 4,
+    "lambda": 0.0,
+    "ode_N_att": 16,
+    "micro_M_mean": 0.07896633623156253,
+    "micro_M_std": 0.02339572352186916,
+    "micro_n_samples": 120,
+    "p_pair": 0.3
+  },
+  "k4_lam0.05": {
+    "k": 4,
+    "lambda": 0.05,
+    "ode_N_att": 8,
+    "micro_M_mean": 0.07896633623156253,
+    "micro_M_std": 0.02339572352186916,
+    "micro_n_samples": 120,
+    "p_pair": 0.3
+  },
+  "k4_lam0.1": {
+    "k": 4,
+    "lambda": 0.1,
+    "ode_N_att": 2,
+    "micro_M_mean": 0.07896633623156253,
+    "micro_M_std": 0.02339572352186916,
+    "micro_n_samples": 120,
+    "p_pair": 0.3
+  },
+  "k4_lam0.2": {
+    "k": 4,
+    "lambda": 0.2,
+    "ode_N_att": 2,
+    "micro_M_mean": 0.07896633623156253,
+    "micro_M_std": 0.02339572352186916,
+    "micro_n_samples": 120,
+    "p_pair": 0.3
+  }
+}

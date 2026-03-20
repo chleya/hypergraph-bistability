@@ -1,0 +1,13 @@
+{
+  "Global Pull": {
+    "0.1": 1.0,
+    "0.3": 1.0,
+    "0.5": 1.0
+  },
+  "Global Boost (fixed)": {
+    "0.1": 1.0,
+    "0.3": 1.0,
+    "0.5": 1.0
+  },
+  "Note": "Original Global Boost used exp(-dist^2/0.1) which collapsed to ~0 when far from target. Fixed with linear pull + basin_factor"
+}

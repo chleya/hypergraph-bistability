@@ -1,0 +1,35 @@
+{
+  "direct_test": {
+    "k1_L1": {
+      "n_attractors": 1,
+      "predicted": 2,
+      "match": "FAIL"
+    },
+    "k2_L1": {
+      "n_attractors": 1,
+      "predicted": 4,
+      "match": "FAIL"
+    },
+    "k1_L2": {
+      "n_attractors": 1,
+      "predicted": 4,
+      "match": "FAIL"
+    },
+    "k2_L2": {
+      "n_attractors": 1,
+      "predicted": 16,
+      "match": "FAIL"
+    }
+  },
+  "lambda_effect": {
+    "0.0": 1,
+    "0.2": 1,
+    "0.5": 1,
+    "1.0": 1
+  },
+  "mu_effect": {
+    "-0.2": 1,
+    "0.0": 1,
+    "0.2": 1
+  }
+}

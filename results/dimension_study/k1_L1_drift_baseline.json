@@ -1,0 +1,24 @@
+{
+  "k": 1,
+  "L": 1,
+  "lambda": 0,
+  "mu": 0,
+  "drift_form": "alpha * M * (1 - M) * (M - a)",
+  "a": 0.5,
+  "alpha": 1.0,
+  "n_runs_no_noise": 50,
+  "n_attractors_no_noise": 2,
+  "unique_M_no_noise": [
+    2.4806931741973144e-13,
+    0.9999999913133935
+  ],
+  "n_runs_noisy": 100,
+  "noise_sigma": 0.02,
+  "n_attractors_noisy": 2,
+  "unique_M_noisy": [
+    0.0032427573983777615,
+    0.999
+  ],
+  "mean_final_M": 0.5301018758608359,
+  "std_final_M": 0.4936098566856471
+}

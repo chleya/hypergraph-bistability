@@ -1,0 +1,10 @@
+{
+  "new_ratio_mean": 0.9642857142857142,
+  "new_ratio_std": 0.08601138984851639,
+  "depth_mean": 1.1213111537718536,
+  "depth_std": 0.33403144753403463,
+  "fusion_birth_mean": 0.4,
+  "local_birth_mean": 17.9,
+  "n_runs": 10,
+  "T": 80
+}

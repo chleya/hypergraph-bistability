@@ -1,0 +1,24 @@
+{
+  "finding": "SOFT BISTABILITY vs HARD BISTABILITY",
+  "description": "Microscopic hypergraph rules produce SOFT bistability (continuum of states), not HARD bistability (discrete M=0 and M=1)",
+  "details": {
+    "microscopic_model": {
+      "M_final_range": "0.02 to 0.37 (continuous)",
+      "n_distinct_states": "~24 for k=1",
+      "type": "SOFT bistability"
+    },
+    "designed_drift_model": {
+      "M_final": "0 and 1 (discrete)",
+      "n_distinct_states": "2 for k=1",
+      "type": "HARD bistability"
+    }
+  },
+  "implications": [
+    "Tensor product structure N_att = 2^{kL} does NOT emerge from microscopic rules",
+    "It is a property of the DESIGNED bistable drift function",
+    "The theory based on explicit drift function is ENGINEERED, not EMERGENT",
+    "To claim emergence, we need to derive bistability from microscopic rules"
+  ],
+  "path_a_status": "PARTIAL SUCCESS - found soft bistability but not hard bistability",
+  "recommendation": "Consider accepting soft bistability as valid, or derive explicit bistable form from microscopic rules"
+}

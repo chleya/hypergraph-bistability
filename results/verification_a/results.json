@@ -1,0 +1,10 @@
+{
+  "bistability_test": {
+    "n_attractors": 1,
+    "attractor_values": [
+      0.05013368983957219
+    ],
+    "mean_M": 0.049277890640537676,
+    "std_M": 0.005901837658216208
+  },
+  "tensor_product": {

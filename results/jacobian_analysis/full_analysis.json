@@ -1,0 +1,30 @@
+{
+  "phase": "Phase 2 & 3 - Lambda_c and Mu Analysis",
+  "key_findings": {
+    "tensor_product": {
+      "k1_L1": 2,
+      "k2_L1": 4,
+      "k3_L1": 8,
+      "k2_L2": 16,
+      "note": "N_att = 2^{k*L} at lambda=0 confirmed"
+    },
+    "lambda_c_approximate": {
+      "k2_L1": 0.09,
+      "k3_L1": 0.04,
+      "k2_L2": 0.18
+    },
+    "lambda_c_theory": "lambda_c ~ alpha * a * (1-a) / 2 ~ 0.125",
+    "mu_effect": {
+      "positive_mu_synchronizes": "forces layers within group to sync, reduces N_att",
+      "negative_mu_competits": "maintains layer differences, preserves N_att",
+      "at_lambda_0_mu_positive": "N_att drops from 16 to 4",
+      "at_lambda_0_mu_negative": "N_att stays at 16"
+    }
+  },
+  "physical_interpretation": {
+    "D_eff": "D_eff = k * L (independent bistable elements)",
+    "lambda": "Group coupling -> winner-take-all -> attractor collapse",
+    "mu": "Layer coupling: positive=synchronization, negative=competition",
+    "transition_mechanism": "Fixed-point annihilation (not stability bifurcation)"
+  }
+}

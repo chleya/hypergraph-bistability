@@ -1,0 +1,17 @@
+{
+  "strategies_verified_ADDITIVE_CONTROL": {
+    "Global Pull": {"λ=0.1": "100%", "λ=0.3": "100%", "λ=0.5": "100%"},
+    "Global Boost": {"λ=0.1": "100%"},
+    "Local Boost": {"λ=0.1": "100%", "λ=0.3": "0%", "λ=0.5": "0%"},
+    "Random Local": {"λ=0.1": "~7%"},
+    "Targeted Local": {"λ=0.1": "0%"}
+  },
+  "paper_claims_CAPACITY_MODIFICATION": {
+    "Local Boost": {"λ=0.1": "62%", "λ=0.3": "55%", "λ=0.5": "38%"}
+  },
+  "discrepancy": "Paper uses capacity modification (changing a,b,c coefficients), not additive field control. These are fundamentally different mechanisms.",
+  "verification_notes": {
+    "strict_criterion": "target > 0.5 for global switching",
+    "local_criterion": "target > avg(others) + 0.15 (node dominance)"
+  }
+}

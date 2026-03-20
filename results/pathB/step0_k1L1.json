@@ -1,0 +1,15 @@
+{
+  "ode_attractors": [
+    2.200576631333771e-08,
+    0.9999975033555043
+  ],
+  "microscopic": {
+    "available": true,
+    "mean": 0.045917912671120865,
+    "std": 0.007487561422808211,
+    "min": 0.02899751449875725,
+    "max": 0.06184012066365008,
+    "n_runs": 50
+  },
+  "conclusion": "ODE produces discrete {0,1}; microscopic produces continuous spectrum"
+}

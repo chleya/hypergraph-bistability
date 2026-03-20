@@ -1,0 +1,220 @@
+{
+  "timestamp": "2026-03-19 19:59:15",
+  "formula": "lambda_c(n_high, k) computed numerically (no closed form); old formula alpha*a^2*(1-a)^2*(k-1)/n_high was incorrect",
+  "lambda_c_numerical": {
+    "k2_n1": 0.1246875,
+    "k3_n1": 0.08305493274066339,
+    "k3_n2": 0.08305493274066336,
+    "k4_n1": 0.021847017152119674,
+    "k4_n2": 0.06234375,
+    "k4_n3": 0.021847017152119313
+  },
+  "step0_k1L1": {
+    "ode_attractors": [
+      2.200576631333771e-08,
+      0.9999975033555043
+    ],
+    "microscopic": {
+      "available": true,
+      "mean": 0.045917912671120865,
+      "std": 0.007487561422808211,
+      "min": 0.02899751449875725,
+      "max": 0.06184012066365008,
+      "n_runs": 50
+    },
+    "conclusion": "ODE produces discrete {0,1}; microscopic produces continuous spectrum"
+  },
+  "step1_baseline_match": {
+    "k=2,L=1": true,
+    "k=3,L=1": true,
+    "k=2,L=2": true,
+    "k=3,L=2": true,
+    "k=4,L=1": true
+  },
+  "step2_theory_vs_sim": {
+    "k=3,L=1": {
+      "0.001": {
+        "theory": 8,
+        "found": 8
+      },
+      "0.01": {
+        "theory": 8,
+        "found": 8
+      },
+      "0.02": {
+        "theory": 8,
+        "found": 8
+      },
+      "0.03": {
+        "theory": 8,
+        "found": 8
+      },
+      "0.04": {
+        "theory": 8,
+        "found": 2
+      },
+      "0.05": {
+        "theory": 8,
+        "found": 2
+      },
+      "0.06": {
+        "theory": 8,
+        "found": 2
+      },
+      "0.07": {
+        "theory": 8,
+        "found": 2
+      },
+      "0.08": {
+        "theory": 8,
+        "found": 2
+      },
+      "0.1": {
+        "theory": 2,
+        "found": 2
+      },
+      "0.13": {
+        "theory": 2,
+        "found": 2
+      },
+      "0.15": {
+        "theory": 2,
+        "found": 2
+      },
+      "0.2": {
+        "theory": 2,
+        "found": 2
+      },
+      "0.3": {
+        "theory": 2,
+        "found": 2
+      }
+    },
+    "k=4,L=1": {
+      "0.001": {
+        "theory": 16,
+        "found": 16
+      },
+      "0.01": {
+        "theory": 16,
+        "found": 16
+      },
+      "0.02": {
+        "theory": 16,
+        "found": 16
+      },
+      "0.03": {
+        "theory": 8,
+        "found": 8
+      },
+      "0.04": {
+        "theory": 8,
+        "found": 4
+      },
+      "0.05": {
+        "theory": 8,
+        "found": 2
+      },
+      "0.06": {
+        "theory": 8,
+        "found": 2
+      },
+      "0.07": {
+        "theory": 2,
+        "found": 2
+      },
+      "0.08": {
+        "theory": 2,
+        "found": 2
+      },
+      "0.1": {
+        "theory": 2,
+        "found": 2
+      },
+      "0.13": {
+        "theory": 2,
+        "found": 2
+      },
+      "0.15": {
+        "theory": 2,
+        "found": 2
+      },
+      "0.2": {
+        "theory": 2,
+        "found": 2
+      },
+      "0.3": {
+        "theory": 2,
+        "found": 2
+      }
+    },
+    "k=3,L=2": {
+      "0.001": {
+        "theory": 64,
+        "found": 64
+      },
+      "0.01": {
+        "theory": 64,
+        "found": 64
+      },
+      "0.02": {
+        "theory": 64,
+        "found": 64
+      },
+      "0.03": {
+        "theory": 64,
+        "found": 64
+      },
+      "0.04": {
+        "theory": 64,
+        "found": 44
+      },
+      "0.05": {
+        "theory": 64,
+        "found": 13
+      },
+      "0.06": {
+        "theory": 64,
+        "found": 10
+      },
+      "0.07": {
+        "theory": 64,
+        "found": 7
+      },
+      "0.08": {
+        "theory": 64,
+        "found": 4
+      },
+      "0.1": {
+        "theory": 16,
+        "found": 4
+      },
+      "0.13": {
+        "theory": 16,
+        "found": 2
+      },
+      "0.15": {
+        "theory": 16,
+        "found": 2
+      },
+      "0.2": {
+        "theory": 16,
+        "found": 3
+      },
+      "0.3": {
+        "theory": 16,
+        "found": 3
+      }
+    }
+  },
+  "step3_lambda_c_vs_mu": {
+    "-0.3": null,
+    "-0.2": 0.2,
+    "-0.1": 0.08,
+    "0.0": 0.05,
+    "0.1": 0.04,
+    "0.2": 0.04,
+    "0.3": 0.04
+  },
+  "step4_micro_vs_ode_available": true
+}

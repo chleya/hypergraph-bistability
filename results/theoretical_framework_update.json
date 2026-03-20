@@ -1,0 +1,31 @@
+{
+  "paper_updates": {
+    "date": "2026-03-19",
+    "changes": [
+      "Abstract: Removed \"emerges through in-situ reconstruction\", added \"engineered through explicit bistable drift function\"",
+      "Section 3.4: Renamed to \"Designed Multistability\" (was \"Deterministic Multistability\")",
+      "Section 3.4: Added explicit note that multistability arises from designed drift function, not microscopic rules",
+      "Section 3.4.1: Changed \"naturally produces\" to \"dimension controls\"",
+      "Section 3.4.2: Renamed to \"Coupling Controls Dimensionality\"",
+      "Section 4.1: Added distinction between microscopic (stochastic fragmentation) vs designed (hard bistability) mechanisms",
+      "Section 4.3: Added limitation noting that hard bistability is designed, not emergent",
+      "Section 5: Changed \"naturally give rise\" to \"demonstrate that dimension and coupling can be engineered\"",
+      "Conclusion: Updated key findings to reflect \"designed multistability\" and \"coupling controls dimensionality\""
+    ]
+  },
+  "theoretical_framework": {
+    "complexity_reconstruction": {
+      "status": "VERIFIED",
+      "mechanism": "96.4% of core structures are newly generated",
+      "transport": "negligible (fusion \u2248 0)",
+      "blocking_effect": "none (\u0394H_core unchanged)"
+    },
+    "multistability": {
+      "status": "ENGINEERED (not emergent)",
+      "microscopic_rules": "produce stochastic fragmentation (continuous spectrum M \u2208 [0, 0.56])",
+      "designed_drift": "F(M) = \u03b1\u00b7M\u00b7(1-M)\u00b7(M-a) produces hard bistability (M=0 and M=1)",
+      "tensor_product": "N_att = 2^{k\u00d7L} in designed model"
+    },
+    "key_insight": "Two distinct regimes: (1) microscopic rules \u2192 complexity reconstruction, (2) designed drift \u2192 multistability"
+  }
+}

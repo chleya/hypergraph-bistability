@@ -1,0 +1,31 @@
+{
+  "phase": "Phase 2 - Lambda_c Scaling Study",
+  "findings": {
+    "k2_L1": {
+      "lambda_c": 0.09,
+      "n_attractors_at_collapse": 2,
+      "note": "approximate"
+    },
+    "k3_L1": {
+      "lambda_c": 0.04,
+      "n_attractors_at_collapse": 2,
+      "note": "approximate"
+    },
+    "k4_L1": {
+      "lambda_c": 0.05,
+      "n_attractors_at_collapse": 2,
+      "note": "approximate"
+    }
+  },
+  "tensor_product_confirmed": {
+    "k1_L1": 2,
+    "k2_L1": 4,
+    "k3_L1": 8,
+    "k2_L2": 16
+  },
+  "phase1_summary": {
+    "lambda=0": "16 attractors for k=2,L=2",
+    "lambda=0.07": "starts collapsing",
+    "lambda=0.18": "only 2 attractors remain"
+  }
+}

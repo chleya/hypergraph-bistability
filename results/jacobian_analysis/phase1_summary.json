@@ -1,0 +1,22 @@
+{
+  "phase": "Phase 1 - k=2, L=2 Lambda Scan",
+  "key_findings": [
+    "lambda=0: 16 attractors (2^{kL}) - tensor product confirmed",
+    "lambda=0.07: starts collapsing to ~6 attractors",
+    "lambda=0.18: only 2 attractors remain (all-0, all-1)",
+    "Intermediate states cease to be fixed points at lambda>0",
+    "D_eff=4 remains constant for all stable fixed points"
+  ],
+  "interpretation": {
+    "mechanism": "Fixed point annihilation via group coupling",
+    "lambda_critical": "~0.1-0.18 for full collapse to 2 attractors",
+    "physical_meaning": "Group coupling lambda forces inter-group synchronization",
+    "transition_type": "First-order-like abrupt reduction in attractor count"
+  },
+  "D_eff_definition": {
+    "definition": "Number of eigenvalues with negative real part in Jacobian",
+    "at_lambda_0": 4,
+    "at_large_lambda": 4,
+    "note": "D_eff measures local stability, not attractor count"
+  }
+}

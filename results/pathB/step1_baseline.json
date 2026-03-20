@@ -1,0 +1,27 @@
+{
+  "k=2,L=1": {
+    "theory": 4,
+    "found": 4,
+    "match": true
+  },
+  "k=3,L=1": {
+    "theory": 8,
+    "found": 8,
+    "match": true
+  },
+  "k=2,L=2": {
+    "theory": 16,
+    "found": 16,
+    "match": true
+  },
+  "k=3,L=2": {
+    "theory": 64,
+    "found": 64,
+    "match": true
+  },
+  "k=4,L=1": {
+    "theory": 16,
+    "found": 16,
+    "match": true
+  }
+}
