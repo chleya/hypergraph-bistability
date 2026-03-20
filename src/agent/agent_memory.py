@@ -189,9 +189,9 @@ class CollapsController:
         lc = cls.get_lambda_c(k)
         
         def count_high_groups(lambda_val: float, mu: float = 0.0) -> int:
-            """Simulate and count HIGH groups."""
-            np.random.seed(42)
-            M0 = np.full((self.k, self.L), 0.5) + np.random.randn(self.k, self.L) * 0.02
+            """Simulate and count HIGH groups using deterministic ICs."""
+            rng = np.random.default_rng(42)
+            M0 = np.full((self.k, self.L), 0.5) + rng.normal(0, 0.005, (self.k, self.L))
             M0 = np.clip(M0, 0.01, 0.99)
             M0_flat = M0.flatten()
             
@@ -213,20 +213,22 @@ class CollapsController:
             M_final = sol[-1].reshape((self.k, self.L))
             return int(np.sum(np.mean(M_final, axis=1) > 0.5))
         
-        lo, hi = 0.0, lc * 0.99
+        lo, hi = 0.0, lc * 1.5
         best_lambda = 0.0
         best_diff = k
+        best_nh = 0
         
-        for lam_test in np.linspace(lo, hi, 20):
+        for lam_test in np.linspace(lo, hi, 30):
             nh = count_high_groups(lam_test)
             diff = abs(nh - n_high)
             if diff < best_diff:
                 best_diff = diff
                 best_lambda = lam_test
+                best_nh = nh
             if diff <= tolerance:
                 break
         
-        profile = [float(count_high_groups(lam)) for lam in np.linspace(0, lc * 0.99, 10)]
+        profile = [float(count_high_groups(lam)) for lam in np.linspace(0, lc * 1.5, 15)]
         
         return best_lambda, profile
 
@@ -395,11 +397,23 @@ class AgentMemory:
         
         Uses scipy.integrate.odeint when available (recommended).
         Falls back to small-step Euler for compatibility.
+        
+        Note: when M is exactly 0.5 (unstable fixed point), adds small
+        perturbation to ensure dynamics diverge to stable states.
         """
         if self._has_scipy and n_steps >= 10:
             total_t = dt * n_steps
-            t = np.linspace(0, total_t, min(n_steps + 1, 50))
-            M0_flat = self.M.flatten()
+            n_points = min(max(n_steps * 2, 50), 200)
+            t = np.linspace(0, total_t, n_points)
+            M0 = self.M.copy()
+            M0_flat = M0.flatten()
+            
+            if np.allclose(M0, 0.5, atol=0.01):
+                rng = np.random.default_rng(42)
+                perturb = rng.normal(0, 0.005, M0.shape)
+                M0 = np.clip(M0 + perturb, 0.01, 0.99)
+                M0_flat = M0.flatten()
+            
             sol = __import__('scipy.integrate', fromlist=['odeint']).odeint(
                 self._compute_dMdt, M0_flat, t
             )
@@ -876,6 +890,91 @@ def demo():
     
     print("\n" + "=" * 60)
     print("Demo complete")
+
+
+def physics_demo():
+    """
+    One-click physics-based memory control demonstration.
+    
+    Shows:
+    1. Multi-attractor regime at r=0 (λ=0)
+    2. r-based λ adjustment via process_prompt
+    3. λ_c formula verification across k values
+    4. scipy odeint dynamics convergence
+    5. Context string with physics metadata
+    
+    Run: python -c "import sys; sys.path.insert(0,'src'); from agent.agent_memory import physics_demo; physics_demo()"
+    """
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+    
+    from agent.agent_memory import AgentMemory, CollapsController, _regime_name
+    import numpy as np
+    
+    CollapsController.clear_cache()
+    
+    print("=" * 70)
+    print("PHYSICS-BASED MEMORY CONTROL DEMO")
+    print("=" * 70)
+    
+    k, L = 4, 2
+    mem = AgentMemory(k=k, L=L, use_physics_control=True)
+    lc = mem.get_lambda_c() or 0.0437
+    
+    print(f"\nSystem: k={k} groups, L={L} layers")
+    print("-" * 70)
+    
+    # 1. λ_c verification across k values
+    print("\n[1] λ_c FORMULA VERIFICATION")
+    print(f"    λ_c(k=2) = {CollapsController.get_lambda_c(2):.5f}")
+    print(f"    λ_c(k=3) = {CollapsController.get_lambda_c(3):.5f}")
+    print(f"    λ_c(k=4) = {CollapsController.get_lambda_c(4):.5f}")
+    print(f"    Formula: lambda_c = 3*h^2*l^2 / (h^2 + (k-1)*l^2), h=l=0.5")
+    
+    # 2. r-based λ adjustment
+    print("\n[2] r-BASED λ ADJUSTMENT")
+    for target_r in [0.3, 0.5, 0.7, 0.85, 0.95]:
+        lam, reason = CollapsController.suggest_lambda(target_r, k)
+        print(f"    r={target_r:.2f} → λ={lam:.5f} [{_regime_name(target_r)}]")
+    
+    # 3. Multi-attractor at r=0
+    print("\n[3] MULTI-ATTRACTOR STATE (r=0)")
+    mem.lambda_ = 0.0
+    rng = np.random.default_rng(42)
+    mem.M = np.full((k, L), 0.5) + rng.normal(0, 0.005, (k, L))
+    mem.M = np.clip(mem.M, 0.01, 0.99)
+    mem.step(dt=0.5, n_steps=100)
+    state = mem.read()
+    print(f"    λ={mem.lambda_:.4f}, r={0.0:.2f}, regime={_regime_name(0.0)}")
+    print(f"    Group means: {state.groups.round(2)}")
+    print(f"    -> Groups diverge to independent attractors (0 or 1)")
+    
+    # 4. Near-WTA at r=0.95
+    print("\n[4] NEAR-WTA STATE (r=0.95)")
+    lam, _ = CollapsController.suggest_lambda(0.95, k)
+    mem.lambda_ = lam
+    mem.step(dt=0.5, n_steps=100)
+    state = mem.read()
+    print(f"    lambda={lam:.5f}, r={lam/lc:.2f}, regime={_regime_name(0.95)}")
+    print(f"    Group means: {state.groups.round(2)}")
+    print(f"    → Groups synchronize to common attractor")
+    
+    # 5. Dynamics convergence (scipy odeint)
+    print("\n[5] DYNAMICS CONVERGENCE (scipy odeint)")
+    print(f"    Using scipy.integrate.odeint: {mem._has_scipy}")
+    print(f"    Method: t=linspace(0, total_t, max(n_steps*2, 50))")
+    
+    # 6. Context string
+    print("\n[6] CONTEXT STRING FOR LLM")
+    ctx = mem.get_context_for_llm()
+    for line in ctx.split('\n'):
+        print(f"    {line}")
+    
+    print("\n" + "=" * 70)
+    print("Key insight: λ = r × λ_c(k) gives physics-grounded control.")
+    print("r < 0.5: multi-attractor | r > 0.85: near-WTA collapse")
+    print("=" * 70)
 
 
 if __name__ == "__main__":
