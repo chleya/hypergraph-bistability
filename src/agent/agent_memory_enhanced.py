@@ -52,7 +52,8 @@ class LLMConflictDetector:
     conflicting or competing signals.
     """
     
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4o-mini"):
+    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4o-mini",
+                 base_url: Optional[str] = None):
         self.model = model
         self._client = None
         self._has_openai = False
@@ -60,7 +61,10 @@ class LLMConflictDetector:
         if api_key or os.environ.get("OPENAI_API_KEY"):
             try:
                 from openai import OpenAI
-                self._client = OpenAI(api_key=api_key or os.environ.get("OPENAI_API_KEY"))
+                actual_key = api_key or os.environ.get("OPENAI_API_KEY")
+                actual_base = (base_url or os.environ.get("OPENAI_API_BASE")
+                              or "https://api.openai.com/v1")
+                self._client = OpenAI(api_key=actual_key, base_url=actual_base)
                 self._has_openai = True
             except ImportError:
                 pass

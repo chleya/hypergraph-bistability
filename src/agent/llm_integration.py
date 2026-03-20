@@ -26,7 +26,8 @@ class LLMAgentWithMemory:
         self,
         memory_module,
         model: str = "gpt-4",
-        api_key: Optional[str] = None
+        api_key: Optional[str] = None,
+        base_url: Optional[str] = None
     ):
         self.memory = memory_module
         self.model = model
@@ -38,7 +39,10 @@ class LLMAgentWithMemory:
         if api_key or os.environ.get("OPENAI_API_KEY"):
             try:
                 from openai import OpenAI
-                self.client = OpenAI(api_key=api_key or os.environ.get("OPENAI_API_KEY"))
+                actual_key = api_key or os.environ.get("OPENAI_API_KEY")
+                actual_base = (base_url or os.environ.get("OPENAI_API_BASE")
+                             or "https://api.openai.com/v1")
+                self.client = OpenAI(api_key=actual_key, base_url=actual_base)
                 self._has_openai = True
             except ImportError:
                 print("Warning: OpenAI not installed properly.")
@@ -130,9 +134,11 @@ class LangChainAgentWithMemory:
     LangChain agent with hypergraph memory integration.
     
     Shows how to use AgentMemory as a LangChain tool.
+    Includes physics-based control via set_n_high.
     """
     
-    def __init__(self, memory_module, llm_provider: str = "openai"):
+    def __init__(self, memory_module, llm_provider: str = "openai",
+                 api_key: Optional[str] = None, base_url: Optional[str] = None):
         self.memory = memory_module
         self.llm_provider = llm_provider
         
@@ -143,6 +149,8 @@ class LangChainAgentWithMemory:
             from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
             
             self._has_langchain = True
+            self._api_key = api_key
+            self._base_url = base_url
             self._setup_tools()
         except ImportError as e:
             self._has_langchain = False
@@ -154,18 +162,32 @@ class LangChainAgentWithMemory:
             Tool(
                 name="read_memory",
                 func=lambda x: self.memory.read().to_dict(),
-                description="Read current memory state. Returns active patterns."
+                description="Read current memory state. Returns active patterns and group/layer info."
             ),
             Tool(
                 name="get_memory_context",
                 func=lambda x: self.memory.get_context_for_llm(),
-                description="Get memory context for LLM. Use before responding."
+                description="Get memory context string for LLM. Use before responding to know current state."
             ),
             Tool(
                 name="switch_memory_mode",
                 func=lambda mode: self.memory.switch_mode(mode) or f"Switched to {mode}",
-                description="Switch memory mode. Modes: neutral, exploratory, focused, professional, casual."
-            )
+                description="Switch memory mode. Modes: neutral (multi-attractor), exploratory (light coupling), focused (near λ_c), creative (moderate coupling + anti-sync)."
+            ),
+            Tool(
+                name="set_high_groups",
+                func=lambda n_str: str(self.memory.set_n_high(int(n_str))),
+                description="Set the number of HIGH active groups (n_high). Input: integer 0 to k. Higher = more contexts collapse. Use to force focus or expand memory. Example: set_high_groups(1) for maximum focus."
+            ),
+            Tool(
+                name="get_collapse_status",
+                func=lambda _: (
+                    f"λ={self.memory.lambda_:.4f}, "
+                    f"λ_c={self.memory.get_lambda_c():.4f}, "
+                    f"r={self.memory.lambda_/self.memory.get_lambda_c():.2f}"
+                ),
+                description="Get current collapse ratio r=λ/λ_c. Shows how close the system is to WTA collapse."
+            ),
         ]
         self.tools = tools
     
@@ -178,7 +200,12 @@ class LangChainAgentWithMemory:
         from langchain_openai import ChatOpenAI
         from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
         
-        llm = ChatOpenAI(model="gpt-4", temperature=0.7)
+        llm_kwargs = {"model": "gpt-4", "temperature": 0.7}
+        if self._api_key:
+            llm_kwargs["api_key"] = self._api_key
+        if self._base_url:
+            llm_kwargs["base_url"] = self._base_url
+        llm = ChatOpenAI(**llm_kwargs)
         
         prompt = ChatPromptTemplate.from_messages([
             ("system", system_prompt),
@@ -192,15 +219,19 @@ class LangChainAgentWithMemory:
 
 
 def demo():
-    """Demo showing the integration pattern."""
+    """Demo showing the integration pattern with physics-based memory control."""
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+    
     print("=" * 60)
-    print("LLM Integration Demo")
+    print("LLM Integration Demo - Physics-Based Memory")
     print("=" * 60)
     
-    from agent.agent_memory import AgentMemory
+    from agent.agent_memory import AgentMemory, CollapsController, _regime_name
     
-    print("\n1. Setup Agent Memory:")
-    memory = AgentMemory(k=3, L=2, name="assistant", auto_adjust=True)
+    print("\n1. Setup Agent Memory (physics-enabled):")
+    memory = AgentMemory(k=3, L=2, name="assistant", use_physics_control=True)
     memory.group_labels = ["professional", "personal", "technical"]
     memory.layer_labels = ["preferences", "context"]
     
@@ -208,11 +239,27 @@ def demo():
     memory.write("User likes code examples", group=2, layer=0)
     
     print(memory.status())
+    print(f"   λ_c = {memory.get_lambda_c():.4f}")
     
-    print("\n2. Setup LLM Agent (mock mode):")
+    print("\n2. Physics-based mode switching:")
+    for mode in ["neutral", "exploratory", "focused", "creative"]:
+        memory.switch_mode(mode)
+        lc = memory.get_lambda_c()
+        r = memory.lambda_ / lc if lc else 0
+        print(f"   {mode:15s}: λ={memory.lambda_:.4f}, r={r:.2f}, regime={_regime_name(r)}")
+    
+    print("\n3. n_high control:")
+    memory.set_n_high(1)
+    print(f"   set_n_high(1): n_high={memory.get_n_high_groups()}, λ={memory.lambda_:.4f}")
+    memory.set_n_high(2)
+    print(f"   set_n_high(2): n_high={memory.get_n_high_groups()}, λ={memory.lambda_:.4f}")
+    
+    print("\n4. Memory context with physics info:")
+    print(memory.get_context_for_llm())
+    
+    print("\n5. Chat with memory context (mock mode):")
     agent = LLMAgentWithMemory(memory, model="gpt-4")
     
-    print("\n3. Chat with memory context:")
     prompts = [
         "Hello!",
         "How do I sort a list in Python?",
@@ -220,19 +267,16 @@ def demo():
     ]
     
     for prompt in prompts:
-        print(f"\nUser: {prompt}")
+        print(f"\n   User: {prompt}")
         response = agent.chat(prompt)
-        print(f"Assistant: {response}")
-        print(f"Memory: {agent.get_memory_status()}")
-    
-    print("\n4. Memory context string for LLM:")
-    print(memory.get_context_for_llm())
+        print(f"   Assistant: {response[:80]}...")
+        print(f"   Memory: λ={memory.lambda_:.4f}, r={memory.lambda_/memory.get_lambda_c():.2f}")
     
     print("\n" + "=" * 60)
-    print("For real OpenAI integration:")
+    print("For real API integration:")
     print("1. pip install openai langchain langchain-openai")
-    print("2. export OPENAI_API_KEY=your_key")
-    print("3. Use LLMAgentWithMemory with _has_openai=True")
+    print("2. Use LLMAgentWithMemory(api_key=..., base_url=...)")
+    print("3. Supports MiniMax: base_url='https://api.minimaxi.com/v1'")
 
 
 if __name__ == "__main__":
