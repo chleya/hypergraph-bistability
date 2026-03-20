@@ -360,6 +360,8 @@ class AgentMemoryEnhanced:
             from scipy.integrate import odeint
         except ImportError:
             self._has_scipy = False
+        
+        self._lambda_from_mode = False
     
     def bistable_dynamics(self, m: np.ndarray) -> np.ndarray:
         return m * (1 - m) * (2 * m - 1)
@@ -452,10 +454,23 @@ class AgentMemoryEnhanced:
         
         Optionally uses LLM for semantic conflict detection (if use_llm=True
         and api_key provided), but λ adjustment always uses r = λ/λ_c.
+        
+        If lambda was just set by switch_mode (_lambda_from_mode=True),
+        preserve it for one prompt before auto-adjusting again.
         """
         old_lambda = self.lambda_
         
-        if self.use_physics_control and self._compute_lambda_c is not None:
+        if self._lambda_from_mode:
+            regime = _regime_name(self.lambda_ / (self.get_lambda_c() or 0.1))
+            result = {
+                "prompt": prompt,
+                "conflict_level": self.lambda_ / (self.get_lambda_c() or 0.1),
+                "reasoning": f"Mode-preserved λ={self.lambda_:.4f}",
+                "old_lambda": old_lambda,
+                "new_lambda": self.lambda_,
+                "regime": regime
+            }
+        elif self.use_physics_control and self._compute_lambda_c is not None:
             if target_r is None:
                 complexity = min(1.0, len(prompt.split()) / 50.0)
                 target_r = 0.4 + 0.5 * complexity
@@ -484,6 +499,7 @@ class AgentMemoryEnhanced:
                 "new_lambda": self.lambda_
             }
         
+        self._lambda_from_mode = False
         self.step(dt=DEFAULT_DT, n_steps=20)
         self.conflict_history.append(result["conflict_level"])
         return result
@@ -503,17 +519,19 @@ class AgentMemoryEnhanced:
         
         if mode in proximity_presets:
             r, mu_val = proximity_presets[mode]
-            if lc is not None and self.use_physics_control:
-                lam = r * lc
-            else:
-                lam = r * 0.1
-            self.lambda_ = lam
-            self.mu = mu_val
         else:
-            raise ValueError(f"Unknown mode: {mode}")
+            r, mu_val = 0.5, 0.0
+        
+        if lc is not None and self.use_physics_control:
+            lam = r * lc
+        else:
+            lam = r * 0.1
+        self.lambda_ = lam
+        self.mu = mu_val
         
         self.current_mode = mode
         self.mode_history.append(mode)
+        self._lambda_from_mode = True
         self.step(dt=DEFAULT_DT, n_steps=20)
     
     def get_active_pattern(self) -> str:
