@@ -1,135 +1,195 @@
 # Hypergraph Bistability
 
-研究容量约束竞争动力学中的双稳态现象 / Studying bistability in capacity-constrained competitive dynamics.
+Research and prototype code for hypergraph competitive dynamics, multistability, and a physics-grounded agent memory system.
 
-## Core Discovery / 核心发现
+## What This Repository Contains
 
-The system reduces to a 1D stochastic dynamical system:
+The project has two layers:
 
-```
-dM/dt = F(M) + η(t)
-```
+- `hypergraph_bistability`: the package layer for reusable memory, control, agent, and core dynamics APIs
+- `experiments`, `paper`, `results`, `figures`: research artifacts, verification scripts, and paper outputs
 
-where M = |C_max| / |E| is the order parameter (maximum faction ratio).
+The main practical deliverable is a controllable memory module built around a `k x L` activation matrix with:
 
-### Bistable Structure / 双稳态结构
+- bistable local dynamics
+- inter-group competition `lambda`
+- inter-layer coupling `mu`
+- physics-grounded control through the critical coupling `lambda_c`
 
-| Attractor | M Value | Stability |
-|-----------|---------|-----------|
-| M₁* | ≈ 0.45 | Deep well, stable |
-| M₀ | ≈ 0.6 | Barrier, unstable |
-| M₂* | ≈ 1.0 | Shallow well, weakly stable |
+The current default agent path is now formalized as runtime profile `stable_v1`, which fixes the validated practical stack around:
 
-Key features:
-- Asymmetric double-well potential
-- Basin boundary ≈ 0.6
-- Critical point K_c/N ≈ 0.35
+- `hyperedge_expansion`
+- conflict-aware retrieval
+- confidence modifiers
+- decision residue support
+- continuity/product regression gates
 
----
+## Recommended Entry Points
 
-## Agent Memory Module / 智能体记忆模块
-
-An AI agent memory system based on hypergraph multistability theory with physics-grounded λ_c control.
-
-### Quick Start / 快速开始
+Use the new package namespace for application code:
 
 ```python
-from agent.agent_memory import AgentMemory
-
-mem = AgentMemory(k=4, L=2, use_physics_control=True)
-mem.group_labels = ["goals", "skills", "preferences", "context"]
-
-# Write to memory
-mem.write("User prefers concise answers", group=0, layer=0)
-
-# Process prompt with physics-based λ control
-result = mem.process_prompt("I want to learn coding but I'm also tired")
-print(f"Conflict: {result['conflict_level']:.1%}")
-
-# Switch modes
-mem.switch_mode("exploratory")  # Light coupling
-mem.switch_mode("focused")      # Strong selection
+from hypergraph_bistability.memory import AgentMemory
+from hypergraph_bistability.agent import HypergraphAgent
+from hypergraph_bistability.control import compute_lambda_c
 ```
 
-### Physics Control / 物理控制
+Legacy imports such as `from agent.agent_memory import AgentMemory` still work during the transition.
 
-Critical coupling formula / 临界耦合公式:
-```
-λ_c = 3h²l² / [h² + (k-1)l²]
-```
-
-| k | λ_c |
-|---|-----|
-| 2 | 0.167 |
-| 3 | 0.068 |
-| 4 | 0.044 |
-
-Control via proximity ratio r = λ/λ_c:
-- r < 0.5: Multi-attractor (independent groups)
-- r > 0.85: Near-WTA collapse (synchronized)
-
-### Mode Presets / 模式预设
-
-| Mode | r | λ (k=4) | Use Case |
-|------|---|---------|----------|
-| neutral | 0.0 | 0.000 | Independent groups |
-| exploratory | 0.3 | 0.013 | Light coupling |
-| focused | 0.85 | 0.037 | Strong selection |
-| sync | 0.5 | 0.022 | Layer sync |
-| creative | 0.5 | 0.022 | Layer anti-sync |
-
-## Installation / 安装
+## Install
 
 ```bash
 pip install -e .
-
-# With LLM integration
-pip install -e ".[llm]"
 ```
 
-## Running Tests / 运行测试
+Optional extras:
 
 ```bash
-# All pytest tests
-python -m pytest tests/ -v
-
-# LLM integration tests
-python src/agent/llm_integration_test.py
-
-# Dialogue scenarios
-python src/agent/test_dialogue_scenarios.py
-
-# Physics demo
-python -c "from agent.agent_memory import physics_demo; physics_demo()"
+pip install -e ".[llm]"
+pip install -e ".[vector]"
+pip install -e ".[dev]"
 ```
 
-## Project Structure / 项目结构
+## Quick Start
 
+### Memory Module
+
+```python
+from hypergraph_bistability.memory import AgentMemory
+
+mem = AgentMemory(k=4, L=2, use_physics_control=True)
+mem.group_labels = ["goals", "skills", "preferences", "context"]
+mem.layer_labels = ["current", "history"]
+
+mem.write("User prefers concise answers", group=0, layer=0)
+result = mem.process_prompt("I want to learn coding but I'm also tired")
+
+print(result["regime"])
+print(mem.get_context_for_llm())
 ```
+
+### Agent Demo
+
+```python
+from hypergraph_bistability.agent import HypergraphAgent
+
+agent = HypergraphAgent(k=4, L=2, use_embeddings=False)
+print(agent.chat("Help me debug a Python function"))
+```
+
+## CLI
+
+After `pip install -e .`, these commands are available:
+
+```bash
+hypergraph-bistability demo-memory
+hypergraph-bistability demo-agent
+hypergraph-bistability chat-demo
+hypergraph-bistability chat-demo --session ./demo_state.json
+hypergraph-bistability run-evals --output ./evals.json
+hypergraph-bistability run-evals --tier core --output ./evals-core.json
+hypergraph-bistability run-evals --tier stress --output ./evals-stress.json
+hypergraph-bistability run-llm-evals --output ./llm-evals.json
+hypergraph-bistability run-llm-evals --tier core --output ./llm-evals-core.json
+hypergraph-bistability run-product-regression --output ./product-regression.json
+hypergraph-bistability run-long-task-regression --output ./long-task-regression.json
+hypergraph-bistability run-llm-product-regression --output ./llm-product-regression.json
+hypergraph-bistability run-llm-long-task-regression --output ./llm-long-task-regression.json
+hypergraph-bistability run-mechanism-experiment --experiment procedure_memory --output ./procedure-memory.json
+```
+
+`run-llm-evals` now defaults to the current MiniMax evaluation profile:
+
+- model: `MiniMax-M2.7`
+- base URL: `https://api.minimaxi.com/anthropic`
+- temperature: `0.01`
+
+## Windows + MiniMax Recommended Path
+
+If Python HTTPS requests are restricted on your machine, use the built-in PowerShell transport:
+
+```powershell
+python -m hypergraph_bistability.cli run-llm-evals --tier core --base-url https://api.minimaxi.com/anthropic --model MiniMax-M2.7 --force-powershell --output .\_llm_eval_results_core.json
+```
+
+For one-click local runs on Windows, use the provided scripts:
+
+```powershell
+& F:\hypergraph_bistability\scripts\run_minimax_eval_one_click.ps1
+& F:\hypergraph_bistability\scripts\run_minimax_eval_stress_one_click.ps1
+& F:\hypergraph_bistability\scripts\run_minimax_product_regression_one_click.ps1
+& F:\hypergraph_bistability\scripts\run_minimax_long_task_regression_one_click.ps1
+& F:\hypergraph_bistability\scripts\run_minimax_competition_one_click.ps1
+& F:\hypergraph_bistability\scripts\run_minimax_associative_expansion_one_click.ps1
+& F:\hypergraph_bistability\scripts\run_minimax_procedure_memory_one_click.ps1
+```
+
+These scripts:
+
+- set the MiniMax key
+- force the PowerShell transport
+- write JSON output files for later inspection
+- preserve `llm_debug` blocks with raw `thinking/text` metadata
+
+## MiniMax Direct Terminal Test
+
+For a direct local PowerShell smoke test that bypasses this agent's Python network limits, run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\minimax_direct_test.ps1 -ApiKey "YOUR_KEY" -Transport anthropic
+```
+
+You can also test both compatibility paths:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\minimax_direct_test.ps1 -ApiKey "YOUR_KEY" -Transport both
+```
+
+This prints:
+
+- parsed text output
+- raw JSON response
+- transport-specific errors if the request fails
+
+## Tests
+
+```bash
+python -m pytest tests -q
+```
+
+## Streamlit Visualization
+
+```bash
+streamlit run src/agent/streamlit_app.py
+```
+
+## Package Layout
+
+```text
+src/hypergraph_bistability/
+  agent/           Stable agent APIs
+  control/         Critical coupling and control helpers
+  core/            Reusable dynamics and potential utilities
+  integrations/    Embeddings and LLM adapters
+  memory/          Primary memory modules
+  visualization/   Visualization entry points
+  cli.py           Small built-in demos
+```
+
+## Current Research Layout
+
+```text
 src/
-├── agent/
-│   ├── agent_memory.py          # Core memory module
-│   ├── agent_memory_enhanced.py # LLM-enhanced version
-│   ├── llm_integration.py       # LangChain tools
-│   └── test_dialogue_scenarios.py
-├── core/
-│   ├── model.py, dynamics.py, noise.py, potential.py
-│   └── memory_types.py
-└── hypergraph_control.py        # λ_c computation
-
-paper/
-├── paper_final.md               # Main paper
-└── Results_Agent_Memory.md      # Performance indicators
+  agent/               Legacy implementation modules
+  core/                Legacy core modules
+  multi_stability/     Research modules used by tests and experiments
+  *.py                 Experimental scripts and figure generators
+paper/                 Paper drafts
+results/               JSON outputs and research summaries
+figures/               Generated figures
+tests/                 Unit and integration tests
 ```
 
-## File Overview / 文件概览
+## Next Refactor Direction
 
-- `figures/` - Key figures / 关键图表
-- `paper/` - Paper drafts / 论文草稿
-- `src/` - Source code / 源代码
-- `tests/` - Test suite / 测试套件
-
----
-
-*Created: 2026-03-17*
-*Updated: 2026-03-20*
+The current package layer is a compatibility-focused first pass. The next structural step is to move research scripts out of `src/` into dedicated `experiments/` directories and make `src/hypergraph_bistability/` the canonical implementation location.

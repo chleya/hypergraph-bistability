@@ -55,6 +55,9 @@ Homepage = "https://github.com/chleya/hypergraph-bistability"
 Repository = "https://github.com/chleya/hypergraph-bistability.git"
 Issues = "https://github.com/chleya/hypergraph-bistability/issues"
 
+[project.scripts]
+hypergraph-bistability = "hypergraph_bistability.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 

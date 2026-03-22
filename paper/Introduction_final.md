@@ -23,7 +23,7 @@ We present a minimal hypergraph system governed by four local rules (growth, fus
 - A phase transition occurs at k_c ≈ 2.35, exhibiting bistability between fragmented and clustered states
 - **Order–complexity separation**: as global order increases, complexity concentrates in the core while the periphery simplifies (r = ±0.97)
 - **No transport mechanism**: fusion events are negligible (~0), and flow-blocking experiments have no effect
-- **In-situ reconstruction**: identity tracking reveals that ~76% of core structures are newly generated, not inherited
+- **In-situ reconstruction**: rigorous parent chain tracking reveals that **96.4% ± 8.6%** of core structures are newly generated, with fusion birth at only 0.4 ± 0.8 per run
 
 Our results show that structure formation can persist even in the absence of measurable transport, implying that reconstruction is not only sufficient but necessary.
 
