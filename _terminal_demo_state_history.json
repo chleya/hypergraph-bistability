@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "system_prompt": "You are an AI assistant with a unique memory system based on physics.\n\nYour memory is organized as a k\u00d7L matrix where:\n- k groups represent different aspects (work, personal, technical, etc.)\n- L layers represent different dimensions (current context, preferences, etc.)\n\nYour responses should:\n1. Be concise and helpful\n2. Draw on the active memory contexts when relevant\n3. Adapt your level of detail based on the topic\n\nMemory state is shown in parentheses like (\u03bb=0.02, r=0.5, regime=moderate-coupling).\nThis indicates your current \"attention focus\" - how distributed or focused your responses are.\n",
+  "conversation_history": [
+    {
+      "role": "user",
+      "content": "remember that i prefer concise answers"
+    },
+    {
+      "role": "assistant",
+      "content": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?"
+    },
+    {
+      "role": "user",
+      "content": "help me plan a release checklist"
+    },
+    {
+      "role": "assistant",
+      "content": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?"
+    }
+  ],
+  "turn_log": [
+    {
+      "user_input": "remember that i prefer concise answers",
+      "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?",
+      "memory_context": "[Memory State: neutral]\nActive contexts: group_0: remember that i prefer concise answers\n(\u03bb=0.013, \u03bb_c\u22480.044, r=0.30, regime=multi-attractor)",
+      "conflict_level": 0.0,
+      "retrieved_items": [],
+      "retrieved_detail": [],
+      "writes": [
+        {
+          "should_write": true,
+          "group": 0,
+          "layer": 0,
+          "importance": 0.675,
+          "kind": "preference",
+          "reason": "user:preference",
+          "content": "remember that i prefer concise answers",
+          "activate": true
+        }
+      ],
+      "controller_state": {
+        "mode": "exploratory",
+        "lambda_ratio": 0.3,
+        "lambda_value": 0.013106999999999999,
+        "mu": 0.0,
+        "turns": 1,
+        "topic_changes": 0,
+        "avg_conflict": 0.0,
+        "pending_decision": false,
+        "is_oscillating": false,
+        "pending_questions": 0
+      }
+    },
+    {
+      "user_input": "help me plan a release checklist",
+      "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?",
+      "memory_context": "[Memory State: neutral]\nActive contexts: group_0: remember that i prefer concise answers, group_1: help me plan a release checklist, group_2, group_3\n(\u03bb=0.013, \u03bb_c\u22480.044, r=0.30, regime=multi-attractor)",
+      "conflict_level": 0.0,
+      "retrieved_items": [
+        "remember that i prefer concise answers"
+      ],
+      "retrieved_detail": [
+        {
+          "source": "working_memory",
+          "content": "remember that i prefer concise answers",
+          "score": 0.75,
+          "kind": "preference",
+          "group": 0,
+          "layer": 0
+        }
+      ],
+      "writes": [
+        {
+          "should_write": true,
+          "group": 1,
+          "layer": 0,
+          "importance": 0.47500000000000003,
+          "kind": "task",
+          "reason": "user:task",
+          "content": "help me plan a release checklist",
+          "activate": true
+        }
+      ],
+      "controller_state": {
+        "mode": "exploratory",
+        "lambda_ratio": 0.3,
+        "lambda_value": 0.013106999999999999,
+        "mu": 0.0,
+        "turns": 2,
+        "topic_changes": 0,
+        "avg_conflict": 0.0,
+        "pending_decision": false,
+        "is_oscillating": false,
+        "pending_questions": 0
+      }
+    }
+  ],
+  "controller_state": {
+    "mode": "exploratory",
+    "lambda_ratio": 0.3,
+    "lambda_value": 0.013106999999999999,
+    "mu": 0.0,
+    "turns": 2,
+    "topic_changes": 0,
+    "avg_conflict": 0.0,
+    "pending_decision": false,
+    "is_oscillating": false,
+    "pending_questions": 0
+  }
+}

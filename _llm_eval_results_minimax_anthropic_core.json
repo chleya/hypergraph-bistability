@@ -1,0 +1,724 @@
+{
+  "runtime": {
+    "name": "llm_runtime",
+    "scenarios": [
+      {
+        "name": "preference_recall",
+        "description": "The agent should recall explicit user preferences on a later turn.",
+        "turns": [
+          {
+            "user_input": "How should you respond to me in future planning discussions?",
+            "expected_retrievals": [
+              "prefer concise answers",
+              "bullet lists"
+            ],
+            "retrieved_items": [
+              "Remember that I prefer concise answers and bullet lists."
+            ],
+            "matched_expected": [
+              "prefer concise answers",
+              "bullet lists"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I prefer concise answers and bullet lists."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "concise",
+              "bullet"
+            ],
+            "matched_response_signals": []
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 1,
+          "retrieved_hit_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 2,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "concise",
+            "bullet"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "response omitted expected signals: concise, bullet"
+        }
+      },
+      {
+        "name": "task_continuity",
+        "description": "The agent should surface an in-progress task when the user resumes it.",
+        "turns": [
+          {
+            "user_input": "Pick up that release work again and tell me what matters most.",
+            "expected_retrievals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback.",
+              "I am preparing a release checklist for version 2.1."
+            ],
+            "matched_expected": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_response_signals": []
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "release checklist",
+            "migration notes",
+            "rollback"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "response omitted expected signals: release checklist, migration notes, rollback"
+        }
+      },
+      {
+        "name": "context_switching",
+        "description": "The agent should recover both the active task and a stable preference after topic shifts.",
+        "turns": [
+          {
+            "user_input": "Back to the onboarding plan. Keep my preference in mind.",
+            "expected_retrievals": [
+              "prefer concise code reviews",
+              "onboarding checklist"
+            ],
+            "retrieved_items": [
+              "Remember that I prefer concise code reviews.",
+              "I need help planning an onboarding checklist for a new backend engineer."
+            ],
+            "matched_expected": [
+              "prefer concise code reviews",
+              "onboarding checklist"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I prefer concise code reviews.",
+              "I need help planning an onboarding checklist for a new backend engineer."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "concise",
+              "onboarding checklist"
+            ],
+            "matched_response_signals": []
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 2,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "concise",
+            "onboarding checklist"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "response omitted expected signals: concise, onboarding checklist"
+        }
+      },
+      {
+        "name": "session_recovery",
+        "description": "The agent should recover task context after a persisted session reload.",
+        "turns": [
+          {
+            "user_input": "After reloading this session, what issue was I working on?",
+            "expected_retrievals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "retrieved_items": [
+              "The failure happens during the database migration step.",
+              "Remember that I am debugging a flaky deployment pipeline."
+            ],
+            "matched_expected": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I am debugging a flaky deployment pipeline.",
+              "The failure happens during the database migration step."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "matched_response_signals": []
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 2,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "flaky deployment pipeline",
+            "database migration step"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "response omitted expected signals: flaky deployment pipeline, database migration step"
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 9,
+      "matched_count": 9,
+      "retrieved_count": 7,
+      "retrieved_hit_count": 6,
+      "recall": 1.0,
+      "precision_proxy": 0.857,
+      "response_signal_count": 9,
+      "response_signal_hits": 0,
+      "provider_error_count": 0,
+      "response_recall": 0.0
+    }
+  },
+  "recent_history_baseline": {
+    "name": "recent_history_baseline",
+    "scenarios": [
+      {
+        "name": "preference_recall",
+        "description": "The agent should recall explicit user preferences on a later turn.",
+        "turns": [
+          {
+            "user_input": "How should you respond to me in future planning discussions?",
+            "expected_retrievals": [
+              "prefer concise answers",
+              "bullet lists"
+            ],
+            "retrieved_items": [],
+            "matched_expected": [],
+            "matched_retrieved_items": [],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 0,
+          "retrieved_count": 0,
+          "retrieved_hit_count": 0,
+          "recall": 0.0,
+          "precision_proxy": 0.0,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "prefer concise answers",
+            "bullet lists"
+          ],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "query overlap or kind scoring was too weak for: prefer concise answers, bullet lists"
+        }
+      },
+      {
+        "name": "task_continuity",
+        "description": "The agent should surface an in-progress task when the user resumes it.",
+        "turns": [
+          {
+            "user_input": "Pick up that release work again and tell me what matters most.",
+            "expected_retrievals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback.",
+              "[baseline] The release checklist should include docs, migration notes, and rollback.",
+              "I am preparing a release checklist for version 2.1.",
+              "[baseline] I am preparing a release checklist for version 2.1."
+            ],
+            "matched_expected": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 0.25,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "no issue detected"
+        }
+      },
+      {
+        "name": "context_switching",
+        "description": "The agent should recover both the active task and a stable preference after topic shifts.",
+        "turns": [
+          {
+            "user_input": "Back to the onboarding plan. Keep my preference in mind.",
+            "expected_retrievals": [
+              "prefer concise code reviews",
+              "onboarding checklist"
+            ],
+            "retrieved_items": [
+              "I need help planning an onboarding checklist for a new backend engineer.",
+              "[baseline] I need help planning an onboarding checklist for a new backend engineer."
+            ],
+            "matched_expected": [
+              "onboarding checklist"
+            ],
+            "matched_retrieved_items": [
+              "I need help planning an onboarding checklist for a new backend engineer."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 1,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 1,
+          "recall": 0.5,
+          "precision_proxy": 0.5,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "prefer concise code reviews"
+          ],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "query overlap or kind scoring was too weak for: prefer concise code reviews"
+        }
+      },
+      {
+        "name": "session_recovery",
+        "description": "The agent should recover task context after a persisted session reload.",
+        "turns": [
+          {
+            "user_input": "After reloading this session, what issue was I working on?",
+            "expected_retrievals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "retrieved_items": [],
+            "matched_expected": [],
+            "matched_retrieved_items": [],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 0,
+          "retrieved_count": 0,
+          "retrieved_hit_count": 0,
+          "recall": 0.0,
+          "precision_proxy": 0.0,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "flaky deployment pipeline",
+            "database migration step"
+          ],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "query overlap or kind scoring was too weak for: flaky deployment pipeline, database migration step"
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 9,
+      "matched_count": 4,
+      "retrieved_count": 6,
+      "retrieved_hit_count": 2,
+      "recall": 0.444,
+      "precision_proxy": 0.333,
+      "response_signal_count": 9,
+      "response_signal_hits": 0,
+      "provider_error_count": 0,
+      "response_recall": 0.0
+    }
+  },
+  "llm_runtime": {
+    "name": "llm_runtime",
+    "scenarios": [
+      {
+        "name": "preference_recall",
+        "description": "The agent should recall explicit user preferences on a later turn.",
+        "turns": [
+          {
+            "user_input": "How should you respond to me in future planning discussions?",
+            "expected_retrievals": [
+              "prefer concise answers",
+              "bullet lists"
+            ],
+            "retrieved_items": [
+              "Remember that I prefer concise answers and bullet lists."
+            ],
+            "matched_expected": [
+              "prefer concise answers",
+              "bullet lists"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I prefer concise answers and bullet lists."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "concise",
+              "bullet"
+            ],
+            "matched_response_signals": []
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 1,
+          "retrieved_hit_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 2,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "concise",
+            "bullet"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "response omitted expected signals: concise, bullet"
+        }
+      },
+      {
+        "name": "task_continuity",
+        "description": "The agent should surface an in-progress task when the user resumes it.",
+        "turns": [
+          {
+            "user_input": "Pick up that release work again and tell me what matters most.",
+            "expected_retrievals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback.",
+              "I am preparing a release checklist for version 2.1."
+            ],
+            "matched_expected": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_response_signals": []
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "release checklist",
+            "migration notes",
+            "rollback"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "response omitted expected signals: release checklist, migration notes, rollback"
+        }
+      },
+      {
+        "name": "context_switching",
+        "description": "The agent should recover both the active task and a stable preference after topic shifts.",
+        "turns": [
+          {
+            "user_input": "Back to the onboarding plan. Keep my preference in mind.",
+            "expected_retrievals": [
+              "prefer concise code reviews",
+              "onboarding checklist"
+            ],
+            "retrieved_items": [
+              "Remember that I prefer concise code reviews.",
+              "I need help planning an onboarding checklist for a new backend engineer."
+            ],
+            "matched_expected": [
+              "prefer concise code reviews",
+              "onboarding checklist"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I prefer concise code reviews.",
+              "I need help planning an onboarding checklist for a new backend engineer."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "concise",
+              "onboarding checklist"
+            ],
+            "matched_response_signals": []
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 2,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "concise",
+            "onboarding checklist"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "response omitted expected signals: concise, onboarding checklist"
+        }
+      },
+      {
+        "name": "session_recovery",
+        "description": "The agent should recover task context after a persisted session reload.",
+        "turns": [
+          {
+            "user_input": "After reloading this session, what issue was I working on?",
+            "expected_retrievals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "retrieved_items": [
+              "The failure happens during the database migration step.",
+              "Remember that I am debugging a flaky deployment pipeline."
+            ],
+            "matched_expected": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I am debugging a flaky deployment pipeline.",
+              "The failure happens during the database migration step."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "matched_response_signals": []
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 2,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "flaky deployment pipeline",
+            "database migration step"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "response omitted expected signals: flaky deployment pipeline, database migration step"
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 9,
+      "matched_count": 9,
+      "retrieved_count": 7,
+      "retrieved_hit_count": 6,
+      "recall": 1.0,
+      "precision_proxy": 0.857,
+      "response_signal_count": 9,
+      "response_signal_hits": 0,
+      "provider_error_count": 0,
+      "response_recall": 0.0
+    },
+    "used_real_llm": true
+  },
+  "comparison": {
+    "recall_delta": 0.556,
+    "precision_proxy_delta": 0.524,
+    "response_recall_delta_vs_baseline": 0.0
+  }
+}

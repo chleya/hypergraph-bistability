@@ -1,0 +1,2033 @@
+{
+  "runtime": {
+    "name": "runtime",
+    "scenarios": [
+      {
+        "name": "task_continuity",
+        "description": "The agent should surface an in-progress task when the user resumes it.",
+        "turns": [
+          {
+            "user_input": "Pick up that release work again and tell me what matters most.",
+            "expected_retrievals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback.",
+              "I am preparing a release checklist for version 2.1."
+            ],
+            "matched_expected": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback."
+            ],
+            "assistant_response": "Top priorities:\n- Release checklist\n- Migration notes\n- Rollback readiness",
+            "expected_response_signals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_response_signals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 1,
+          "irrelevant_retrieved_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "irrelevant_context_rate": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 3,
+          "provider_error_count": 0,
+          "response_recall": 1.0
+        },
+        "continuity": {
+          "task_continuation": 1.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 1.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 1
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "hypergraph_view": {
+          "node_count": 3,
+          "edge_count": 0,
+          "hyperedge_count": 2,
+          "conflict_hyperedge_count": 0,
+          "nodes": [
+            {
+              "node_id": "turn0_write0",
+              "node_type": "context",
+              "hyperedge_id": "task_hyperedge_6349802962",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": null,
+              "turn_index": 0
+            },
+            {
+              "node_id": "turn1_write0",
+              "node_type": "task",
+              "hyperedge_id": "task_hyperedge_754d959359",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": null,
+              "turn_index": 1
+            },
+            {
+              "node_id": "turn2_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": null,
+              "turn_index": 2
+            }
+          ],
+          "edges": [],
+          "hyperedges": [
+            {
+              "hyperedge_id": "task_hyperedge_6349802962",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": null,
+              "member_node_ids": [
+                "turn0_write0"
+              ]
+            },
+            {
+              "hyperedge_id": "task_hyperedge_754d959359",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": null,
+              "member_node_ids": [
+                "turn1_write0"
+              ]
+            }
+          ],
+          "conflict_hyperedges": []
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "no issue detected"
+        }
+      },
+      {
+        "name": "debugging_resume_with_preference",
+        "description": "The agent should resume a debugging issue while honoring a stored diagnostic preference.",
+        "turns": [
+          {
+            "user_input": "Return to the bug and tell me what to investigate first.",
+            "expected_retrievals": [
+              "root cause hypothesis first",
+              "flaky cache invalidation bug",
+              "stale profile data"
+            ],
+            "retrieved_items": [
+              "Remember that when debugging, I want the root cause hypothesis first.",
+              "The bug appears after deploys when stale profile data persists.",
+              "I am investigating a flaky cache invalidation bug in the user profile service."
+            ],
+            "matched_expected": [
+              "root cause hypothesis first",
+              "flaky cache invalidation bug",
+              "stale profile data"
+            ],
+            "matched_retrieved_items": [
+              "Remember that when debugging, I want the root cause hypothesis first.",
+              "I am investigating a flaky cache invalidation bug in the user profile service.",
+              "The bug appears after deploys when stale profile data persists."
+            ],
+            "assistant_response": "Root cause hypothesis: First checks:\n- Root cause hypothesis first.\n- Inspect cache invalidation ordering.\n- Trace stale profile data after deploy.",
+            "expected_response_signals": [
+              "root cause",
+              "cache invalidation",
+              "stale profile data"
+            ],
+            "matched_response_signals": [
+              "root cause",
+              "cache invalidation",
+              "stale profile data"
+            ],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 3,
+          "retrieved_hit_count": 3,
+          "irrelevant_retrieved_count": 0,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "irrelevant_context_rate": 0.0,
+          "response_signal_count": 3,
+          "response_signal_hits": 3,
+          "provider_error_count": 0,
+          "response_recall": 1.0
+        },
+        "continuity": {
+          "task_continuation": 1.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 0.0,
+          "repeated_work_avoidance_proxy": 1.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 0
+        },
+        "artifact_graph": {
+          "node_count": 1,
+          "edge_count": 0,
+          "nodes": [
+            {
+              "artifact_id": "hypothesis_8e14454a81",
+              "artifact_type": "hypothesis",
+              "linked_task": null,
+              "turn_index": 0
+            }
+          ],
+          "edges": []
+        },
+        "hypergraph_view": {
+          "node_count": 5,
+          "edge_count": 0,
+          "hyperedge_count": 4,
+          "conflict_hyperedge_count": 0,
+          "nodes": [
+            {
+              "node_id": "hypothesis_8e14454a81",
+              "node_type": "hypothesis",
+              "hyperedge_id": "evidence_hyperedge_baf0c684b3",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": null,
+              "turn_index": 0
+            },
+            {
+              "node_id": "turn1_write0",
+              "node_type": "context",
+              "hyperedge_id": "evidence_hyperedge_e1a91884f4",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "cache invalidation",
+              "turn_index": 1
+            },
+            {
+              "node_id": "turn2_write0",
+              "node_type": "context",
+              "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "turn_index": 2
+            },
+            {
+              "node_id": "turn3_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": null,
+              "turn_index": 3
+            },
+            {
+              "node_id": "turn4_write0",
+              "node_type": "context",
+              "hyperedge_id": "evidence_hyperedge_4314532078",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": null,
+              "turn_index": 4
+            }
+          ],
+          "edges": [],
+          "hyperedges": [
+            {
+              "hyperedge_id": "evidence_hyperedge_baf0c684b3",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": null,
+              "member_node_ids": [
+                "hypothesis_8e14454a81"
+              ]
+            },
+            {
+              "hyperedge_id": "evidence_hyperedge_e1a91884f4",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "cache invalidation",
+              "member_node_ids": [
+                "turn1_write0"
+              ]
+            },
+            {
+              "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "member_node_ids": [
+                "turn2_write0"
+              ]
+            },
+            {
+              "hyperedge_id": "evidence_hyperedge_4314532078",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": null,
+              "member_node_ids": [
+                "turn4_write0"
+              ]
+            }
+          ],
+          "conflict_hyperedges": []
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "artifact context recovered with 1 node(s)",
+          "suspected_cause": "no issue detected"
+        }
+      },
+      {
+        "name": "artifact_chain_resume",
+        "description": "The agent should recover logs, a debugging hypothesis, and a fix plan after an interruption.",
+        "turns": [
+          {
+            "user_input": "Return to the scheduler incident. What should I inspect first?",
+            "expected_retrievals": [
+              "retry loop overflow",
+              "duplicate scheduler state",
+              "patch dedupe"
+            ],
+            "retrieved_items": [
+              "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.",
+              "Log: worker-7 retry loop overflow after checkpoint resume."
+            ],
+            "matched_expected": [
+              "retry loop overflow",
+              "duplicate scheduler state",
+              "patch dedupe"
+            ],
+            "matched_retrieved_items": [
+              "Log: worker-7 retry loop overflow after checkpoint resume.",
+              "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+            ],
+            "assistant_response": "First checks:\n- Inspect the retry loop state transitions.\n- Inspect retry state restore.\n- Compare checkpoint IDs before and after resume.\n- Confirm the dedupe patch point before requeue.",
+            "expected_response_signals": [
+              "retry state restore",
+              "checkpoint ids",
+              "dedupe"
+            ],
+            "matched_response_signals": [
+              "retry state restore",
+              "checkpoint ids",
+              "dedupe"
+            ],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 3,
+          "retrieved_hit_count": 3,
+          "irrelevant_retrieved_count": 0,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "irrelevant_context_rate": 0.0,
+          "response_signal_count": 3,
+          "response_signal_hits": 3,
+          "provider_error_count": 0,
+          "response_recall": 1.0
+        },
+        "continuity": {
+          "task_continuation": 1.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 1.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 1
+        },
+        "artifact_graph": {
+          "node_count": 3,
+          "edge_count": 1,
+          "nodes": [
+            {
+              "artifact_id": "log_43c01c8272",
+              "artifact_type": "log",
+              "linked_task": "retry loop",
+              "turn_index": 0
+            },
+            {
+              "artifact_id": "hypothesis_8f6ae46b7c",
+              "artifact_type": "hypothesis",
+              "linked_task": "worker scheduler",
+              "turn_index": 1
+            },
+            {
+              "artifact_id": "plan_851fbd998b",
+              "artifact_type": "plan",
+              "linked_task": "worker scheduler",
+              "turn_index": 2
+            }
+          ],
+          "edges": [
+            {
+              "source": "hypothesis_8f6ae46b7c",
+              "target": "plan_851fbd998b",
+              "relation_type": "tests",
+              "linked_task": "worker scheduler"
+            }
+          ]
+        },
+        "hypergraph_view": {
+          "node_count": 5,
+          "edge_count": 1,
+          "hyperedge_count": 4,
+          "conflict_hyperedge_count": 0,
+          "nodes": [
+            {
+              "node_id": "log_43c01c8272",
+              "node_type": "log",
+              "hyperedge_id": "evidence_hyperedge_dce989be91",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "retry loop",
+              "turn_index": 0
+            },
+            {
+              "node_id": "hypothesis_8f6ae46b7c",
+              "node_type": "hypothesis",
+              "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "worker scheduler",
+              "turn_index": 1
+            },
+            {
+              "node_id": "plan_851fbd998b",
+              "node_type": "plan",
+              "hyperedge_id": "change_hyperedge_5dc5ad4870",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": "worker scheduler",
+              "turn_index": 2
+            },
+            {
+              "node_id": "turn3_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": null,
+              "turn_index": 3
+            },
+            {
+              "node_id": "turn4_write0",
+              "node_type": "task",
+              "hyperedge_id": "task_hyperedge_2d28f89724",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": "worker scheduler",
+              "turn_index": 4
+            }
+          ],
+          "edges": [
+            {
+              "source": "hypothesis_8f6ae46b7c",
+              "target": "plan_851fbd998b",
+              "relation_type": "tests",
+              "linked_task": "worker scheduler"
+            }
+          ],
+          "hyperedges": [
+            {
+              "hyperedge_id": "evidence_hyperedge_dce989be91",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "retry loop",
+              "member_node_ids": [
+                "log_43c01c8272"
+              ]
+            },
+            {
+              "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "worker scheduler",
+              "member_node_ids": [
+                "hypothesis_8f6ae46b7c"
+              ]
+            },
+            {
+              "hyperedge_id": "change_hyperedge_5dc5ad4870",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": "worker scheduler",
+              "member_node_ids": [
+                "plan_851fbd998b"
+              ]
+            },
+            {
+              "hyperedge_id": "task_hyperedge_2d28f89724",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": "worker scheduler",
+              "member_node_ids": [
+                "turn4_write0"
+              ]
+            }
+          ],
+          "conflict_hyperedges": []
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "relation chain recovered with 1 edge(s)",
+          "suspected_cause": "no issue detected"
+        }
+      },
+      {
+        "name": "blocker_resume_no_reexplaining",
+        "description": "The agent should resume a blocked task without asking the user to restate the blocker.",
+        "turns": [
+          {
+            "user_input": "Back to the billing rollout. What is blocking us and what should happen next?",
+            "expected_retrievals": [
+              "migration notes are still incomplete",
+              "rollback steps for the old billing schema are missing"
+            ],
+            "retrieved_items": [
+              "The blocker is that rollback steps for the old billing schema are missing.",
+              "I am blocked on the billing rollout because the migration notes are still incomplete.",
+              "Also, give me two lunch ideas near the office."
+            ],
+            "matched_expected": [
+              "migration notes are still incomplete",
+              "rollback steps for the old billing schema are missing"
+            ],
+            "matched_retrieved_items": [
+              "I am blocked on the billing rollout because the migration notes are still incomplete.",
+              "The blocker is that rollback steps for the old billing schema are missing."
+            ],
+            "assistant_response": "Current blockers:\n- The migration notes are still incomplete.\n- The rollback steps for the old billing schema are still missing.\n- Next: finish the rollback steps before the rollout continues.",
+            "expected_response_signals": [
+              "rollback",
+              "migration notes",
+              "next"
+            ],
+            "matched_response_signals": [
+              "rollback",
+              "migration notes",
+              "next"
+            ],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 3,
+          "retrieved_hit_count": 2,
+          "irrelevant_retrieved_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 0.667,
+          "irrelevant_context_rate": 0.333,
+          "response_signal_count": 3,
+          "response_signal_hits": 3,
+          "provider_error_count": 0,
+          "response_recall": 1.0
+        },
+        "continuity": {
+          "task_continuation": 1.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 1.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 1
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "hypergraph_view": {
+          "node_count": 4,
+          "edge_count": 0,
+          "hyperedge_count": 2,
+          "conflict_hyperedge_count": 0,
+          "nodes": [
+            {
+              "node_id": "turn0_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": "production rollout",
+              "turn_index": 0
+            },
+            {
+              "node_id": "turn1_write0",
+              "node_type": "fact",
+              "hyperedge_id": "change_hyperedge_7814cd35a4",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": null,
+              "turn_index": 1
+            },
+            {
+              "node_id": "turn2_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": null,
+              "turn_index": 2
+            },
+            {
+              "node_id": "turn3_write0",
+              "node_type": "task",
+              "hyperedge_id": "task_hyperedge_d6cb99fc7c",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": "production rollout",
+              "turn_index": 3
+            }
+          ],
+          "edges": [],
+          "hyperedges": [
+            {
+              "hyperedge_id": "change_hyperedge_7814cd35a4",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": null,
+              "member_node_ids": [
+                "turn1_write0"
+              ]
+            },
+            {
+              "hyperedge_id": "task_hyperedge_d6cb99fc7c",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": "production rollout",
+              "member_node_ids": [
+                "turn3_write0"
+              ]
+            }
+          ],
+          "conflict_hyperedges": []
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "no issue detected"
+        }
+      },
+      {
+        "name": "decision_resume_after_interruption",
+        "description": "The agent should preserve a prior decision and continue from it after unrelated interruption.",
+        "turns": [
+          {
+            "user_input": "Return to the scheduler work. What decision did we already make and why?",
+            "expected_retrievals": [
+              "patch dedupe before touching the retry policy",
+              "duplicate backoff state is the current blocker"
+            ],
+            "retrieved_items": [
+              "Decision: for the worker scheduler fix, patch dedupe before touching the retry policy.",
+              "Reason: duplicate backoff state is the current blocker and we should avoid widening the change."
+            ],
+            "matched_expected": [
+              "patch dedupe before touching the retry policy",
+              "duplicate backoff state is the current blocker"
+            ],
+            "matched_retrieved_items": [
+              "Decision: for the worker scheduler fix, patch dedupe before touching the retry policy.",
+              "Reason: duplicate backoff state is the current blocker and we should avoid widening the change."
+            ],
+            "assistant_response": "Decision summary:\n- We decided to patch dedupe before touching the retry policy.\n- The reason was the duplicate backoff state blocker.\n- We wanted to avoid widening the change.",
+            "expected_response_signals": [
+              "patch dedupe",
+              "duplicate backoff state",
+              "avoid widening the change"
+            ],
+            "matched_response_signals": [
+              "patch dedupe",
+              "duplicate backoff state",
+              "avoid widening the change"
+            ],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 2,
+          "irrelevant_retrieved_count": 0,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "irrelevant_context_rate": 0.0,
+          "response_signal_count": 3,
+          "response_signal_hits": 3,
+          "provider_error_count": 0,
+          "response_recall": 1.0
+        },
+        "continuity": {
+          "task_continuation": 1.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 1.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 1
+        },
+        "artifact_graph": {
+          "node_count": 2,
+          "edge_count": 1,
+          "nodes": [
+            {
+              "artifact_id": "decision_1f555de57d",
+              "artifact_type": "decision",
+              "linked_task": "worker scheduler",
+              "turn_index": 0
+            },
+            {
+              "artifact_id": "rationale_1ecd6f8c7e",
+              "artifact_type": "rationale",
+              "linked_task": "worker scheduler",
+              "turn_index": 1
+            }
+          ],
+          "edges": [
+            {
+              "source": "decision_1f555de57d",
+              "target": "rationale_1ecd6f8c7e",
+              "relation_type": "rationale_for",
+              "linked_task": "worker scheduler"
+            }
+          ]
+        },
+        "hypergraph_view": {
+          "node_count": 4,
+          "edge_count": 1,
+          "hyperedge_count": 1,
+          "conflict_hyperedge_count": 0,
+          "nodes": [
+            {
+              "node_id": "decision_1f555de57d",
+              "node_type": "decision",
+              "hyperedge_id": "decision_hyperedge_116c356bda",
+              "hyperedge_type": "decision_hyperedge",
+              "linked_task": "worker scheduler",
+              "turn_index": 0
+            },
+            {
+              "node_id": "rationale_1ecd6f8c7e",
+              "node_type": "rationale",
+              "hyperedge_id": "decision_hyperedge_116c356bda",
+              "hyperedge_type": "decision_hyperedge",
+              "linked_task": "worker scheduler",
+              "turn_index": 1
+            },
+            {
+              "node_id": "turn2_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": null,
+              "turn_index": 2
+            },
+            {
+              "node_id": "turn3_write0",
+              "node_type": "context",
+              "hyperedge_id": "decision_hyperedge_116c356bda",
+              "hyperedge_type": "decision_hyperedge",
+              "linked_task": "worker scheduler",
+              "turn_index": 3
+            }
+          ],
+          "edges": [
+            {
+              "source": "decision_1f555de57d",
+              "target": "rationale_1ecd6f8c7e",
+              "relation_type": "rationale_for",
+              "linked_task": "worker scheduler"
+            }
+          ],
+          "hyperedges": [
+            {
+              "hyperedge_id": "decision_hyperedge_116c356bda",
+              "hyperedge_type": "decision_hyperedge",
+              "linked_task": "worker scheduler",
+              "member_node_ids": [
+                "decision_1f555de57d",
+                "rationale_1ecd6f8c7e",
+                "turn3_write0"
+              ]
+            }
+          ],
+          "conflict_hyperedges": []
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "relation chain recovered with 1 edge(s)",
+          "suspected_cause": "no issue detected"
+        }
+      },
+      {
+        "name": "plan_resume_without_restart",
+        "description": "The agent should continue an existing plan instead of restarting with generic exploration prompts.",
+        "turns": [
+          {
+            "user_input": "Continue the scheduler plan from where we left off.",
+            "expected_retrievals": [
+              "inspect retry state restore",
+              "compare checkpoint IDs",
+              "patch dedupe",
+              "duplicate backoff state"
+            ],
+            "retrieved_items": [
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+            ],
+            "matched_expected": [
+              "inspect retry state restore",
+              "compare checkpoint IDs",
+              "patch dedupe"
+            ],
+            "matched_retrieved_items": [
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+            ],
+            "assistant_response": "Plan continuation:\n- Inspect retry state restore first.\n- Compare checkpoint IDs before and after resume.\n- Confirm the dedupe patch point before requeue.",
+            "expected_response_signals": [
+              "retry state restore",
+              "checkpoint ids",
+              "dedupe",
+              "backoff state"
+            ],
+            "matched_response_signals": [
+              "retry state restore",
+              "checkpoint ids",
+              "dedupe"
+            ],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 4,
+          "matched_count": 3,
+          "retrieved_count": 1,
+          "retrieved_hit_count": 1,
+          "irrelevant_retrieved_count": 0,
+          "recall": 0.75,
+          "precision_proxy": 1.0,
+          "irrelevant_context_rate": 0.0,
+          "response_signal_count": 4,
+          "response_signal_hits": 3,
+          "provider_error_count": 0,
+          "response_recall": 0.75
+        },
+        "continuity": {
+          "task_continuation": 1.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 1.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 1
+        },
+        "artifact_graph": {
+          "node_count": 1,
+          "edge_count": 0,
+          "nodes": [
+            {
+              "artifact_id": "plan_851fbd998b",
+              "artifact_type": "plan",
+              "linked_task": null,
+              "turn_index": 0
+            }
+          ],
+          "edges": []
+        },
+        "hypergraph_view": {
+          "node_count": 4,
+          "edge_count": 0,
+          "hyperedge_count": 2,
+          "conflict_hyperedge_count": 0,
+          "nodes": [
+            {
+              "node_id": "plan_851fbd998b",
+              "node_type": "plan",
+              "hyperedge_id": "change_hyperedge_5dc5ad4870",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": null,
+              "turn_index": 0
+            },
+            {
+              "node_id": "turn1_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": null,
+              "turn_index": 1
+            },
+            {
+              "node_id": "turn2_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": null,
+              "turn_index": 2
+            },
+            {
+              "node_id": "turn3_write0",
+              "node_type": "task",
+              "hyperedge_id": "task_hyperedge_2d28f89724",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": "worker scheduler",
+              "turn_index": 3
+            }
+          ],
+          "edges": [],
+          "hyperedges": [
+            {
+              "hyperedge_id": "change_hyperedge_5dc5ad4870",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": null,
+              "member_node_ids": [
+                "plan_851fbd998b"
+              ]
+            },
+            {
+              "hyperedge_id": "task_hyperedge_2d28f89724",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": "worker scheduler",
+              "member_node_ids": [
+                "turn3_write0"
+              ]
+            }
+          ],
+          "conflict_hyperedges": []
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "duplicate backoff state"
+          ],
+          "missing_response_signals": [
+            "backoff state"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "plan artifact present but linked hypothesis missing",
+          "suspected_cause": "query overlap or kind scoring was too weak for: duplicate backoff state"
+        }
+      },
+      {
+        "name": "contradiction_link_resume",
+        "description": "The agent should resume a task with the strongest remaining root cause instead of resurfacing the ruled-out one.",
+        "turns": [
+          {
+            "user_input": "Return to the profile-sync incident and tell me the strongest remaining root cause.",
+            "expected_retrievals": [
+              "times out after redis reconnect",
+              "stale cursor state remains"
+            ],
+            "retrieved_items": [
+              "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker.",
+              "Log: profile-sync job times out after redis reconnect.",
+              "Hypothesis: cursor reset timing is causing the timeout in the sync worker."
+            ],
+            "matched_expected": [
+              "times out after redis reconnect",
+              "stale cursor state remains"
+            ],
+            "matched_retrieved_items": [
+              "Log: profile-sync job times out after redis reconnect.",
+              "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker."
+            ],
+            "assistant_response": "Root cause continuation:\n- The strongest remaining root cause is stale cursor state after reconnect.\n- Backing evidence: the incident starts after redis reconnect.\n\nNext checks:\n- Inspect cursor reset first.",
+            "expected_response_signals": [
+              "stale cursor state",
+              "redis reconnect"
+            ],
+            "matched_response_signals": [
+              "stale cursor state",
+              "redis reconnect"
+            ],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 3,
+          "retrieved_hit_count": 2,
+          "irrelevant_retrieved_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 0.667,
+          "irrelevant_context_rate": 0.333,
+          "response_signal_count": 2,
+          "response_signal_hits": 2,
+          "provider_error_count": 0,
+          "response_recall": 1.0
+        },
+        "continuity": {
+          "task_continuation": 1.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 0.0,
+          "repeated_work_avoidance_proxy": 1.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 0
+        },
+        "artifact_graph": {
+          "node_count": 4,
+          "edge_count": 3,
+          "nodes": [
+            {
+              "artifact_id": "log_84e906201b",
+              "artifact_type": "log",
+              "linked_task": "user profile service",
+              "turn_index": 0
+            },
+            {
+              "artifact_id": "hypothesis_1011f7812d",
+              "artifact_type": "hypothesis",
+              "linked_task": "user profile service",
+              "turn_index": 1
+            },
+            {
+              "artifact_id": "hypothesis_5cb79fe267",
+              "artifact_type": "hypothesis",
+              "linked_task": "user profile service",
+              "turn_index": 3
+            },
+            {
+              "artifact_id": "hypothesis_130908b9c3",
+              "artifact_type": "hypothesis",
+              "linked_task": "user profile service",
+              "turn_index": 4
+            }
+          ],
+          "edges": [
+            {
+              "source": "log_84e906201b",
+              "target": "hypothesis_1011f7812d",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "log_84e906201b",
+              "target": "hypothesis_5cb79fe267",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "log_84e906201b",
+              "target": "hypothesis_130908b9c3",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            }
+          ]
+        },
+        "hypergraph_view": {
+          "node_count": 5,
+          "edge_count": 4,
+          "hyperedge_count": 1,
+          "conflict_hyperedge_count": 1,
+          "nodes": [
+            {
+              "node_id": "log_84e906201b",
+              "node_type": "log",
+              "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "turn_index": 0
+            },
+            {
+              "node_id": "hypothesis_1011f7812d",
+              "node_type": "hypothesis",
+              "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "turn_index": 1
+            },
+            {
+              "node_id": "turn2_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": "user profile service",
+              "turn_index": 2
+            },
+            {
+              "node_id": "hypothesis_5cb79fe267",
+              "node_type": "hypothesis",
+              "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "turn_index": 3
+            },
+            {
+              "node_id": "hypothesis_130908b9c3",
+              "node_type": "hypothesis",
+              "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "turn_index": 4
+            }
+          ],
+          "edges": [
+            {
+              "source": "log_84e906201b",
+              "target": "hypothesis_1011f7812d",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "hypothesis_1011f7812d",
+              "target": "turn2_write0",
+              "relation_type": "contradicts",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "log_84e906201b",
+              "target": "hypothesis_5cb79fe267",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "log_84e906201b",
+              "target": "hypothesis_130908b9c3",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            }
+          ],
+          "hyperedges": [
+            {
+              "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "member_node_ids": [
+                "log_84e906201b",
+                "hypothesis_1011f7812d",
+                "hypothesis_5cb79fe267",
+                "hypothesis_130908b9c3"
+              ]
+            }
+          ],
+          "conflict_hyperedges": [
+            {
+              "conflict_hyperedge_id": "conflict::user profile service::evidence_hyperedge_dd6e3c0c59",
+              "linked_task": "user profile service",
+              "backing_hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "status": "active_conflict",
+              "dominant_node_id": "hypothesis_130908b9c3",
+              "hypothesis_node_ids": [
+                "hypothesis_1011f7812d",
+                "hypothesis_5cb79fe267",
+                "hypothesis_130908b9c3"
+              ],
+              "contradicted_node_ids": [
+                "hypothesis_1011f7812d"
+              ],
+              "active_hypothesis_node_ids": [
+                "hypothesis_5cb79fe267",
+                "hypothesis_130908b9c3"
+              ]
+            }
+          ]
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "relation chain recovered with 3 edge(s) and 1 conflict unit(s)",
+          "suspected_cause": "no issue detected"
+        }
+      },
+      {
+        "name": "conflict_unit_dominance",
+        "description": "The agent should preserve the dominant remaining hypothesis and its backing evidence inside a conflict unit.",
+        "turns": [
+          {
+            "user_input": "Return to the profile-sync incident and name the strongest remaining root cause.",
+            "expected_retrievals": [
+              "stale cursor state remains",
+              "times out after redis reconnect"
+            ],
+            "retrieved_items": [
+              "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush.",
+              "Log: profile-sync job times out after redis reconnect and the worker stalls before final checkpoint flush.",
+              "Hypothesis: cursor reset timing is causing the timeout in the sync worker.",
+              "Hypothesis: the reconnect path is reusing a stale lease token after reconnect."
+            ],
+            "matched_expected": [
+              "stale cursor state remains",
+              "times out after redis reconnect"
+            ],
+            "matched_retrieved_items": [
+              "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush.",
+              "Log: profile-sync job times out after redis reconnect and the worker stalls before final checkpoint flush."
+            ],
+            "assistant_response": "Root cause continuation:\n- The strongest remaining root cause is stale cursor state after reconnect.\n- Backing evidence: the incident starts after redis reconnect.\n- Backing evidence: the worker stalls before the final checkpoint flush.\n\nNext checks:\n- Inspect cursor reset first.",
+            "expected_response_signals": [
+              "stale cursor state",
+              "redis reconnect",
+              "checkpoint flush"
+            ],
+            "matched_response_signals": [
+              "stale cursor state",
+              "redis reconnect",
+              "checkpoint flush"
+            ],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "irrelevant_retrieved_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "irrelevant_context_rate": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 3,
+          "provider_error_count": 0,
+          "response_recall": 1.0
+        },
+        "continuity": {
+          "task_continuation": 1.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 0.0,
+          "repeated_work_avoidance_proxy": 1.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 0
+        },
+        "artifact_graph": {
+          "node_count": 5,
+          "edge_count": 4,
+          "nodes": [
+            {
+              "artifact_id": "log_b86f9f5ab4",
+              "artifact_type": "log",
+              "linked_task": "user profile service",
+              "turn_index": 0
+            },
+            {
+              "artifact_id": "hypothesis_1011f7812d",
+              "artifact_type": "hypothesis",
+              "linked_task": "user profile service",
+              "turn_index": 1
+            },
+            {
+              "artifact_id": "hypothesis_b010917279",
+              "artifact_type": "hypothesis",
+              "linked_task": "user profile service",
+              "turn_index": 3
+            },
+            {
+              "artifact_id": "hypothesis_39abef07d7",
+              "artifact_type": "hypothesis",
+              "linked_task": "user profile service",
+              "turn_index": 4
+            },
+            {
+              "artifact_id": "hypothesis_cc9dae8b7c",
+              "artifact_type": "hypothesis",
+              "linked_task": "user profile service",
+              "turn_index": 5
+            }
+          ],
+          "edges": [
+            {
+              "source": "log_b86f9f5ab4",
+              "target": "hypothesis_1011f7812d",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "log_b86f9f5ab4",
+              "target": "hypothesis_b010917279",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "log_b86f9f5ab4",
+              "target": "hypothesis_39abef07d7",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "log_b86f9f5ab4",
+              "target": "hypothesis_cc9dae8b7c",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            }
+          ]
+        },
+        "hypergraph_view": {
+          "node_count": 6,
+          "edge_count": 5,
+          "hyperedge_count": 2,
+          "conflict_hyperedge_count": 1,
+          "nodes": [
+            {
+              "node_id": "log_b86f9f5ab4",
+              "node_type": "log",
+              "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "turn_index": 0
+            },
+            {
+              "node_id": "hypothesis_1011f7812d",
+              "node_type": "hypothesis",
+              "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "turn_index": 1
+            },
+            {
+              "node_id": "turn2_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": "user profile service",
+              "turn_index": 2
+            },
+            {
+              "node_id": "hypothesis_b010917279",
+              "node_type": "hypothesis",
+              "hyperedge_id": "evidence_hyperedge_8d40a547a0",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "turn_index": 3
+            },
+            {
+              "node_id": "hypothesis_39abef07d7",
+              "node_type": "hypothesis",
+              "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "turn_index": 4
+            },
+            {
+              "node_id": "hypothesis_cc9dae8b7c",
+              "node_type": "hypothesis",
+              "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "turn_index": 5
+            }
+          ],
+          "edges": [
+            {
+              "source": "log_b86f9f5ab4",
+              "target": "hypothesis_1011f7812d",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "hypothesis_1011f7812d",
+              "target": "turn2_write0",
+              "relation_type": "contradicts",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "log_b86f9f5ab4",
+              "target": "hypothesis_b010917279",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "log_b86f9f5ab4",
+              "target": "hypothesis_39abef07d7",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "log_b86f9f5ab4",
+              "target": "hypothesis_cc9dae8b7c",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            }
+          ],
+          "hyperedges": [
+            {
+              "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "member_node_ids": [
+                "log_b86f9f5ab4",
+                "hypothesis_1011f7812d",
+                "hypothesis_39abef07d7",
+                "hypothesis_cc9dae8b7c"
+              ]
+            },
+            {
+              "hyperedge_id": "evidence_hyperedge_8d40a547a0",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "member_node_ids": [
+                "hypothesis_b010917279"
+              ]
+            }
+          ],
+          "conflict_hyperedges": [
+            {
+              "conflict_hyperedge_id": "conflict::user profile service::evidence_hyperedge_dd6e3c0c59",
+              "linked_task": "user profile service",
+              "backing_hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "status": "active_conflict",
+              "dominant_node_id": "hypothesis_cc9dae8b7c",
+              "hypothesis_node_ids": [
+                "hypothesis_1011f7812d",
+                "hypothesis_39abef07d7",
+                "hypothesis_cc9dae8b7c"
+              ],
+              "contradicted_node_ids": [
+                "hypothesis_1011f7812d"
+              ],
+              "active_hypothesis_node_ids": [
+                "hypothesis_39abef07d7",
+                "hypothesis_cc9dae8b7c"
+              ]
+            }
+          ]
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "relation chain recovered with 4 edge(s) and 1 conflict unit(s)",
+          "suspected_cause": "no issue detected"
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 21,
+      "matched_count": 20,
+      "retrieved_count": 21,
+      "retrieved_hit_count": 16,
+      "irrelevant_retrieved_count": 5,
+      "recall": 0.952,
+      "precision_proxy": 0.762,
+      "irrelevant_context_rate": 0.238,
+      "response_signal_count": 24,
+      "response_signal_hits": 23,
+      "provider_error_count": 0,
+      "response_recall": 0.958
+    },
+    "continuity": {
+      "scenario_count": 8,
+      "blocker_eligible_scenarios": 8,
+      "decision_eligible_scenarios": 5,
+      "task_continuation": 1.0,
+      "blocker_preservation": 1.0,
+      "decision_continuity": 1.0,
+      "repeated_work_avoidance_proxy": 1.0
+    }
+  },
+  "recent_history_baseline": {
+    "name": "recent_history_baseline",
+    "scenarios": [
+      {
+        "name": "task_continuity",
+        "description": "The agent should surface an in-progress task when the user resumes it.",
+        "turns": [
+          {
+            "user_input": "Pick up that release work again and tell me what matters most.",
+            "expected_retrievals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback.",
+              "[baseline] The release checklist should include docs, migration notes, and rollback.",
+              "I am preparing a release checklist for version 2.1.",
+              "[baseline] I am preparing a release checklist for version 2.1."
+            ],
+            "matched_expected": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_response_signals": [],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 1,
+          "irrelevant_retrieved_count": 3,
+          "recall": 1.0,
+          "precision_proxy": 0.25,
+          "irrelevant_context_rate": 0.75,
+          "response_signal_count": 3,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "continuity": {
+          "task_continuation": 0.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 0.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 1
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "release checklist",
+            "migration notes",
+            "rollback"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "response omitted expected signals: release checklist, migration notes, rollback"
+        }
+      },
+      {
+        "name": "debugging_resume_with_preference",
+        "description": "The agent should resume a debugging issue while honoring a stored diagnostic preference.",
+        "turns": [
+          {
+            "user_input": "Return to the bug and tell me what to investigate first.",
+            "expected_retrievals": [
+              "root cause hypothesis first",
+              "flaky cache invalidation bug",
+              "stale profile data"
+            ],
+            "retrieved_items": [
+              "Remember that when debugging, I want the root cause hypothesis first.",
+              "[baseline] Remember that when debugging, I want the root cause hypothesis first.",
+              "I am investigating a flaky cache invalidation bug in the user profile service.",
+              "[baseline] I am investigating a flaky cache invalidation bug in the user profile service."
+            ],
+            "matched_expected": [
+              "root cause hypothesis first",
+              "flaky cache invalidation bug"
+            ],
+            "matched_retrieved_items": [
+              "Remember that when debugging, I want the root cause hypothesis first.",
+              "I am investigating a flaky cache invalidation bug in the user profile service."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "root cause",
+              "cache invalidation",
+              "stale profile data"
+            ],
+            "matched_response_signals": [],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "irrelevant_retrieved_count": 2,
+          "recall": 0.667,
+          "precision_proxy": 0.5,
+          "irrelevant_context_rate": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "continuity": {
+          "task_continuation": 0.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 0.0,
+          "repeated_work_avoidance_proxy": 0.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 0
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "stale profile data"
+          ],
+          "missing_response_signals": [
+            "root cause",
+            "cache invalidation",
+            "stale profile data"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "query overlap or kind scoring was too weak for: stale profile data"
+        }
+      },
+      {
+        "name": "artifact_chain_resume",
+        "description": "The agent should recover logs, a debugging hypothesis, and a fix plan after an interruption.",
+        "turns": [
+          {
+            "user_input": "Return to the scheduler incident. What should I inspect first?",
+            "expected_retrievals": [
+              "retry loop overflow",
+              "duplicate scheduler state",
+              "patch dedupe"
+            ],
+            "retrieved_items": [
+              "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+              "[baseline] Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.",
+              "[baseline] Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+            ],
+            "matched_expected": [
+              "duplicate scheduler state",
+              "patch dedupe"
+            ],
+            "matched_retrieved_items": [
+              "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "retry state restore",
+              "checkpoint ids",
+              "dedupe"
+            ],
+            "matched_response_signals": [],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "irrelevant_retrieved_count": 2,
+          "recall": 0.667,
+          "precision_proxy": 0.5,
+          "irrelevant_context_rate": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "continuity": {
+          "task_continuation": 0.0,
+          "blocker_preservation": 0.0,
+          "decision_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 0.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 1
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "retry loop overflow"
+          ],
+          "missing_response_signals": [
+            "retry state restore",
+            "checkpoint ids",
+            "dedupe"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "query overlap or kind scoring was too weak for: retry loop overflow"
+        }
+      },
+      {
+        "name": "blocker_resume_no_reexplaining",
+        "description": "The agent should resume a blocked task without asking the user to restate the blocker.",
+        "turns": [
+          {
+            "user_input": "Back to the billing rollout. What is blocking us and what should happen next?",
+            "expected_retrievals": [
+              "migration notes are still incomplete",
+              "rollback steps for the old billing schema are missing"
+            ],
+            "retrieved_items": [
+              "I am blocked on the billing rollout because the migration notes are still incomplete.",
+              "[baseline] I am blocked on the billing rollout because the migration notes are still incomplete.",
+              "The blocker is that rollback steps for the old billing schema are missing.",
+              "[baseline] The blocker is that rollback steps for the old billing schema are missing."
+            ],
+            "matched_expected": [
+              "migration notes are still incomplete",
+              "rollback steps for the old billing schema are missing"
+            ],
+            "matched_retrieved_items": [
+              "I am blocked on the billing rollout because the migration notes are still incomplete.",
+              "The blocker is that rollback steps for the old billing schema are missing."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "rollback",
+              "migration notes",
+              "next"
+            ],
+            "matched_response_signals": [],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "irrelevant_retrieved_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "irrelevant_context_rate": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "continuity": {
+          "task_continuation": 0.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 0.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 1
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "rollback",
+            "migration notes",
+            "next"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "response omitted expected signals: rollback, migration notes, next"
+        }
+      },
+      {
+        "name": "decision_resume_after_interruption",
+        "description": "The agent should preserve a prior decision and continue from it after unrelated interruption.",
+        "turns": [
+          {
+            "user_input": "Return to the scheduler work. What decision did we already make and why?",
+            "expected_retrievals": [
+              "patch dedupe before touching the retry policy",
+              "duplicate backoff state is the current blocker"
+            ],
+            "retrieved_items": [
+              "Decision: for the worker scheduler fix, patch dedupe before touching the retry policy.",
+              "[baseline] Decision: for the worker scheduler fix, patch dedupe before touching the retry policy.",
+              "Reason: duplicate backoff state is the current blocker and we should avoid widening the change.",
+              "[baseline] Reason: duplicate backoff state is the current blocker and we should avoid widening the change."
+            ],
+            "matched_expected": [
+              "patch dedupe before touching the retry policy",
+              "duplicate backoff state is the current blocker"
+            ],
+            "matched_retrieved_items": [
+              "Decision: for the worker scheduler fix, patch dedupe before touching the retry policy.",
+              "Reason: duplicate backoff state is the current blocker and we should avoid widening the change."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "patch dedupe",
+              "duplicate backoff state",
+              "avoid widening the change"
+            ],
+            "matched_response_signals": [],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "irrelevant_retrieved_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "irrelevant_context_rate": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "continuity": {
+          "task_continuation": 0.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 0.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 1
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "patch dedupe",
+            "duplicate backoff state",
+            "avoid widening the change"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "response omitted expected signals: patch dedupe, duplicate backoff state, avoid widening the change"
+        }
+      },
+      {
+        "name": "plan_resume_without_restart",
+        "description": "The agent should continue an existing plan instead of restarting with generic exploration prompts.",
+        "turns": [
+          {
+            "user_input": "Continue the scheduler plan from where we left off.",
+            "expected_retrievals": [
+              "inspect retry state restore",
+              "compare checkpoint IDs",
+              "patch dedupe",
+              "duplicate backoff state"
+            ],
+            "retrieved_items": [
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.",
+              "[baseline] Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.",
+              "The current blocker is duplicate backoff state after checkpoint resume.",
+              "[baseline] The current blocker is duplicate backoff state after checkpoint resume."
+            ],
+            "matched_expected": [
+              "inspect retry state restore",
+              "compare checkpoint IDs",
+              "patch dedupe",
+              "duplicate backoff state"
+            ],
+            "matched_retrieved_items": [
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.",
+              "The current blocker is duplicate backoff state after checkpoint resume."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "retry state restore",
+              "checkpoint ids",
+              "dedupe",
+              "backoff state"
+            ],
+            "matched_response_signals": [],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 4,
+          "matched_count": 4,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "irrelevant_retrieved_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "irrelevant_context_rate": 0.5,
+          "response_signal_count": 4,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "continuity": {
+          "task_continuation": 0.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 0.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 1
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "retry state restore",
+            "checkpoint ids",
+            "dedupe",
+            "backoff state"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "response omitted expected signals: retry state restore, checkpoint ids, dedupe"
+        }
+      },
+      {
+        "name": "contradiction_link_resume",
+        "description": "The agent should resume a task with the strongest remaining root cause instead of resurfacing the ruled-out one.",
+        "turns": [
+          {
+            "user_input": "Return to the profile-sync incident and tell me the strongest remaining root cause.",
+            "expected_retrievals": [
+              "times out after redis reconnect",
+              "stale cursor state remains"
+            ],
+            "retrieved_items": [
+              "The cursor reset timing theory was wrong and ruled out after reproducing the timeout.",
+              "[baseline] The cursor reset timing theory was wrong and ruled out after reproducing the timeout.",
+              "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker.",
+              "[baseline] Hypothesis: stale cursor state remains after reconnect and blocks the sync worker."
+            ],
+            "matched_expected": [
+              "stale cursor state remains"
+            ],
+            "matched_retrieved_items": [
+              "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "stale cursor state",
+              "redis reconnect"
+            ],
+            "matched_response_signals": [],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 1,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 1,
+          "irrelevant_retrieved_count": 3,
+          "recall": 0.5,
+          "precision_proxy": 0.25,
+          "irrelevant_context_rate": 0.75,
+          "response_signal_count": 2,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "continuity": {
+          "task_continuation": 0.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 0.0,
+          "repeated_work_avoidance_proxy": 0.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 0
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "times out after redis reconnect"
+          ],
+          "missing_response_signals": [
+            "stale cursor state",
+            "redis reconnect"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "query overlap or kind scoring was too weak for: times out after redis reconnect"
+        }
+      },
+      {
+        "name": "conflict_unit_dominance",
+        "description": "The agent should preserve the dominant remaining hypothesis and its backing evidence inside a conflict unit.",
+        "turns": [
+          {
+            "user_input": "Return to the profile-sync incident and name the strongest remaining root cause.",
+            "expected_retrievals": [
+              "stale cursor state remains",
+              "times out after redis reconnect"
+            ],
+            "retrieved_items": [
+              "The cursor reset timing theory was wrong and ruled out after reproducing the timeout.",
+              "[baseline] The cursor reset timing theory was wrong and ruled out after reproducing the timeout.",
+              "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush.",
+              "[baseline] Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush."
+            ],
+            "matched_expected": [
+              "stale cursor state remains"
+            ],
+            "matched_retrieved_items": [
+              "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "stale cursor state",
+              "redis reconnect",
+              "checkpoint flush"
+            ],
+            "matched_response_signals": [],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 1,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 1,
+          "irrelevant_retrieved_count": 3,
+          "recall": 0.5,
+          "precision_proxy": 0.25,
+          "irrelevant_context_rate": 0.75,
+          "response_signal_count": 3,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "continuity": {
+          "task_continuation": 0.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 0.0,
+          "repeated_work_avoidance_proxy": 0.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 0
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "times out after redis reconnect"
+          ],
+          "missing_response_signals": [
+            "stale cursor state",
+            "redis reconnect",
+            "checkpoint flush"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "query overlap or kind scoring was too weak for: times out after redis reconnect"
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 21,
+      "matched_count": 17,
+      "retrieved_count": 32,
+      "retrieved_hit_count": 13,
+      "irrelevant_retrieved_count": 19,
+      "recall": 0.81,
+      "precision_proxy": 0.406,
+      "irrelevant_context_rate": 0.594,
+      "response_signal_count": 24,
+      "response_signal_hits": 0,
+      "provider_error_count": 0,
+      "response_recall": 0.0
+    },
+    "continuity": {
+      "scenario_count": 8,
+      "blocker_eligible_scenarios": 8,
+      "decision_eligible_scenarios": 5,
+      "task_continuation": 0.0,
+      "blocker_preservation": 0.875,
+      "decision_continuity": 1.0,
+      "repeated_work_avoidance_proxy": 0.0
+    }
+  },
+  "comparison": {
+    "recall_delta": 0.1419999999999999,
+    "precision_proxy_delta": 0.356,
+    "response_recall_delta_vs_baseline": 0.958
+  }
+}

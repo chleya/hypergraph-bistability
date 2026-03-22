@@ -1,0 +1,680 @@
+{
+  "runtime": {
+    "name": "runtime",
+    "scenarios": [
+      {
+        "name": "blocker_resume_no_reexplaining",
+        "description": "The agent should resume a blocked task without asking the user to restate the blocker.",
+        "turns": [
+          {
+            "user_input": "Back to the billing rollout. What is blocking us and what should happen next?",
+            "expected_retrievals": [
+              "migration notes are still incomplete",
+              "rollback steps for the old billing schema are missing"
+            ],
+            "retrieved_items": [
+              "The blocker is that rollback steps for the old billing schema are missing.",
+              "I am blocked on the billing rollout because the migration notes are still incomplete.",
+              "Also, give me two lunch ideas near the office."
+            ],
+            "matched_expected": [
+              "migration notes are still incomplete",
+              "rollback steps for the old billing schema are missing"
+            ],
+            "matched_retrieved_items": [
+              "I am blocked on the billing rollout because the migration notes are still incomplete.",
+              "The blocker is that rollback steps for the old billing schema are missing."
+            ],
+            "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?",
+            "expected_response_signals": [
+              "rollback",
+              "migration notes",
+              "next"
+            ],
+            "matched_response_signals": [],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 3,
+          "retrieved_hit_count": 2,
+          "irrelevant_retrieved_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 0.667,
+          "irrelevant_context_rate": 0.333,
+          "response_signal_count": 3,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "continuity": {
+          "task_continuation": 0.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 0.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "hypergraph_view": {
+          "node_count": 4,
+          "edge_count": 0,
+          "hyperedge_count": 2,
+          "conflict_hyperedge_count": 0,
+          "nodes": [
+            {
+              "node_id": "turn0_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": "production rollout",
+              "turn_index": 0
+            },
+            {
+              "node_id": "turn1_write0",
+              "node_type": "fact",
+              "hyperedge_id": "change_hyperedge_7814cd35a4",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": null,
+              "turn_index": 1
+            },
+            {
+              "node_id": "turn2_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": null,
+              "turn_index": 2
+            },
+            {
+              "node_id": "turn3_write0",
+              "node_type": "task",
+              "hyperedge_id": "task_hyperedge_d6cb99fc7c",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": "production rollout",
+              "turn_index": 3
+            }
+          ],
+          "edges": [],
+          "hyperedges": [
+            {
+              "hyperedge_id": "change_hyperedge_7814cd35a4",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": null,
+              "member_node_ids": [
+                "turn1_write0"
+              ]
+            },
+            {
+              "hyperedge_id": "task_hyperedge_d6cb99fc7c",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": "production rollout",
+              "member_node_ids": [
+                "turn3_write0"
+              ]
+            }
+          ],
+          "conflict_hyperedges": []
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "rollback",
+            "migration notes",
+            "next"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "response omitted expected signals: rollback, migration notes, next"
+        }
+      },
+      {
+        "name": "decision_resume_after_interruption",
+        "description": "The agent should preserve a prior decision and continue from it after unrelated interruption.",
+        "turns": [
+          {
+            "user_input": "Return to the scheduler work. What decision did we already make and why?",
+            "expected_retrievals": [
+              "patch dedupe before touching the retry policy",
+              "duplicate backoff state is the current blocker"
+            ],
+            "retrieved_items": [
+              "Reason: duplicate backoff state is the current blocker and we should avoid widening the change.",
+              "Decision: for the worker scheduler fix, patch dedupe before touching the retry policy."
+            ],
+            "matched_expected": [
+              "patch dedupe before touching the retry policy",
+              "duplicate backoff state is the current blocker"
+            ],
+            "matched_retrieved_items": [
+              "Decision: for the worker scheduler fix, patch dedupe before touching the retry policy.",
+              "Reason: duplicate backoff state is the current blocker and we should avoid widening the change."
+            ],
+            "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?",
+            "expected_response_signals": [
+              "patch dedupe",
+              "duplicate backoff state",
+              "avoid widening the change"
+            ],
+            "matched_response_signals": [],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 2,
+          "irrelevant_retrieved_count": 0,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "irrelevant_context_rate": 0.0,
+          "response_signal_count": 3,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "continuity": {
+          "task_continuation": 0.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 0.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "hypergraph_view": {
+          "node_count": 4,
+          "edge_count": 0,
+          "hyperedge_count": 3,
+          "conflict_hyperedge_count": 0,
+          "nodes": [
+            {
+              "node_id": "turn0_write0",
+              "node_type": "context",
+              "hyperedge_id": "change_hyperedge_4804f76f49",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": "worker scheduler",
+              "turn_index": 0
+            },
+            {
+              "node_id": "turn1_write0",
+              "node_type": "task",
+              "hyperedge_id": "task_hyperedge_b82390f55a",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": null,
+              "turn_index": 1
+            },
+            {
+              "node_id": "turn2_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": null,
+              "turn_index": 2
+            },
+            {
+              "node_id": "turn3_write0",
+              "node_type": "context",
+              "hyperedge_id": "decision_hyperedge_116c356bda",
+              "hyperedge_type": "decision_hyperedge",
+              "linked_task": "worker scheduler",
+              "turn_index": 3
+            }
+          ],
+          "edges": [],
+          "hyperedges": [
+            {
+              "hyperedge_id": "change_hyperedge_4804f76f49",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": "worker scheduler",
+              "member_node_ids": [
+                "turn0_write0"
+              ]
+            },
+            {
+              "hyperedge_id": "task_hyperedge_b82390f55a",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": null,
+              "member_node_ids": [
+                "turn1_write0"
+              ]
+            },
+            {
+              "hyperedge_id": "decision_hyperedge_116c356bda",
+              "hyperedge_type": "decision_hyperedge",
+              "linked_task": "worker scheduler",
+              "member_node_ids": [
+                "turn3_write0"
+              ]
+            }
+          ],
+          "conflict_hyperedges": []
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "patch dedupe",
+            "duplicate backoff state",
+            "avoid widening the change"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "response omitted expected signals: patch dedupe, duplicate backoff state, avoid widening the change"
+        }
+      },
+      {
+        "name": "plan_resume_without_restart",
+        "description": "The agent should continue an existing plan instead of restarting with generic exploration prompts.",
+        "turns": [
+          {
+            "user_input": "Continue the scheduler plan from where we left off.",
+            "expected_retrievals": [
+              "inspect retry state restore",
+              "compare checkpoint IDs",
+              "patch dedupe",
+              "duplicate backoff state"
+            ],
+            "retrieved_items": [
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+            ],
+            "matched_expected": [
+              "inspect retry state restore",
+              "compare checkpoint IDs",
+              "patch dedupe"
+            ],
+            "matched_retrieved_items": [
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+            ],
+            "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?",
+            "expected_response_signals": [
+              "retry state restore",
+              "checkpoint ids",
+              "dedupe",
+              "backoff state"
+            ],
+            "matched_response_signals": [],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 4,
+          "matched_count": 3,
+          "retrieved_count": 1,
+          "retrieved_hit_count": 1,
+          "irrelevant_retrieved_count": 0,
+          "recall": 0.75,
+          "precision_proxy": 1.0,
+          "irrelevant_context_rate": 0.0,
+          "response_signal_count": 4,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "continuity": {
+          "task_continuation": 0.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 0.0
+        },
+        "artifact_graph": {
+          "node_count": 1,
+          "edge_count": 0,
+          "nodes": [
+            {
+              "artifact_id": "plan_851fbd998b",
+              "artifact_type": "plan",
+              "linked_task": null,
+              "turn_index": 0
+            }
+          ],
+          "edges": []
+        },
+        "hypergraph_view": {
+          "node_count": 4,
+          "edge_count": 0,
+          "hyperedge_count": 2,
+          "conflict_hyperedge_count": 0,
+          "nodes": [
+            {
+              "node_id": "plan_851fbd998b",
+              "node_type": "plan",
+              "hyperedge_id": "change_hyperedge_5dc5ad4870",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": null,
+              "turn_index": 0
+            },
+            {
+              "node_id": "turn1_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": null,
+              "turn_index": 1
+            },
+            {
+              "node_id": "turn2_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": null,
+              "turn_index": 2
+            },
+            {
+              "node_id": "turn3_write0",
+              "node_type": "task",
+              "hyperedge_id": "task_hyperedge_2d28f89724",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": "worker scheduler",
+              "turn_index": 3
+            }
+          ],
+          "edges": [],
+          "hyperedges": [
+            {
+              "hyperedge_id": "change_hyperedge_5dc5ad4870",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": null,
+              "member_node_ids": [
+                "plan_851fbd998b"
+              ]
+            },
+            {
+              "hyperedge_id": "task_hyperedge_2d28f89724",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": "worker scheduler",
+              "member_node_ids": [
+                "turn3_write0"
+              ]
+            }
+          ],
+          "conflict_hyperedges": []
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "duplicate backoff state"
+          ],
+          "missing_response_signals": [
+            "retry state restore",
+            "checkpoint ids",
+            "dedupe",
+            "backoff state"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "plan artifact present but linked hypothesis missing",
+          "suspected_cause": "query overlap or kind scoring was too weak for: duplicate backoff state"
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 8,
+      "matched_count": 7,
+      "retrieved_count": 6,
+      "retrieved_hit_count": 5,
+      "irrelevant_retrieved_count": 1,
+      "recall": 0.875,
+      "precision_proxy": 0.833,
+      "irrelevant_context_rate": 0.167,
+      "response_signal_count": 10,
+      "response_signal_hits": 0,
+      "provider_error_count": 0,
+      "response_recall": 0.0
+    },
+    "continuity": {
+      "scenario_count": 3,
+      "task_continuation": 0.0,
+      "blocker_preservation": 1.0,
+      "decision_continuity": 1.0,
+      "repeated_work_avoidance_proxy": 0.0
+    }
+  },
+  "recent_history_baseline": {
+    "name": "recent_history_baseline",
+    "scenarios": [
+      {
+        "name": "blocker_resume_no_reexplaining",
+        "description": "The agent should resume a blocked task without asking the user to restate the blocker.",
+        "turns": [
+          {
+            "user_input": "Back to the billing rollout. What is blocking us and what should happen next?",
+            "expected_retrievals": [
+              "migration notes are still incomplete",
+              "rollback steps for the old billing schema are missing"
+            ],
+            "retrieved_items": [
+              "I am blocked on the billing rollout because the migration notes are still incomplete.",
+              "[baseline] I am blocked on the billing rollout because the migration notes are still incomplete.",
+              "The blocker is that rollback steps for the old billing schema are missing.",
+              "[baseline] The blocker is that rollback steps for the old billing schema are missing."
+            ],
+            "matched_expected": [
+              "migration notes are still incomplete",
+              "rollback steps for the old billing schema are missing"
+            ],
+            "matched_retrieved_items": [
+              "I am blocked on the billing rollout because the migration notes are still incomplete.",
+              "The blocker is that rollback steps for the old billing schema are missing."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "rollback",
+              "migration notes",
+              "next"
+            ],
+            "matched_response_signals": [],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "irrelevant_retrieved_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "irrelevant_context_rate": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "continuity": {
+          "task_continuation": 0.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 0.0
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "rollback",
+            "migration notes",
+            "next"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "response omitted expected signals: rollback, migration notes, next"
+        }
+      },
+      {
+        "name": "decision_resume_after_interruption",
+        "description": "The agent should preserve a prior decision and continue from it after unrelated interruption.",
+        "turns": [
+          {
+            "user_input": "Return to the scheduler work. What decision did we already make and why?",
+            "expected_retrievals": [
+              "patch dedupe before touching the retry policy",
+              "duplicate backoff state is the current blocker"
+            ],
+            "retrieved_items": [
+              "Decision: for the worker scheduler fix, patch dedupe before touching the retry policy.",
+              "[baseline] Decision: for the worker scheduler fix, patch dedupe before touching the retry policy.",
+              "Reason: duplicate backoff state is the current blocker and we should avoid widening the change.",
+              "[baseline] Reason: duplicate backoff state is the current blocker and we should avoid widening the change."
+            ],
+            "matched_expected": [
+              "patch dedupe before touching the retry policy",
+              "duplicate backoff state is the current blocker"
+            ],
+            "matched_retrieved_items": [
+              "Decision: for the worker scheduler fix, patch dedupe before touching the retry policy.",
+              "Reason: duplicate backoff state is the current blocker and we should avoid widening the change."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "patch dedupe",
+              "duplicate backoff state",
+              "avoid widening the change"
+            ],
+            "matched_response_signals": [],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "irrelevant_retrieved_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "irrelevant_context_rate": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "continuity": {
+          "task_continuation": 0.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 0.0
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "patch dedupe",
+            "duplicate backoff state",
+            "avoid widening the change"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "response omitted expected signals: patch dedupe, duplicate backoff state, avoid widening the change"
+        }
+      },
+      {
+        "name": "plan_resume_without_restart",
+        "description": "The agent should continue an existing plan instead of restarting with generic exploration prompts.",
+        "turns": [
+          {
+            "user_input": "Continue the scheduler plan from where we left off.",
+            "expected_retrievals": [
+              "inspect retry state restore",
+              "compare checkpoint IDs",
+              "patch dedupe",
+              "duplicate backoff state"
+            ],
+            "retrieved_items": [
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.",
+              "[baseline] Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.",
+              "The current blocker is duplicate backoff state after checkpoint resume.",
+              "[baseline] The current blocker is duplicate backoff state after checkpoint resume."
+            ],
+            "matched_expected": [
+              "inspect retry state restore",
+              "compare checkpoint IDs",
+              "patch dedupe",
+              "duplicate backoff state"
+            ],
+            "matched_retrieved_items": [
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.",
+              "The current blocker is duplicate backoff state after checkpoint resume."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "retry state restore",
+              "checkpoint ids",
+              "dedupe",
+              "backoff state"
+            ],
+            "matched_response_signals": [],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 4,
+          "matched_count": 4,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "irrelevant_retrieved_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "irrelevant_context_rate": 0.5,
+          "response_signal_count": 4,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "continuity": {
+          "task_continuation": 0.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 0.0
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "retry state restore",
+            "checkpoint ids",
+            "dedupe",
+            "backoff state"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "response omitted expected signals: retry state restore, checkpoint ids, dedupe"
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 8,
+      "matched_count": 8,
+      "retrieved_count": 12,
+      "retrieved_hit_count": 6,
+      "irrelevant_retrieved_count": 6,
+      "recall": 1.0,
+      "precision_proxy": 0.5,
+      "irrelevant_context_rate": 0.5,
+      "response_signal_count": 10,
+      "response_signal_hits": 0,
+      "provider_error_count": 0,
+      "response_recall": 0.0
+    },
+    "continuity": {
+      "scenario_count": 3,
+      "task_continuation": 0.0,
+      "blocker_preservation": 1.0,
+      "decision_continuity": 1.0,
+      "repeated_work_avoidance_proxy": 0.0
+    }
+  },
+  "comparison": {
+    "recall_delta": -0.125,
+    "precision_proxy_delta": 0.33299999999999996,
+    "response_recall_delta_vs_baseline": 0.0
+  }
+}

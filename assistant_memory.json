@@ -1,0 +1,37 @@
+{
+  "name": "assistant",
+  "k": 3,
+  "L": 2,
+  "lambda_": 0.05,
+  "mu": 0.0,
+  "current_mode": "neutral",
+  "mode_history": [],
+  "M": [
+    [
+      0.9964697841672008,
+      0.7542047793208367
+    ],
+    [
+      0.9964697782672708,
+      0.7542047793208367
+    ],
+    [
+      0.8787233091661393,
+      0.9891704953783117
+    ]
+  ],
+  "content_map": {
+    "(0,0)": "Short responses preferred",
+    "(1,0)": "Like analogies",
+    "(2,1)": "Tech industry"
+  },
+  "group_labels": [
+    "professional",
+    "friendly",
+    "technical"
+  ],
+  "layer_labels": [
+    "preferences",
+    "context"
+  ]
+}

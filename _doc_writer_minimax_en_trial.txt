@@ -1,0 +1,29 @@
+# Stable Agent Roadmap Summary
+
+## Current Position
+
+The project has a stable alpha runtime under `stable_v1` (`src/hypergraph_bistability/`) with:
+
+- Controllable memory core with physics-based control (`lambda`, `mu`, `lambda_c`)
+- Structured agent turn pipeline with write/retrieval policies
+- Session persistence with turn logs and terminal chat demo
+- Working-set/query layer for current task state, dominant conflict, decision residue, and applicable procedures
+- Document-driven writing path (`cli write-from-docs`)
+- All formal regressions green (product, long-task, conflict-heavy)
+
+The system is validated through practical regression, not only mechanism experiments. However, it is not yet a fully practical production-grade agent.
+
+## Three-Stage Roadmap
+
+**Stage 1: Alpha Completion** (completed)
+Stable runtime with core components, basic validation suites, and offline-safe fallback.
+
+**Stage 2: Production Hardening** (current)
+Focus on practical interfaces for integration, predictable behavior, stable memory management, and measurable quality against baseline agent memory approaches.
+
+**Stage 3: Full Practical Agent System**
+Deployable as long-running assistants, coding/planning agents, multi-context copilots, and interpretable memory-aware chat systems with practical handoff/review/closeout continuity.
+
+## Next Step
+
+Continue the `Procedural Memory v1` capability push while hardening integration interfaces and expanding practical regression coverage to validate predictable behavior in real-world agent tasks.

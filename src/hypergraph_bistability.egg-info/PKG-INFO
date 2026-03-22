@@ -1,0 +1,163 @@
+Metadata-Version: 2.4
+Name: hypergraph-bistability
+Version: 0.1.0
+Summary: Agent Memory Module based on hypergraph multistability theory with physics-grounded λ_c control
+Author: Project Authors
+License: MIT
+Project-URL: Homepage, https://github.com/chleya/hypergraph-bistability
+Project-URL: Repository, https://github.com/chleya/hypergraph-bistability.git
+Project-URL: Issues, https://github.com/chleya/hypergraph-bistability/issues
+Keywords: hypergraph,multistability,agent-memory,physics,bistability,machine-learning
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Scientific/Engineering :: Physics
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: numpy>=1.20.0
+Requires-Dist: scipy>=1.7.0
+Provides-Extra: llm
+Requires-Dist: openai>=1.0.0; extra == "llm"
+Requires-Dist: langchain>=0.1.0; extra == "llm"
+Requires-Dist: langchain-openai>=0.0.5; extra == "llm"
+Requires-Dist: langchain-core>=0.1.0; extra == "llm"
+Provides-Extra: vector
+Requires-Dist: chromadb>=0.4.0; extra == "vector"
+Requires-Dist: sentence-transformers>=2.2.0; extra == "vector"
+Provides-Extra: local-embed
+Requires-Dist: sentence-transformers>=2.2.0; extra == "local-embed"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: matplotlib>=3.5.0; extra == "dev"
+
+# Hypergraph Bistability
+
+Research and prototype code for hypergraph competitive dynamics, multistability, and a physics-grounded agent memory system.
+
+## What This Repository Contains
+
+The project has two layers:
+
+- `hypergraph_bistability`: the package layer for reusable memory, control, agent, and core dynamics APIs
+- `experiments`, `paper`, `results`, `figures`: research artifacts, verification scripts, and paper outputs
+
+The main practical deliverable is a controllable memory module built around a `k x L` activation matrix with:
+
+- bistable local dynamics
+- inter-group competition `lambda`
+- inter-layer coupling `mu`
+- physics-grounded control through the critical coupling `lambda_c`
+
+## Recommended Entry Points
+
+Use the new package namespace for application code:
+
+```python
+from hypergraph_bistability.memory import AgentMemory
+from hypergraph_bistability.agent import HypergraphAgent
+from hypergraph_bistability.control import compute_lambda_c
+```
+
+Legacy imports such as `from agent.agent_memory import AgentMemory` still work during the transition.
+
+## Install
+
+```bash
+pip install -e .
+```
+
+Optional extras:
+
+```bash
+pip install -e ".[llm]"
+pip install -e ".[vector]"
+pip install -e ".[dev]"
+```
+
+## Quick Start
+
+### Memory Module
+
+```python
+from hypergraph_bistability.memory import AgentMemory
+
+mem = AgentMemory(k=4, L=2, use_physics_control=True)
+mem.group_labels = ["goals", "skills", "preferences", "context"]
+mem.layer_labels = ["current", "history"]
+
+mem.write("User prefers concise answers", group=0, layer=0)
+result = mem.process_prompt("I want to learn coding but I'm also tired")
+
+print(result["regime"])
+print(mem.get_context_for_llm())
+```
+
+### Agent Demo
+
+```python
+from hypergraph_bistability.agent import HypergraphAgent
+
+agent = HypergraphAgent(k=4, L=2, use_embeddings=False)
+print(agent.chat("Help me debug a Python function"))
+```
+
+## CLI
+
+After `pip install -e .`, these commands are available:
+
+```bash
+hypergraph-bistability demo-memory
+hypergraph-bistability demo-agent
+hypergraph-bistability chat-demo
+hypergraph-bistability chat-demo --session ./demo_state.json
+```
+
+## Tests
+
+```bash
+python -m pytest tests -q
+```
+
+## Streamlit Visualization
+
+```bash
+streamlit run src/agent/streamlit_app.py
+```
+
+## Package Layout
+
+```text
+src/hypergraph_bistability/
+  agent/           Stable agent APIs
+  control/         Critical coupling and control helpers
+  core/            Reusable dynamics and potential utilities
+  integrations/    Embeddings and LLM adapters
+  memory/          Primary memory modules
+  visualization/   Visualization entry points
+  cli.py           Small built-in demos
+```
+
+## Current Research Layout
+
+```text
+src/
+  agent/               Legacy implementation modules
+  core/                Legacy core modules
+  multi_stability/     Research modules used by tests and experiments
+  *.py                 Experimental scripts and figure generators
+paper/                 Paper drafts
+results/               JSON outputs and research summaries
+figures/               Generated figures
+tests/                 Unit and integration tests
+```
+
+## Next Refactor Direction
+
+The current package layer is a compatibility-focused first pass. The next structural step is to move research scripts out of `src/` into dedicated `experiments/` directories and make `src/hypergraph_bistability/` the canonical implementation location.

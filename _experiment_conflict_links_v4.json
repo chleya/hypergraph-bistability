@@ -1,0 +1,2969 @@
+{
+  "experiment": "conflict_links",
+  "description": "Contradiction-link-aware retrieval vs contradiction-blind retrieval on invalidated hypotheses.",
+  "scenario_names": [
+    "contradiction_link_filtering",
+    "conflict_unit_dominance",
+    "contradiction_link_resume"
+  ],
+  "results": {
+    "conflict_hyperedge_aware": {
+      "name": "conflict_hyperedge_aware",
+      "scenarios": [
+        {
+          "name": "contradiction_link_filtering",
+          "description": "Contradiction links should suppress an invalidated hypothesis in favor of the still-active one.",
+          "turns": [
+            {
+              "user_input": "Back to the scheduler incident. Which explanation still looks strongest?",
+              "expected_retrievals": [
+                "duplicate backoff state",
+                "duplicate scheduler state"
+              ],
+              "retrieved_items": [
+                "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+                "Log: worker scheduler duplicate backoff state still appears after checkpoint resume."
+              ],
+              "matched_expected": [
+                "duplicate backoff state",
+                "duplicate scheduler state"
+              ],
+              "matched_retrieved_items": [
+                "Log: worker scheduler duplicate backoff state still appears after checkpoint resume.",
+                "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice."
+              ],
+              "assistant_response": "Investigation order:\n- Verify whether duplicate scheduler state rehydrates the same backoff entry twice.\n- Compare checkpoint IDs before and after resume.",
+              "expected_response_signals": [
+                "duplicate scheduler state",
+                "backoff state"
+              ],
+              "matched_response_signals": [
+                "duplicate scheduler state"
+              ],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 2,
+            "response_signal_hits": 1,
+            "provider_error_count": 0,
+            "response_recall": 0.5
+          },
+          "artifact_graph": {
+            "node_count": 3,
+            "edge_count": 2,
+            "nodes": [
+              {
+                "artifact_id": "log_195d05be0b",
+                "artifact_type": "log",
+                "linked_task": "worker scheduler",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_84d624840b",
+                "artifact_type": "hypothesis",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "hypothesis_8f6ae46b7c",
+                "artifact_type": "hypothesis",
+                "linked_task": "worker scheduler",
+                "turn_index": 3
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_84d624840b",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_8f6ae46b7c",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 5,
+            "edge_count": 3,
+            "hyperedge_count": 2,
+            "conflict_hyperedge_count": 1,
+            "nodes": [
+              {
+                "node_id": "log_195d05be0b",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_84d624840b",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "issue",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              },
+              {
+                "node_id": "hypothesis_8f6ae46b7c",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 3
+              },
+              {
+                "node_id": "turn4_write0",
+                "node_type": "task",
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 4
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_84d624840b",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "hypothesis_84d624840b",
+                "target": "turn2_write0",
+                "relation_type": "contradicts",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_8f6ae46b7c",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "log_195d05be0b",
+                  "hypothesis_84d624840b",
+                  "hypothesis_8f6ae46b7c"
+                ]
+              },
+              {
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn4_write0"
+                ]
+              }
+            ],
+            "conflict_hyperedges": [
+              {
+                "conflict_hyperedge_id": "conflict::worker scheduler::evidence_hyperedge_0bb7600f50",
+                "linked_task": "worker scheduler",
+                "backing_hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "status": "active_conflict",
+                "dominant_node_id": "hypothesis_8f6ae46b7c",
+                "hypothesis_node_ids": [
+                  "hypothesis_84d624840b",
+                  "hypothesis_8f6ae46b7c"
+                ],
+                "contradicted_node_ids": [
+                  "hypothesis_84d624840b"
+                ],
+                "active_hypothesis_node_ids": [
+                  "hypothesis_8f6ae46b7c"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "backoff state"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 2 edge(s) and 1 conflict unit(s)",
+            "suspected_cause": "retrieved artifacts were available but the response did not use them explicitly"
+          }
+        },
+        {
+          "name": "conflict_unit_dominance",
+          "description": "Conflict hyperedges should prefer the dominant remaining hypothesis when multiple competing explanations share the same task.",
+          "turns": [
+            {
+              "user_input": "Return to the profile-sync incident and name the strongest remaining root cause.",
+              "expected_retrievals": [
+                "stale cursor state remains",
+                "times out after redis reconnect"
+              ],
+              "retrieved_items": [
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush.",
+                "Log: profile-sync job times out after redis reconnect and the worker stalls before final checkpoint flush."
+              ],
+              "matched_expected": [
+                "stale cursor state remains",
+                "times out after redis reconnect"
+              ],
+              "matched_retrieved_items": [
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush.",
+                "Log: profile-sync job times out after redis reconnect and the worker stalls before final checkpoint flush."
+              ],
+              "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?",
+              "expected_response_signals": [
+                "stale cursor state",
+                "redis reconnect",
+                "checkpoint flush"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 3,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "artifact_graph": {
+            "node_count": 5,
+            "edge_count": 4,
+            "nodes": [
+              {
+                "artifact_id": "log_b86f9f5ab4",
+                "artifact_type": "log",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_1011f7812d",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "hypothesis_b010917279",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              },
+              {
+                "artifact_id": "hypothesis_39abef07d7",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 4
+              },
+              {
+                "artifact_id": "hypothesis_cc9dae8b7c",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 5
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_1011f7812d",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_b010917279",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_39abef07d7",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_cc9dae8b7c",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 6,
+            "edge_count": 5,
+            "hyperedge_count": 2,
+            "conflict_hyperedge_count": 1,
+            "nodes": [
+              {
+                "node_id": "log_b86f9f5ab4",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_1011f7812d",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "node_id": "hypothesis_b010917279",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_8d40a547a0",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              },
+              {
+                "node_id": "hypothesis_39abef07d7",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 4
+              },
+              {
+                "node_id": "hypothesis_cc9dae8b7c",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 5
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_1011f7812d",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "hypothesis_1011f7812d",
+                "target": "turn2_write0",
+                "relation_type": "contradicts",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_b010917279",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_39abef07d7",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_cc9dae8b7c",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "log_b86f9f5ab4",
+                  "hypothesis_1011f7812d",
+                  "hypothesis_39abef07d7",
+                  "hypothesis_cc9dae8b7c"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_8d40a547a0",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "hypothesis_b010917279"
+                ]
+              }
+            ],
+            "conflict_hyperedges": [
+              {
+                "conflict_hyperedge_id": "conflict::user profile service::evidence_hyperedge_dd6e3c0c59",
+                "linked_task": "user profile service",
+                "backing_hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "status": "active_conflict",
+                "dominant_node_id": "hypothesis_cc9dae8b7c",
+                "hypothesis_node_ids": [
+                  "hypothesis_1011f7812d",
+                  "hypothesis_39abef07d7",
+                  "hypothesis_cc9dae8b7c"
+                ],
+                "contradicted_node_ids": [
+                  "hypothesis_1011f7812d"
+                ],
+                "active_hypothesis_node_ids": [
+                  "hypothesis_39abef07d7",
+                  "hypothesis_cc9dae8b7c"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "stale cursor state",
+              "redis reconnect",
+              "checkpoint flush"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 4 edge(s) and 1 conflict unit(s)",
+            "suspected_cause": "retrieved artifacts were available but the response did not use them explicitly"
+          }
+        },
+        {
+          "name": "contradiction_link_resume",
+          "description": "Contradiction links should keep the invalidated root cause from resurfacing when resuming a task.",
+          "turns": [
+            {
+              "user_input": "Return to the profile-sync incident and tell me the strongest remaining root cause.",
+              "expected_retrievals": [
+                "times out after redis reconnect",
+                "stale cursor state remains"
+              ],
+              "retrieved_items": [
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker.",
+                "Log: profile-sync job times out after redis reconnect."
+              ],
+              "matched_expected": [
+                "times out after redis reconnect",
+                "stale cursor state remains"
+              ],
+              "matched_retrieved_items": [
+                "Log: profile-sync job times out after redis reconnect.",
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker."
+              ],
+              "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?",
+              "expected_response_signals": [
+                "stale cursor state",
+                "redis reconnect"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 2,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "artifact_graph": {
+            "node_count": 4,
+            "edge_count": 3,
+            "nodes": [
+              {
+                "artifact_id": "log_84e906201b",
+                "artifact_type": "log",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_1011f7812d",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "hypothesis_5cb79fe267",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              },
+              {
+                "artifact_id": "hypothesis_130908b9c3",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 4
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1011f7812d",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_5cb79fe267",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_130908b9c3",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 5,
+            "edge_count": 4,
+            "hyperedge_count": 1,
+            "conflict_hyperedge_count": 1,
+            "nodes": [
+              {
+                "node_id": "log_84e906201b",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_1011f7812d",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "node_id": "hypothesis_5cb79fe267",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              },
+              {
+                "node_id": "hypothesis_130908b9c3",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 4
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1011f7812d",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "hypothesis_1011f7812d",
+                "target": "turn2_write0",
+                "relation_type": "contradicts",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_5cb79fe267",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_130908b9c3",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "log_84e906201b",
+                  "hypothesis_1011f7812d",
+                  "hypothesis_5cb79fe267",
+                  "hypothesis_130908b9c3"
+                ]
+              }
+            ],
+            "conflict_hyperedges": [
+              {
+                "conflict_hyperedge_id": "conflict::user profile service::evidence_hyperedge_dd6e3c0c59",
+                "linked_task": "user profile service",
+                "backing_hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "status": "active_conflict",
+                "dominant_node_id": "hypothesis_130908b9c3",
+                "hypothesis_node_ids": [
+                  "hypothesis_1011f7812d",
+                  "hypothesis_5cb79fe267",
+                  "hypothesis_130908b9c3"
+                ],
+                "contradicted_node_ids": [
+                  "hypothesis_1011f7812d"
+                ],
+                "active_hypothesis_node_ids": [
+                  "hypothesis_5cb79fe267",
+                  "hypothesis_130908b9c3"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "stale cursor state",
+              "redis reconnect"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 3 edge(s) and 1 conflict unit(s)",
+            "suspected_cause": "retrieved artifacts were available but the response did not use them explicitly"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 6,
+        "matched_count": 6,
+        "retrieved_count": 6,
+        "retrieved_hit_count": 6,
+        "irrelevant_retrieved_count": 0,
+        "recall": 1.0,
+        "precision_proxy": 1.0,
+        "irrelevant_context_rate": 0.0,
+        "response_signal_count": 7,
+        "response_signal_hits": 1,
+        "provider_error_count": 0,
+        "response_recall": 0.143
+      }
+    },
+    "conflict_hyperedge_blind": {
+      "name": "conflict_hyperedge_blind",
+      "scenarios": [
+        {
+          "name": "contradiction_link_filtering",
+          "description": "Contradiction links should suppress an invalidated hypothesis in favor of the still-active one.",
+          "turns": [
+            {
+              "user_input": "Back to the scheduler incident. Which explanation still looks strongest?",
+              "expected_retrievals": [
+                "duplicate backoff state",
+                "duplicate scheduler state"
+              ],
+              "retrieved_items": [
+                "Log: worker scheduler duplicate backoff state still appears after checkpoint resume.",
+                "Hypothesis: stale checkpoint IDs are causing the duplicate backoff state in the worker scheduler."
+              ],
+              "matched_expected": [
+                "duplicate backoff state"
+              ],
+              "matched_retrieved_items": [
+                "Log: worker scheduler duplicate backoff state still appears after checkpoint resume."
+              ],
+              "assistant_response": "Investigation order:\n- Compare checkpoint IDs before and after resume.",
+              "expected_response_signals": [
+                "duplicate scheduler state",
+                "backoff state"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 1,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 1,
+            "recall": 0.5,
+            "precision_proxy": 0.5,
+            "irrelevant_context_rate": 0.5,
+            "response_signal_count": 2,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "artifact_graph": {
+            "node_count": 3,
+            "edge_count": 2,
+            "nodes": [
+              {
+                "artifact_id": "log_195d05be0b",
+                "artifact_type": "log",
+                "linked_task": "worker scheduler",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_84d624840b",
+                "artifact_type": "hypothesis",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "hypothesis_8f6ae46b7c",
+                "artifact_type": "hypothesis",
+                "linked_task": "worker scheduler",
+                "turn_index": 3
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_84d624840b",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_8f6ae46b7c",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 5,
+            "edge_count": 3,
+            "hyperedge_count": 2,
+            "conflict_hyperedge_count": 1,
+            "nodes": [
+              {
+                "node_id": "log_195d05be0b",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_84d624840b",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "issue",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              },
+              {
+                "node_id": "hypothesis_8f6ae46b7c",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 3
+              },
+              {
+                "node_id": "turn4_write0",
+                "node_type": "task",
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 4
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_84d624840b",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "hypothesis_84d624840b",
+                "target": "turn2_write0",
+                "relation_type": "contradicts",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_8f6ae46b7c",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "log_195d05be0b",
+                  "hypothesis_84d624840b",
+                  "hypothesis_8f6ae46b7c"
+                ]
+              },
+              {
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn4_write0"
+                ]
+              }
+            ],
+            "conflict_hyperedges": [
+              {
+                "conflict_hyperedge_id": "conflict::worker scheduler::evidence_hyperedge_0bb7600f50",
+                "linked_task": "worker scheduler",
+                "backing_hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "status": "active_conflict",
+                "dominant_node_id": "hypothesis_8f6ae46b7c",
+                "hypothesis_node_ids": [
+                  "hypothesis_84d624840b",
+                  "hypothesis_8f6ae46b7c"
+                ],
+                "contradicted_node_ids": [
+                  "hypothesis_84d624840b"
+                ],
+                "active_hypothesis_node_ids": [
+                  "hypothesis_8f6ae46b7c"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "duplicate scheduler state"
+            ],
+            "missing_response_signals": [
+              "duplicate scheduler state",
+              "backoff state"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 2 edge(s) and 1 conflict unit(s)",
+            "suspected_cause": "query overlap or kind scoring was too weak for: duplicate scheduler state"
+          }
+        },
+        {
+          "name": "conflict_unit_dominance",
+          "description": "Conflict hyperedges should prefer the dominant remaining hypothesis when multiple competing explanations share the same task.",
+          "turns": [
+            {
+              "user_input": "Return to the profile-sync incident and name the strongest remaining root cause.",
+              "expected_retrievals": [
+                "stale cursor state remains",
+                "times out after redis reconnect"
+              ],
+              "retrieved_items": [
+                "Hypothesis: cursor reset timing is causing the timeout in the sync worker.",
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush."
+              ],
+              "matched_expected": [
+                "stale cursor state remains"
+              ],
+              "matched_retrieved_items": [
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush."
+              ],
+              "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?\n\nNext checks:\n- Inspect cursor reset first.",
+              "expected_response_signals": [
+                "stale cursor state",
+                "redis reconnect",
+                "checkpoint flush"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 1,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 1,
+            "recall": 0.5,
+            "precision_proxy": 0.5,
+            "irrelevant_context_rate": 0.5,
+            "response_signal_count": 3,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "artifact_graph": {
+            "node_count": 5,
+            "edge_count": 4,
+            "nodes": [
+              {
+                "artifact_id": "log_b86f9f5ab4",
+                "artifact_type": "log",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_1011f7812d",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "hypothesis_b010917279",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              },
+              {
+                "artifact_id": "hypothesis_39abef07d7",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 4
+              },
+              {
+                "artifact_id": "hypothesis_cc9dae8b7c",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 5
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_1011f7812d",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_b010917279",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_39abef07d7",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_cc9dae8b7c",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 6,
+            "edge_count": 5,
+            "hyperedge_count": 2,
+            "conflict_hyperedge_count": 1,
+            "nodes": [
+              {
+                "node_id": "log_b86f9f5ab4",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_1011f7812d",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "node_id": "hypothesis_b010917279",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_8d40a547a0",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              },
+              {
+                "node_id": "hypothesis_39abef07d7",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 4
+              },
+              {
+                "node_id": "hypothesis_cc9dae8b7c",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 5
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_1011f7812d",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "hypothesis_1011f7812d",
+                "target": "turn2_write0",
+                "relation_type": "contradicts",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_b010917279",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_39abef07d7",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_cc9dae8b7c",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "log_b86f9f5ab4",
+                  "hypothesis_1011f7812d",
+                  "hypothesis_39abef07d7",
+                  "hypothesis_cc9dae8b7c"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_8d40a547a0",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "hypothesis_b010917279"
+                ]
+              }
+            ],
+            "conflict_hyperedges": [
+              {
+                "conflict_hyperedge_id": "conflict::user profile service::evidence_hyperedge_dd6e3c0c59",
+                "linked_task": "user profile service",
+                "backing_hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "status": "active_conflict",
+                "dominant_node_id": "hypothesis_cc9dae8b7c",
+                "hypothesis_node_ids": [
+                  "hypothesis_1011f7812d",
+                  "hypothesis_39abef07d7",
+                  "hypothesis_cc9dae8b7c"
+                ],
+                "contradicted_node_ids": [
+                  "hypothesis_1011f7812d"
+                ],
+                "active_hypothesis_node_ids": [
+                  "hypothesis_39abef07d7",
+                  "hypothesis_cc9dae8b7c"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "times out after redis reconnect"
+            ],
+            "missing_response_signals": [
+              "stale cursor state",
+              "redis reconnect",
+              "checkpoint flush"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 4 edge(s) and 1 conflict unit(s)",
+            "suspected_cause": "query overlap or kind scoring was too weak for: times out after redis reconnect"
+          }
+        },
+        {
+          "name": "contradiction_link_resume",
+          "description": "Contradiction links should keep the invalidated root cause from resurfacing when resuming a task.",
+          "turns": [
+            {
+              "user_input": "Return to the profile-sync incident and tell me the strongest remaining root cause.",
+              "expected_retrievals": [
+                "times out after redis reconnect",
+                "stale cursor state remains"
+              ],
+              "retrieved_items": [
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker.",
+                "Log: profile-sync job times out after redis reconnect."
+              ],
+              "matched_expected": [
+                "times out after redis reconnect",
+                "stale cursor state remains"
+              ],
+              "matched_retrieved_items": [
+                "Log: profile-sync job times out after redis reconnect.",
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker."
+              ],
+              "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?",
+              "expected_response_signals": [
+                "stale cursor state",
+                "redis reconnect"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 2,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "artifact_graph": {
+            "node_count": 4,
+            "edge_count": 3,
+            "nodes": [
+              {
+                "artifact_id": "log_84e906201b",
+                "artifact_type": "log",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_1011f7812d",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "hypothesis_5cb79fe267",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              },
+              {
+                "artifact_id": "hypothesis_130908b9c3",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 4
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1011f7812d",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_5cb79fe267",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_130908b9c3",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 5,
+            "edge_count": 4,
+            "hyperedge_count": 1,
+            "conflict_hyperedge_count": 1,
+            "nodes": [
+              {
+                "node_id": "log_84e906201b",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_1011f7812d",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "node_id": "hypothesis_5cb79fe267",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              },
+              {
+                "node_id": "hypothesis_130908b9c3",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 4
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1011f7812d",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "hypothesis_1011f7812d",
+                "target": "turn2_write0",
+                "relation_type": "contradicts",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_5cb79fe267",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_130908b9c3",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "log_84e906201b",
+                  "hypothesis_1011f7812d",
+                  "hypothesis_5cb79fe267",
+                  "hypothesis_130908b9c3"
+                ]
+              }
+            ],
+            "conflict_hyperedges": [
+              {
+                "conflict_hyperedge_id": "conflict::user profile service::evidence_hyperedge_dd6e3c0c59",
+                "linked_task": "user profile service",
+                "backing_hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "status": "active_conflict",
+                "dominant_node_id": "hypothesis_130908b9c3",
+                "hypothesis_node_ids": [
+                  "hypothesis_1011f7812d",
+                  "hypothesis_5cb79fe267",
+                  "hypothesis_130908b9c3"
+                ],
+                "contradicted_node_ids": [
+                  "hypothesis_1011f7812d"
+                ],
+                "active_hypothesis_node_ids": [
+                  "hypothesis_5cb79fe267",
+                  "hypothesis_130908b9c3"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "stale cursor state",
+              "redis reconnect"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 3 edge(s) and 1 conflict unit(s)",
+            "suspected_cause": "retrieved artifacts were available but the response did not use them explicitly"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 6,
+        "matched_count": 4,
+        "retrieved_count": 6,
+        "retrieved_hit_count": 4,
+        "irrelevant_retrieved_count": 2,
+        "recall": 0.667,
+        "precision_proxy": 0.667,
+        "irrelevant_context_rate": 0.333,
+        "response_signal_count": 7,
+        "response_signal_hits": 0,
+        "provider_error_count": 0,
+        "response_recall": 0.0
+      }
+    },
+    "conflict_link_aware": {
+      "name": "conflict_link_aware",
+      "scenarios": [
+        {
+          "name": "contradiction_link_filtering",
+          "description": "Contradiction links should suppress an invalidated hypothesis in favor of the still-active one.",
+          "turns": [
+            {
+              "user_input": "Back to the scheduler incident. Which explanation still looks strongest?",
+              "expected_retrievals": [
+                "duplicate backoff state",
+                "duplicate scheduler state"
+              ],
+              "retrieved_items": [
+                "Log: worker scheduler duplicate backoff state still appears after checkpoint resume.",
+                "Hypothesis: stale checkpoint IDs are causing the duplicate backoff state in the worker scheduler."
+              ],
+              "matched_expected": [
+                "duplicate backoff state"
+              ],
+              "matched_retrieved_items": [
+                "Log: worker scheduler duplicate backoff state still appears after checkpoint resume."
+              ],
+              "assistant_response": "Investigation order:\n- Compare checkpoint IDs before and after resume.",
+              "expected_response_signals": [
+                "duplicate scheduler state",
+                "backoff state"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 1,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 1,
+            "recall": 0.5,
+            "precision_proxy": 0.5,
+            "irrelevant_context_rate": 0.5,
+            "response_signal_count": 2,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "artifact_graph": {
+            "node_count": 3,
+            "edge_count": 2,
+            "nodes": [
+              {
+                "artifact_id": "log_195d05be0b",
+                "artifact_type": "log",
+                "linked_task": "worker scheduler",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_84d624840b",
+                "artifact_type": "hypothesis",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "hypothesis_8f6ae46b7c",
+                "artifact_type": "hypothesis",
+                "linked_task": "worker scheduler",
+                "turn_index": 3
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_84d624840b",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_8f6ae46b7c",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 5,
+            "edge_count": 3,
+            "hyperedge_count": 2,
+            "conflict_hyperedge_count": 1,
+            "nodes": [
+              {
+                "node_id": "log_195d05be0b",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_84d624840b",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "issue",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              },
+              {
+                "node_id": "hypothesis_8f6ae46b7c",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 3
+              },
+              {
+                "node_id": "turn4_write0",
+                "node_type": "task",
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 4
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_84d624840b",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "hypothesis_84d624840b",
+                "target": "turn2_write0",
+                "relation_type": "contradicts",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_8f6ae46b7c",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "log_195d05be0b",
+                  "hypothesis_84d624840b",
+                  "hypothesis_8f6ae46b7c"
+                ]
+              },
+              {
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn4_write0"
+                ]
+              }
+            ],
+            "conflict_hyperedges": [
+              {
+                "conflict_hyperedge_id": "conflict::worker scheduler::evidence_hyperedge_0bb7600f50",
+                "linked_task": "worker scheduler",
+                "backing_hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "status": "active_conflict",
+                "dominant_node_id": "hypothesis_8f6ae46b7c",
+                "hypothesis_node_ids": [
+                  "hypothesis_84d624840b",
+                  "hypothesis_8f6ae46b7c"
+                ],
+                "contradicted_node_ids": [
+                  "hypothesis_84d624840b"
+                ],
+                "active_hypothesis_node_ids": [
+                  "hypothesis_8f6ae46b7c"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "duplicate scheduler state"
+            ],
+            "missing_response_signals": [
+              "duplicate scheduler state",
+              "backoff state"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 2 edge(s) and 1 conflict unit(s)",
+            "suspected_cause": "query overlap or kind scoring was too weak for: duplicate scheduler state"
+          }
+        },
+        {
+          "name": "conflict_unit_dominance",
+          "description": "Conflict hyperedges should prefer the dominant remaining hypothesis when multiple competing explanations share the same task.",
+          "turns": [
+            {
+              "user_input": "Return to the profile-sync incident and name the strongest remaining root cause.",
+              "expected_retrievals": [
+                "stale cursor state remains",
+                "times out after redis reconnect"
+              ],
+              "retrieved_items": [
+                "Hypothesis: cursor reset timing is causing the timeout in the sync worker.",
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush."
+              ],
+              "matched_expected": [
+                "stale cursor state remains"
+              ],
+              "matched_retrieved_items": [
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush."
+              ],
+              "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?\n\nNext checks:\n- Inspect cursor reset first.",
+              "expected_response_signals": [
+                "stale cursor state",
+                "redis reconnect",
+                "checkpoint flush"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 1,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 1,
+            "recall": 0.5,
+            "precision_proxy": 0.5,
+            "irrelevant_context_rate": 0.5,
+            "response_signal_count": 3,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "artifact_graph": {
+            "node_count": 5,
+            "edge_count": 4,
+            "nodes": [
+              {
+                "artifact_id": "log_b86f9f5ab4",
+                "artifact_type": "log",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_1011f7812d",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "hypothesis_b010917279",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              },
+              {
+                "artifact_id": "hypothesis_39abef07d7",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 4
+              },
+              {
+                "artifact_id": "hypothesis_cc9dae8b7c",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 5
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_1011f7812d",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_b010917279",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_39abef07d7",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_cc9dae8b7c",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 6,
+            "edge_count": 5,
+            "hyperedge_count": 2,
+            "conflict_hyperedge_count": 1,
+            "nodes": [
+              {
+                "node_id": "log_b86f9f5ab4",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_1011f7812d",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "node_id": "hypothesis_b010917279",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_8d40a547a0",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              },
+              {
+                "node_id": "hypothesis_39abef07d7",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 4
+              },
+              {
+                "node_id": "hypothesis_cc9dae8b7c",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 5
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_1011f7812d",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "hypothesis_1011f7812d",
+                "target": "turn2_write0",
+                "relation_type": "contradicts",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_b010917279",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_39abef07d7",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_cc9dae8b7c",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "log_b86f9f5ab4",
+                  "hypothesis_1011f7812d",
+                  "hypothesis_39abef07d7",
+                  "hypothesis_cc9dae8b7c"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_8d40a547a0",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "hypothesis_b010917279"
+                ]
+              }
+            ],
+            "conflict_hyperedges": [
+              {
+                "conflict_hyperedge_id": "conflict::user profile service::evidence_hyperedge_dd6e3c0c59",
+                "linked_task": "user profile service",
+                "backing_hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "status": "active_conflict",
+                "dominant_node_id": "hypothesis_cc9dae8b7c",
+                "hypothesis_node_ids": [
+                  "hypothesis_1011f7812d",
+                  "hypothesis_39abef07d7",
+                  "hypothesis_cc9dae8b7c"
+                ],
+                "contradicted_node_ids": [
+                  "hypothesis_1011f7812d"
+                ],
+                "active_hypothesis_node_ids": [
+                  "hypothesis_39abef07d7",
+                  "hypothesis_cc9dae8b7c"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "times out after redis reconnect"
+            ],
+            "missing_response_signals": [
+              "stale cursor state",
+              "redis reconnect",
+              "checkpoint flush"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 4 edge(s) and 1 conflict unit(s)",
+            "suspected_cause": "query overlap or kind scoring was too weak for: times out after redis reconnect"
+          }
+        },
+        {
+          "name": "contradiction_link_resume",
+          "description": "Contradiction links should keep the invalidated root cause from resurfacing when resuming a task.",
+          "turns": [
+            {
+              "user_input": "Return to the profile-sync incident and tell me the strongest remaining root cause.",
+              "expected_retrievals": [
+                "times out after redis reconnect",
+                "stale cursor state remains"
+              ],
+              "retrieved_items": [
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker.",
+                "Log: profile-sync job times out after redis reconnect."
+              ],
+              "matched_expected": [
+                "times out after redis reconnect",
+                "stale cursor state remains"
+              ],
+              "matched_retrieved_items": [
+                "Log: profile-sync job times out after redis reconnect.",
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker."
+              ],
+              "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?",
+              "expected_response_signals": [
+                "stale cursor state",
+                "redis reconnect"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 2,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "artifact_graph": {
+            "node_count": 4,
+            "edge_count": 3,
+            "nodes": [
+              {
+                "artifact_id": "log_84e906201b",
+                "artifact_type": "log",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_1011f7812d",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "hypothesis_5cb79fe267",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              },
+              {
+                "artifact_id": "hypothesis_130908b9c3",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 4
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1011f7812d",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_5cb79fe267",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_130908b9c3",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 5,
+            "edge_count": 4,
+            "hyperedge_count": 1,
+            "conflict_hyperedge_count": 1,
+            "nodes": [
+              {
+                "node_id": "log_84e906201b",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_1011f7812d",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "node_id": "hypothesis_5cb79fe267",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              },
+              {
+                "node_id": "hypothesis_130908b9c3",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 4
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1011f7812d",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "hypothesis_1011f7812d",
+                "target": "turn2_write0",
+                "relation_type": "contradicts",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_5cb79fe267",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_130908b9c3",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "log_84e906201b",
+                  "hypothesis_1011f7812d",
+                  "hypothesis_5cb79fe267",
+                  "hypothesis_130908b9c3"
+                ]
+              }
+            ],
+            "conflict_hyperedges": [
+              {
+                "conflict_hyperedge_id": "conflict::user profile service::evidence_hyperedge_dd6e3c0c59",
+                "linked_task": "user profile service",
+                "backing_hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "status": "active_conflict",
+                "dominant_node_id": "hypothesis_130908b9c3",
+                "hypothesis_node_ids": [
+                  "hypothesis_1011f7812d",
+                  "hypothesis_5cb79fe267",
+                  "hypothesis_130908b9c3"
+                ],
+                "contradicted_node_ids": [
+                  "hypothesis_1011f7812d"
+                ],
+                "active_hypothesis_node_ids": [
+                  "hypothesis_5cb79fe267",
+                  "hypothesis_130908b9c3"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "stale cursor state",
+              "redis reconnect"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 3 edge(s) and 1 conflict unit(s)",
+            "suspected_cause": "retrieved artifacts were available but the response did not use them explicitly"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 6,
+        "matched_count": 4,
+        "retrieved_count": 6,
+        "retrieved_hit_count": 4,
+        "irrelevant_retrieved_count": 2,
+        "recall": 0.667,
+        "precision_proxy": 0.667,
+        "irrelevant_context_rate": 0.333,
+        "response_signal_count": 7,
+        "response_signal_hits": 0,
+        "provider_error_count": 0,
+        "response_recall": 0.0
+      }
+    },
+    "conflict_link_blind": {
+      "name": "conflict_link_blind",
+      "scenarios": [
+        {
+          "name": "contradiction_link_filtering",
+          "description": "Contradiction links should suppress an invalidated hypothesis in favor of the still-active one.",
+          "turns": [
+            {
+              "user_input": "Back to the scheduler incident. Which explanation still looks strongest?",
+              "expected_retrievals": [
+                "duplicate backoff state",
+                "duplicate scheduler state"
+              ],
+              "retrieved_items": [
+                "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+                "Log: worker scheduler duplicate backoff state still appears after checkpoint resume."
+              ],
+              "matched_expected": [
+                "duplicate backoff state",
+                "duplicate scheduler state"
+              ],
+              "matched_retrieved_items": [
+                "Log: worker scheduler duplicate backoff state still appears after checkpoint resume.",
+                "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice."
+              ],
+              "assistant_response": "Investigation order:\n- Verify whether duplicate scheduler state rehydrates the same backoff entry twice.\n- Compare checkpoint IDs before and after resume.",
+              "expected_response_signals": [
+                "duplicate scheduler state",
+                "backoff state"
+              ],
+              "matched_response_signals": [
+                "duplicate scheduler state"
+              ],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 2,
+            "response_signal_hits": 1,
+            "provider_error_count": 0,
+            "response_recall": 0.5
+          },
+          "artifact_graph": {
+            "node_count": 3,
+            "edge_count": 2,
+            "nodes": [
+              {
+                "artifact_id": "log_195d05be0b",
+                "artifact_type": "log",
+                "linked_task": "worker scheduler",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_84d624840b",
+                "artifact_type": "hypothesis",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "hypothesis_8f6ae46b7c",
+                "artifact_type": "hypothesis",
+                "linked_task": "worker scheduler",
+                "turn_index": 3
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_84d624840b",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_8f6ae46b7c",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 5,
+            "edge_count": 3,
+            "hyperedge_count": 2,
+            "conflict_hyperedge_count": 1,
+            "nodes": [
+              {
+                "node_id": "log_195d05be0b",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_84d624840b",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "issue",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              },
+              {
+                "node_id": "hypothesis_8f6ae46b7c",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 3
+              },
+              {
+                "node_id": "turn4_write0",
+                "node_type": "task",
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 4
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_84d624840b",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "hypothesis_84d624840b",
+                "target": "turn2_write0",
+                "relation_type": "contradicts",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_8f6ae46b7c",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "log_195d05be0b",
+                  "hypothesis_84d624840b",
+                  "hypothesis_8f6ae46b7c"
+                ]
+              },
+              {
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn4_write0"
+                ]
+              }
+            ],
+            "conflict_hyperedges": [
+              {
+                "conflict_hyperedge_id": "conflict::worker scheduler::evidence_hyperedge_0bb7600f50",
+                "linked_task": "worker scheduler",
+                "backing_hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "status": "active_conflict",
+                "dominant_node_id": "hypothesis_8f6ae46b7c",
+                "hypothesis_node_ids": [
+                  "hypothesis_84d624840b",
+                  "hypothesis_8f6ae46b7c"
+                ],
+                "contradicted_node_ids": [
+                  "hypothesis_84d624840b"
+                ],
+                "active_hypothesis_node_ids": [
+                  "hypothesis_8f6ae46b7c"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "backoff state"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 2 edge(s) and 1 conflict unit(s)",
+            "suspected_cause": "retrieved artifacts were available but the response did not use them explicitly"
+          }
+        },
+        {
+          "name": "conflict_unit_dominance",
+          "description": "Conflict hyperedges should prefer the dominant remaining hypothesis when multiple competing explanations share the same task.",
+          "turns": [
+            {
+              "user_input": "Return to the profile-sync incident and name the strongest remaining root cause.",
+              "expected_retrievals": [
+                "stale cursor state remains",
+                "times out after redis reconnect"
+              ],
+              "retrieved_items": [
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush.",
+                "Log: profile-sync job times out after redis reconnect and the worker stalls before final checkpoint flush."
+              ],
+              "matched_expected": [
+                "stale cursor state remains",
+                "times out after redis reconnect"
+              ],
+              "matched_retrieved_items": [
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush.",
+                "Log: profile-sync job times out after redis reconnect and the worker stalls before final checkpoint flush."
+              ],
+              "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?",
+              "expected_response_signals": [
+                "stale cursor state",
+                "redis reconnect",
+                "checkpoint flush"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 3,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "artifact_graph": {
+            "node_count": 5,
+            "edge_count": 4,
+            "nodes": [
+              {
+                "artifact_id": "log_b86f9f5ab4",
+                "artifact_type": "log",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_1011f7812d",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "hypothesis_b010917279",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              },
+              {
+                "artifact_id": "hypothesis_39abef07d7",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 4
+              },
+              {
+                "artifact_id": "hypothesis_cc9dae8b7c",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 5
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_1011f7812d",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_b010917279",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_39abef07d7",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_cc9dae8b7c",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 6,
+            "edge_count": 5,
+            "hyperedge_count": 2,
+            "conflict_hyperedge_count": 1,
+            "nodes": [
+              {
+                "node_id": "log_b86f9f5ab4",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_1011f7812d",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "node_id": "hypothesis_b010917279",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_8d40a547a0",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              },
+              {
+                "node_id": "hypothesis_39abef07d7",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 4
+              },
+              {
+                "node_id": "hypothesis_cc9dae8b7c",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 5
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_1011f7812d",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "hypothesis_1011f7812d",
+                "target": "turn2_write0",
+                "relation_type": "contradicts",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_b010917279",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_39abef07d7",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_b86f9f5ab4",
+                "target": "hypothesis_cc9dae8b7c",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "log_b86f9f5ab4",
+                  "hypothesis_1011f7812d",
+                  "hypothesis_39abef07d7",
+                  "hypothesis_cc9dae8b7c"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_8d40a547a0",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "hypothesis_b010917279"
+                ]
+              }
+            ],
+            "conflict_hyperedges": [
+              {
+                "conflict_hyperedge_id": "conflict::user profile service::evidence_hyperedge_dd6e3c0c59",
+                "linked_task": "user profile service",
+                "backing_hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "status": "active_conflict",
+                "dominant_node_id": "hypothesis_cc9dae8b7c",
+                "hypothesis_node_ids": [
+                  "hypothesis_1011f7812d",
+                  "hypothesis_39abef07d7",
+                  "hypothesis_cc9dae8b7c"
+                ],
+                "contradicted_node_ids": [
+                  "hypothesis_1011f7812d"
+                ],
+                "active_hypothesis_node_ids": [
+                  "hypothesis_39abef07d7",
+                  "hypothesis_cc9dae8b7c"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "stale cursor state",
+              "redis reconnect",
+              "checkpoint flush"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 4 edge(s) and 1 conflict unit(s)",
+            "suspected_cause": "retrieved artifacts were available but the response did not use them explicitly"
+          }
+        },
+        {
+          "name": "contradiction_link_resume",
+          "description": "Contradiction links should keep the invalidated root cause from resurfacing when resuming a task.",
+          "turns": [
+            {
+              "user_input": "Return to the profile-sync incident and tell me the strongest remaining root cause.",
+              "expected_retrievals": [
+                "times out after redis reconnect",
+                "stale cursor state remains"
+              ],
+              "retrieved_items": [
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker.",
+                "Log: profile-sync job times out after redis reconnect."
+              ],
+              "matched_expected": [
+                "times out after redis reconnect",
+                "stale cursor state remains"
+              ],
+              "matched_retrieved_items": [
+                "Log: profile-sync job times out after redis reconnect.",
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker."
+              ],
+              "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?",
+              "expected_response_signals": [
+                "stale cursor state",
+                "redis reconnect"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 2,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "artifact_graph": {
+            "node_count": 4,
+            "edge_count": 3,
+            "nodes": [
+              {
+                "artifact_id": "log_84e906201b",
+                "artifact_type": "log",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_1011f7812d",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "hypothesis_5cb79fe267",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              },
+              {
+                "artifact_id": "hypothesis_130908b9c3",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 4
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1011f7812d",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_5cb79fe267",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_130908b9c3",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 5,
+            "edge_count": 4,
+            "hyperedge_count": 1,
+            "conflict_hyperedge_count": 1,
+            "nodes": [
+              {
+                "node_id": "log_84e906201b",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_1011f7812d",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "node_id": "hypothesis_5cb79fe267",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              },
+              {
+                "node_id": "hypothesis_130908b9c3",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 4
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1011f7812d",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "hypothesis_1011f7812d",
+                "target": "turn2_write0",
+                "relation_type": "contradicts",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_5cb79fe267",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_130908b9c3",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "log_84e906201b",
+                  "hypothesis_1011f7812d",
+                  "hypothesis_5cb79fe267",
+                  "hypothesis_130908b9c3"
+                ]
+              }
+            ],
+            "conflict_hyperedges": [
+              {
+                "conflict_hyperedge_id": "conflict::user profile service::evidence_hyperedge_dd6e3c0c59",
+                "linked_task": "user profile service",
+                "backing_hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "status": "active_conflict",
+                "dominant_node_id": "hypothesis_130908b9c3",
+                "hypothesis_node_ids": [
+                  "hypothesis_1011f7812d",
+                  "hypothesis_5cb79fe267",
+                  "hypothesis_130908b9c3"
+                ],
+                "contradicted_node_ids": [
+                  "hypothesis_1011f7812d"
+                ],
+                "active_hypothesis_node_ids": [
+                  "hypothesis_5cb79fe267",
+                  "hypothesis_130908b9c3"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "stale cursor state",
+              "redis reconnect"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 3 edge(s) and 1 conflict unit(s)",
+            "suspected_cause": "retrieved artifacts were available but the response did not use them explicitly"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 6,
+        "matched_count": 6,
+        "retrieved_count": 6,
+        "retrieved_hit_count": 6,
+        "irrelevant_retrieved_count": 0,
+        "recall": 1.0,
+        "precision_proxy": 1.0,
+        "irrelevant_context_rate": 0.0,
+        "response_signal_count": 7,
+        "response_signal_hits": 1,
+        "provider_error_count": 0,
+        "response_recall": 0.143
+      }
+    },
+    "recent_history_baseline": {
+      "name": "recent_history_baseline",
+      "scenarios": [
+        {
+          "name": "contradiction_link_filtering",
+          "description": "Contradiction links should suppress an invalidated hypothesis in favor of the still-active one.",
+          "turns": [
+            {
+              "user_input": "Back to the scheduler incident. Which explanation still looks strongest?",
+              "expected_retrievals": [
+                "duplicate backoff state",
+                "duplicate scheduler state"
+              ],
+              "retrieved_items": [
+                "Log: worker scheduler duplicate backoff state still appears after checkpoint resume.",
+                "[baseline] Log: worker scheduler duplicate backoff state still appears after checkpoint resume.",
+                "Hypothesis: stale checkpoint IDs are causing the duplicate backoff state in the worker scheduler.",
+                "[baseline] Hypothesis: stale checkpoint IDs are causing the duplicate backoff state in the worker scheduler."
+              ],
+              "matched_expected": [
+                "duplicate backoff state"
+              ],
+              "matched_retrieved_items": [
+                "Log: worker scheduler duplicate backoff state still appears after checkpoint resume."
+              ],
+              "assistant_response": "",
+              "expected_response_signals": null,
+              "matched_response_signals": null,
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 1,
+            "retrieved_count": 4,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 3,
+            "recall": 0.5,
+            "precision_proxy": 0.25,
+            "irrelevant_context_rate": 0.75,
+            "response_signal_count": 0,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "duplicate scheduler state"
+            ],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "no artifact graph available",
+            "suspected_cause": "query overlap or kind scoring was too weak for: duplicate scheduler state"
+          }
+        },
+        {
+          "name": "conflict_unit_dominance",
+          "description": "Conflict hyperedges should prefer the dominant remaining hypothesis when multiple competing explanations share the same task.",
+          "turns": [
+            {
+              "user_input": "Return to the profile-sync incident and name the strongest remaining root cause.",
+              "expected_retrievals": [
+                "stale cursor state remains",
+                "times out after redis reconnect"
+              ],
+              "retrieved_items": [
+                "The cursor reset timing theory was wrong and ruled out after reproducing the timeout.",
+                "[baseline] The cursor reset timing theory was wrong and ruled out after reproducing the timeout.",
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush.",
+                "[baseline] Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush."
+              ],
+              "matched_expected": [
+                "stale cursor state remains"
+              ],
+              "matched_retrieved_items": [
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush."
+              ],
+              "assistant_response": "",
+              "expected_response_signals": null,
+              "matched_response_signals": null,
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 1,
+            "retrieved_count": 4,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 3,
+            "recall": 0.5,
+            "precision_proxy": 0.25,
+            "irrelevant_context_rate": 0.75,
+            "response_signal_count": 0,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "times out after redis reconnect"
+            ],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "no artifact graph available",
+            "suspected_cause": "query overlap or kind scoring was too weak for: times out after redis reconnect"
+          }
+        },
+        {
+          "name": "contradiction_link_resume",
+          "description": "Contradiction links should keep the invalidated root cause from resurfacing when resuming a task.",
+          "turns": [
+            {
+              "user_input": "Return to the profile-sync incident and tell me the strongest remaining root cause.",
+              "expected_retrievals": [
+                "times out after redis reconnect",
+                "stale cursor state remains"
+              ],
+              "retrieved_items": [
+                "The cursor reset timing theory was wrong and ruled out after reproducing the timeout.",
+                "[baseline] The cursor reset timing theory was wrong and ruled out after reproducing the timeout.",
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker.",
+                "[baseline] Hypothesis: stale cursor state remains after reconnect and blocks the sync worker."
+              ],
+              "matched_expected": [
+                "stale cursor state remains"
+              ],
+              "matched_retrieved_items": [
+                "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker."
+              ],
+              "assistant_response": "",
+              "expected_response_signals": null,
+              "matched_response_signals": null,
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 1,
+            "retrieved_count": 4,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 3,
+            "recall": 0.5,
+            "precision_proxy": 0.25,
+            "irrelevant_context_rate": 0.75,
+            "response_signal_count": 0,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "times out after redis reconnect"
+            ],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "no artifact graph available",
+            "suspected_cause": "query overlap or kind scoring was too weak for: times out after redis reconnect"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 6,
+        "matched_count": 3,
+        "retrieved_count": 12,
+        "retrieved_hit_count": 3,
+        "irrelevant_retrieved_count": 9,
+        "recall": 0.5,
+        "precision_proxy": 0.25,
+        "irrelevant_context_rate": 0.75,
+        "response_signal_count": 7,
+        "response_signal_hits": 0,
+        "provider_error_count": 0,
+        "response_recall": 0.0
+      }
+    },
+    "comparison": {
+      "hyperedge_aware_vs_link_aware": {
+        "recall_delta": 0.33299999999999996,
+        "precision_proxy_delta": 0.33299999999999996,
+        "irrelevant_context_rate_delta": -0.333,
+        "response_recall_delta": 0.143,
+        "avg_retrieved_delta": 0.0
+      },
+      "hyperedge_aware_vs_hyperedge_blind": {
+        "recall_delta": 0.33299999999999996,
+        "precision_proxy_delta": 0.33299999999999996,
+        "irrelevant_context_rate_delta": -0.333,
+        "response_recall_delta": 0.143,
+        "avg_retrieved_delta": 0.0
+      },
+      "aware_vs_blind": {
+        "recall_delta": -0.33299999999999996,
+        "precision_proxy_delta": -0.33299999999999996,
+        "irrelevant_context_rate_delta": 0.333,
+        "response_recall_delta": -0.143,
+        "avg_retrieved_delta": 0.0
+      },
+      "aware_vs_baseline": {
+        "recall_delta": 0.16700000000000004,
+        "precision_proxy_delta": 0.41700000000000004,
+        "irrelevant_context_rate_delta": -0.417,
+        "response_recall_delta": 0.0,
+        "avg_retrieved_delta": -1.0
+      }
+    }
+  }
+}

@@ -1,0 +1,616 @@
+{
+  "experiment": "decision_residue",
+  "description": "Decision-residue-aware retrieval vs decision-residue-blind retrieval on decision continuity scenarios.",
+  "scenario_names": [
+    "decision_residue_resume"
+  ],
+  "results": {
+    "decision_residue_aware": {
+      "name": "decision_residue_aware_llm",
+      "scenarios": [
+        {
+          "name": "decision_residue_resume",
+          "description": "Decision residue should preserve the chosen approach, rationale, and constraint under unrelated preference noise.",
+          "turns": [
+            {
+              "user_input": "Return to the scheduler work. What decision did we already make and why?",
+              "expected_retrievals": [
+                "patch dedupe before touching the retry policy",
+                "duplicate backoff state is the current blocker",
+                "avoid widening the change"
+              ],
+              "retrieved_items": [
+                "Decision: for the worker scheduler fix, patch dedupe before touching the retry policy.",
+                "Constraint: avoid widening the change until scheduler dedupe is verified.",
+                "Reason: duplicate backoff state is the current blocker and we should avoid widening the change.",
+                "Alternative: for the worker scheduler, rather than changing retry policy first, keep the retry settings stable.",
+                "Remember that I prefer concise answers."
+              ],
+              "matched_expected": [
+                "patch dedupe before touching the retry policy",
+                "duplicate backoff state is the current blocker",
+                "avoid widening the change"
+              ],
+              "matched_retrieved_items": [
+                "Decision: for the worker scheduler fix, patch dedupe before touching the retry policy.",
+                "Reason: duplicate backoff state is the current blocker and we should avoid widening the change.",
+                "Constraint: avoid widening the change until scheduler dedupe is verified."
+              ],
+              "assistant_response": "Decision summary:\n- We decided to patch dedupe before touching the retry policy.\n- The reason was the duplicate backoff state blocker.\n- We wanted to avoid widening the change.",
+              "expected_response_signals": [
+                "patch dedupe",
+                "duplicate backoff state",
+                "avoid widening the change"
+              ],
+              "matched_response_signals": [
+                "patch dedupe",
+                "duplicate backoff state",
+                "avoid widening the change"
+              ],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 3,
+            "retrieved_count": 5,
+            "retrieved_hit_count": 3,
+            "irrelevant_retrieved_count": 2,
+            "recall": 1.0,
+            "precision_proxy": 0.6,
+            "irrelevant_context_rate": 0.4,
+            "response_signal_count": 3,
+            "response_signal_hits": 3,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "continuity": {
+            "task_continuation": 1.0,
+            "blocker_preservation": 1.0,
+            "decision_continuity": 1.0,
+            "repeated_work_avoidance_proxy": 1.0,
+            "blocker_eligible_count": 1,
+            "decision_eligible_count": 1
+          },
+          "artifact_graph": {
+            "node_count": 4,
+            "edge_count": 3,
+            "nodes": [
+              {
+                "artifact_id": "decision_1f555de57d",
+                "artifact_type": "decision",
+                "linked_task": "worker scheduler",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "rationale_1ecd6f8c7e",
+                "artifact_type": "rationale",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "constraint_2442b6bbc0",
+                "artifact_type": "constraint",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              },
+              {
+                "artifact_id": "alternative_9761d1bfca",
+                "artifact_type": "alternative",
+                "linked_task": "worker scheduler",
+                "turn_index": 3
+              }
+            ],
+            "edges": [
+              {
+                "source": "decision_1f555de57d",
+                "target": "rationale_1ecd6f8c7e",
+                "relation_type": "rationale_for",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "decision_1f555de57d",
+                "target": "constraint_2442b6bbc0",
+                "relation_type": "constrains",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "decision_1f555de57d",
+                "target": "alternative_9761d1bfca",
+                "relation_type": "alternative_to",
+                "linked_task": "worker scheduler"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 6,
+            "edge_count": 3,
+            "hyperedge_count": 1,
+            "conflict_hyperedge_count": 0,
+            "nodes": [
+              {
+                "node_id": "decision_1f555de57d",
+                "node_type": "decision",
+                "hyperedge_id": "decision_hyperedge_116c356bda",
+                "hyperedge_type": "decision_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 0
+              },
+              {
+                "node_id": "rationale_1ecd6f8c7e",
+                "node_type": "rationale",
+                "hyperedge_id": "decision_hyperedge_116c356bda",
+                "hyperedge_type": "decision_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "node_id": "constraint_2442b6bbc0",
+                "node_type": "constraint",
+                "hyperedge_id": "decision_hyperedge_116c356bda",
+                "hyperedge_type": "decision_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              },
+              {
+                "node_id": "alternative_9761d1bfca",
+                "node_type": "alternative",
+                "hyperedge_id": "decision_hyperedge_116c356bda",
+                "hyperedge_type": "decision_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 3
+              },
+              {
+                "node_id": "turn4_write0",
+                "node_type": "preference",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 4
+              },
+              {
+                "node_id": "turn5_write0",
+                "node_type": "context",
+                "hyperedge_id": "decision_hyperedge_116c356bda",
+                "hyperedge_type": "decision_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 5
+              }
+            ],
+            "edges": [
+              {
+                "source": "decision_1f555de57d",
+                "target": "rationale_1ecd6f8c7e",
+                "relation_type": "rationale_for",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "decision_1f555de57d",
+                "target": "constraint_2442b6bbc0",
+                "relation_type": "constrains",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "decision_1f555de57d",
+                "target": "alternative_9761d1bfca",
+                "relation_type": "alternative_to",
+                "linked_task": "worker scheduler"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "decision_hyperedge_116c356bda",
+                "hyperedge_type": "decision_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "decision_1f555de57d",
+                  "rationale_1ecd6f8c7e",
+                  "constraint_2442b6bbc0",
+                  "alternative_9761d1bfca",
+                  "turn5_write0"
+                ]
+              }
+            ],
+            "conflict_hyperedges": []
+          },
+          "analysis": {
+            "stage_failure": "none",
+            "missing_expected": [],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 3 edge(s)",
+            "suspected_cause": "no issue detected"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 3,
+        "matched_count": 3,
+        "retrieved_count": 5,
+        "retrieved_hit_count": 3,
+        "irrelevant_retrieved_count": 2,
+        "recall": 1.0,
+        "precision_proxy": 0.6,
+        "irrelevant_context_rate": 0.4,
+        "response_signal_count": 3,
+        "response_signal_hits": 3,
+        "provider_error_count": 0,
+        "response_recall": 1.0
+      },
+      "continuity": {
+        "scenario_count": 1,
+        "blocker_eligible_scenarios": 1,
+        "decision_eligible_scenarios": 1,
+        "task_continuation": 1.0,
+        "blocker_preservation": 1.0,
+        "decision_continuity": 1.0,
+        "repeated_work_avoidance_proxy": 1.0
+      }
+    },
+    "decision_residue_blind": {
+      "name": "decision_residue_blind_llm",
+      "scenarios": [
+        {
+          "name": "decision_residue_resume",
+          "description": "Decision residue should preserve the chosen approach, rationale, and constraint under unrelated preference noise.",
+          "turns": [
+            {
+              "user_input": "Return to the scheduler work. What decision did we already make and why?",
+              "expected_retrievals": [
+                "patch dedupe before touching the retry policy",
+                "duplicate backoff state is the current blocker",
+                "avoid widening the change"
+              ],
+              "retrieved_items": [
+                "Constraint: avoid widening the change until scheduler dedupe is verified.",
+                "Remember that I prefer concise answers.",
+                "Decision: for the worker scheduler fix, patch dedupe before touching the retry policy.",
+                "Reason: duplicate backoff state is the current blocker and we should avoid widening the change.",
+                "Alternative: for the worker scheduler, rather than changing retry policy first, keep the retry settings stable."
+              ],
+              "matched_expected": [
+                "patch dedupe before touching the retry policy",
+                "duplicate backoff state is the current blocker",
+                "avoid widening the change"
+              ],
+              "matched_retrieved_items": [
+                "Decision: for the worker scheduler fix, patch dedupe before touching the retry policy.",
+                "Reason: duplicate backoff state is the current blocker and we should avoid widening the change.",
+                "Constraint: avoid widening the change until scheduler dedupe is verified."
+              ],
+              "assistant_response": "Decision summary:\n- We decided to patch dedupe before touching the retry policy.\n- The reason was the duplicate backoff state blocker.\n- We wanted to avoid widening the change.",
+              "expected_response_signals": [
+                "patch dedupe",
+                "duplicate backoff state",
+                "avoid widening the change"
+              ],
+              "matched_response_signals": [
+                "patch dedupe",
+                "duplicate backoff state",
+                "avoid widening the change"
+              ],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 3,
+            "retrieved_count": 5,
+            "retrieved_hit_count": 3,
+            "irrelevant_retrieved_count": 2,
+            "recall": 1.0,
+            "precision_proxy": 0.6,
+            "irrelevant_context_rate": 0.4,
+            "response_signal_count": 3,
+            "response_signal_hits": 3,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "continuity": {
+            "task_continuation": 1.0,
+            "blocker_preservation": 1.0,
+            "decision_continuity": 1.0,
+            "repeated_work_avoidance_proxy": 1.0,
+            "blocker_eligible_count": 1,
+            "decision_eligible_count": 1
+          },
+          "artifact_graph": {
+            "node_count": 4,
+            "edge_count": 3,
+            "nodes": [
+              {
+                "artifact_id": "decision_1f555de57d",
+                "artifact_type": "decision",
+                "linked_task": "worker scheduler",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "rationale_1ecd6f8c7e",
+                "artifact_type": "rationale",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "constraint_2442b6bbc0",
+                "artifact_type": "constraint",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              },
+              {
+                "artifact_id": "alternative_9761d1bfca",
+                "artifact_type": "alternative",
+                "linked_task": "worker scheduler",
+                "turn_index": 3
+              }
+            ],
+            "edges": [
+              {
+                "source": "decision_1f555de57d",
+                "target": "rationale_1ecd6f8c7e",
+                "relation_type": "rationale_for",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "decision_1f555de57d",
+                "target": "constraint_2442b6bbc0",
+                "relation_type": "constrains",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "decision_1f555de57d",
+                "target": "alternative_9761d1bfca",
+                "relation_type": "alternative_to",
+                "linked_task": "worker scheduler"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 6,
+            "edge_count": 3,
+            "hyperedge_count": 1,
+            "conflict_hyperedge_count": 0,
+            "nodes": [
+              {
+                "node_id": "decision_1f555de57d",
+                "node_type": "decision",
+                "hyperedge_id": "decision_hyperedge_116c356bda",
+                "hyperedge_type": "decision_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 0
+              },
+              {
+                "node_id": "rationale_1ecd6f8c7e",
+                "node_type": "rationale",
+                "hyperedge_id": "decision_hyperedge_116c356bda",
+                "hyperedge_type": "decision_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "node_id": "constraint_2442b6bbc0",
+                "node_type": "constraint",
+                "hyperedge_id": "decision_hyperedge_116c356bda",
+                "hyperedge_type": "decision_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              },
+              {
+                "node_id": "alternative_9761d1bfca",
+                "node_type": "alternative",
+                "hyperedge_id": "decision_hyperedge_116c356bda",
+                "hyperedge_type": "decision_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 3
+              },
+              {
+                "node_id": "turn4_write0",
+                "node_type": "preference",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 4
+              },
+              {
+                "node_id": "turn5_write0",
+                "node_type": "context",
+                "hyperedge_id": "decision_hyperedge_116c356bda",
+                "hyperedge_type": "decision_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 5
+              }
+            ],
+            "edges": [
+              {
+                "source": "decision_1f555de57d",
+                "target": "rationale_1ecd6f8c7e",
+                "relation_type": "rationale_for",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "decision_1f555de57d",
+                "target": "constraint_2442b6bbc0",
+                "relation_type": "constrains",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "decision_1f555de57d",
+                "target": "alternative_9761d1bfca",
+                "relation_type": "alternative_to",
+                "linked_task": "worker scheduler"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "decision_hyperedge_116c356bda",
+                "hyperedge_type": "decision_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "decision_1f555de57d",
+                  "rationale_1ecd6f8c7e",
+                  "constraint_2442b6bbc0",
+                  "alternative_9761d1bfca",
+                  "turn5_write0"
+                ]
+              }
+            ],
+            "conflict_hyperedges": []
+          },
+          "analysis": {
+            "stage_failure": "none",
+            "missing_expected": [],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 3 edge(s)",
+            "suspected_cause": "no issue detected"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 3,
+        "matched_count": 3,
+        "retrieved_count": 5,
+        "retrieved_hit_count": 3,
+        "irrelevant_retrieved_count": 2,
+        "recall": 1.0,
+        "precision_proxy": 0.6,
+        "irrelevant_context_rate": 0.4,
+        "response_signal_count": 3,
+        "response_signal_hits": 3,
+        "provider_error_count": 0,
+        "response_recall": 1.0
+      },
+      "continuity": {
+        "scenario_count": 1,
+        "blocker_eligible_scenarios": 1,
+        "decision_eligible_scenarios": 1,
+        "task_continuation": 1.0,
+        "blocker_preservation": 1.0,
+        "decision_continuity": 1.0,
+        "repeated_work_avoidance_proxy": 1.0
+      }
+    },
+    "recent_history_baseline": {
+      "name": "recent_history_baseline",
+      "scenarios": [
+        {
+          "name": "decision_residue_resume",
+          "description": "Decision residue should preserve the chosen approach, rationale, and constraint under unrelated preference noise.",
+          "turns": [
+            {
+              "user_input": "Return to the scheduler work. What decision did we already make and why?",
+              "expected_retrievals": [
+                "patch dedupe before touching the retry policy",
+                "duplicate backoff state is the current blocker",
+                "avoid widening the change"
+              ],
+              "retrieved_items": [
+                "Reason: duplicate backoff state is the current blocker and we should avoid widening the change.",
+                "[baseline] Reason: duplicate backoff state is the current blocker and we should avoid widening the change.",
+                "Constraint: avoid widening the change until scheduler dedupe is verified.",
+                "[baseline] Constraint: avoid widening the change until scheduler dedupe is verified."
+              ],
+              "matched_expected": [
+                "duplicate backoff state is the current blocker",
+                "avoid widening the change"
+              ],
+              "matched_retrieved_items": [
+                "Reason: duplicate backoff state is the current blocker and we should avoid widening the change."
+              ],
+              "assistant_response": "",
+              "expected_response_signals": [
+                "patch dedupe",
+                "duplicate backoff state",
+                "avoid widening the change"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 2,
+            "retrieved_count": 4,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 3,
+            "recall": 0.667,
+            "precision_proxy": 0.25,
+            "irrelevant_context_rate": 0.75,
+            "response_signal_count": 3,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "continuity": {
+            "task_continuation": 0.0,
+            "blocker_preservation": 1.0,
+            "decision_continuity": 0.0,
+            "repeated_work_avoidance_proxy": 0.0,
+            "blocker_eligible_count": 1,
+            "decision_eligible_count": 1
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "patch dedupe before touching the retry policy"
+            ],
+            "missing_response_signals": [
+              "patch dedupe",
+              "duplicate backoff state",
+              "avoid widening the change"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "no artifact graph available",
+            "suspected_cause": "query overlap or kind scoring was too weak for: patch dedupe before touching the retry policy"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 3,
+        "matched_count": 2,
+        "retrieved_count": 4,
+        "retrieved_hit_count": 1,
+        "irrelevant_retrieved_count": 3,
+        "recall": 0.667,
+        "precision_proxy": 0.25,
+        "irrelevant_context_rate": 0.75,
+        "response_signal_count": 3,
+        "response_signal_hits": 0,
+        "provider_error_count": 0,
+        "response_recall": 0.0
+      },
+      "continuity": {
+        "scenario_count": 1,
+        "blocker_eligible_scenarios": 1,
+        "decision_eligible_scenarios": 1,
+        "task_continuation": 0.0,
+        "blocker_preservation": 1.0,
+        "decision_continuity": 0.0,
+        "repeated_work_avoidance_proxy": 0.0
+      }
+    },
+    "comparison": {
+      "aware_vs_blind": {
+        "recall_delta": 0.0,
+        "precision_proxy_delta": 0.0,
+        "irrelevant_context_rate_delta": 0.0,
+        "response_recall_delta": 0.0,
+        "avg_retrieved_delta": 0.0,
+        "task_continuation_delta": 0.0,
+        "blocker_preservation_delta": 0.0,
+        "decision_continuity_delta": 0.0,
+        "repeated_work_avoidance_delta": 0.0
+      },
+      "aware_vs_baseline": {
+        "recall_delta": 0.33299999999999996,
+        "precision_proxy_delta": 0.35,
+        "irrelevant_context_rate_delta": -0.35,
+        "response_recall_delta": 1.0,
+        "avg_retrieved_delta": 0.3340000000000001,
+        "task_continuation_delta": 1.0,
+        "blocker_preservation_delta": 0.0,
+        "decision_continuity_delta": 1.0,
+        "repeated_work_avoidance_delta": 1.0
+      }
+    }
+  }
+}

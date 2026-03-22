@@ -1,0 +1,799 @@
+{
+  "experiment": "hyperedge_state",
+  "description": "State-aware retrieval vs state-blind retrieval on conflicted and resolved hyperedges.",
+  "scenario_names": [
+    "conflicted_hypothesis_debugging",
+    "resolved_issue_deprioritization"
+  ],
+  "results": {
+    "state_aware": {
+      "name": "state_aware_llm",
+      "scenarios": [
+        {
+          "name": "conflicted_hypothesis_debugging",
+          "description": "State-aware retrieval should keep conflicting hypotheses active during debugging.",
+          "turns": [
+            {
+              "user_input": "Return to the profile-sync incident and compare the root causes.",
+              "expected_retrievals": [
+                "stale cursor state",
+                "cursor reset happens too early"
+              ],
+              "retrieved_items": [
+                "Log: profile-sync job times out after redis reconnect.",
+                "Hypothesis: the reconnect path is timing out because cursor reset happens too early.",
+                "Hypothesis: the reconnect path leaves stale cursor state in the sync worker."
+              ],
+              "matched_expected": [
+                "stale cursor state",
+                "cursor reset happens too early"
+              ],
+              "matched_retrieved_items": [
+                "Hypothesis: the reconnect path leaves stale cursor state in the sync worker.",
+                "Hypothesis: the reconnect path is timing out because cursor reset happens too early."
+              ],
+              "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?\n\nNext checks:\n- Inspect cursor reset first.",
+              "expected_response_signals": [
+                "stale cursor state",
+                "cursor reset"
+              ],
+              "matched_response_signals": [
+                "cursor reset"
+              ],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 3,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 1,
+            "recall": 1.0,
+            "precision_proxy": 0.667,
+            "irrelevant_context_rate": 0.333,
+            "response_signal_count": 2,
+            "response_signal_hits": 1,
+            "provider_error_count": 0,
+            "response_recall": 0.5
+          },
+          "artifact_graph": {
+            "node_count": 4,
+            "edge_count": 3,
+            "nodes": [
+              {
+                "artifact_id": "log_84e906201b",
+                "artifact_type": "log",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_1c62df2e05",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "hypothesis_92f1d48b79",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "artifact_id": "hypothesis_32ea8a6da1",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1c62df2e05",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_92f1d48b79",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_32ea8a6da1",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 4,
+            "edge_count": 3,
+            "hyperedge_count": 1,
+            "nodes": [
+              {
+                "node_id": "log_84e906201b",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_1c62df2e05",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "node_id": "hypothesis_92f1d48b79",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "node_id": "hypothesis_32ea8a6da1",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1c62df2e05",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_92f1d48b79",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_32ea8a6da1",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "log_84e906201b",
+                  "hypothesis_1c62df2e05",
+                  "hypothesis_92f1d48b79",
+                  "hypothesis_32ea8a6da1"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "stale cursor state"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 3 edge(s)",
+            "suspected_cause": "retrieved artifacts were available but the response did not use them explicitly"
+          }
+        },
+        {
+          "name": "resolved_issue_deprioritization",
+          "description": "State-aware retrieval should deprioritize resolved work in favor of active issues.",
+          "turns": [
+            {
+              "user_input": "What issue is still active and needs investigation?",
+              "expected_retrievals": [
+                "retry loop overflow"
+              ],
+              "retrieved_items": [
+                "Log: worker-7 retry loop overflow after checkpoint resume."
+              ],
+              "matched_expected": [
+                "retry loop overflow"
+              ],
+              "matched_retrieved_items": [
+                "Log: worker-7 retry loop overflow after checkpoint resume."
+              ],
+              "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?",
+              "expected_response_signals": [
+                "retry loop"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 1,
+            "matched_count": 1,
+            "retrieved_count": 1,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 1,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "artifact_graph": {
+            "node_count": 2,
+            "edge_count": 0,
+            "nodes": [
+              {
+                "artifact_id": "log_84e906201b",
+                "artifact_type": "log",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "log_43c01c8272",
+                "artifact_type": "log",
+                "linked_task": "retry loop",
+                "turn_index": 2
+              }
+            ],
+            "edges": []
+          },
+          "hypergraph_view": {
+            "node_count": 4,
+            "edge_count": 0,
+            "hyperedge_count": 2,
+            "nodes": [
+              {
+                "node_id": "log_84e906201b",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "node_id": "turn1_write0",
+                "node_type": "context",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "node_id": "log_43c01c8272",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dce989be91",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "retry loop",
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "issue",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 3
+              }
+            ],
+            "edges": [],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "log_84e906201b",
+                  "turn1_write0"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_dce989be91",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "retry loop",
+                "member_node_ids": [
+                  "log_43c01c8272"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "retry loop"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "multiple artifacts stored but no relation edges recovered",
+            "suspected_cause": "response omitted expected signals: retry loop"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 3,
+        "matched_count": 3,
+        "retrieved_count": 4,
+        "retrieved_hit_count": 3,
+        "irrelevant_retrieved_count": 1,
+        "recall": 1.0,
+        "precision_proxy": 0.75,
+        "irrelevant_context_rate": 0.25,
+        "response_signal_count": 3,
+        "response_signal_hits": 1,
+        "provider_error_count": 0,
+        "response_recall": 0.333
+      }
+    },
+    "state_blind": {
+      "name": "state_blind_llm",
+      "scenarios": [
+        {
+          "name": "conflicted_hypothesis_debugging",
+          "description": "State-aware retrieval should keep conflicting hypotheses active during debugging.",
+          "turns": [
+            {
+              "user_input": "Return to the profile-sync incident and compare the root causes.",
+              "expected_retrievals": [
+                "stale cursor state",
+                "cursor reset happens too early"
+              ],
+              "retrieved_items": [
+                "Log: profile-sync job times out after redis reconnect.",
+                "Hypothesis: the reconnect path is timing out because cursor reset happens too early.",
+                "Hypothesis: the reconnect path leaves stale cursor state in the sync worker."
+              ],
+              "matched_expected": [
+                "stale cursor state",
+                "cursor reset happens too early"
+              ],
+              "matched_retrieved_items": [
+                "Hypothesis: the reconnect path leaves stale cursor state in the sync worker.",
+                "Hypothesis: the reconnect path is timing out because cursor reset happens too early."
+              ],
+              "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?\n\nNext checks:\n- Inspect cursor reset first.",
+              "expected_response_signals": [
+                "stale cursor state",
+                "cursor reset"
+              ],
+              "matched_response_signals": [
+                "cursor reset"
+              ],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 3,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 1,
+            "recall": 1.0,
+            "precision_proxy": 0.667,
+            "irrelevant_context_rate": 0.333,
+            "response_signal_count": 2,
+            "response_signal_hits": 1,
+            "provider_error_count": 0,
+            "response_recall": 0.5
+          },
+          "artifact_graph": {
+            "node_count": 4,
+            "edge_count": 3,
+            "nodes": [
+              {
+                "artifact_id": "log_84e906201b",
+                "artifact_type": "log",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_1c62df2e05",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "hypothesis_92f1d48b79",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "artifact_id": "hypothesis_32ea8a6da1",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1c62df2e05",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_92f1d48b79",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_32ea8a6da1",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 4,
+            "edge_count": 3,
+            "hyperedge_count": 1,
+            "nodes": [
+              {
+                "node_id": "log_84e906201b",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_1c62df2e05",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "node_id": "hypothesis_92f1d48b79",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "node_id": "hypothesis_32ea8a6da1",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1c62df2e05",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_92f1d48b79",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_32ea8a6da1",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "log_84e906201b",
+                  "hypothesis_1c62df2e05",
+                  "hypothesis_92f1d48b79",
+                  "hypothesis_32ea8a6da1"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "stale cursor state"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 3 edge(s)",
+            "suspected_cause": "retrieved artifacts were available but the response did not use them explicitly"
+          }
+        },
+        {
+          "name": "resolved_issue_deprioritization",
+          "description": "State-aware retrieval should deprioritize resolved work in favor of active issues.",
+          "turns": [
+            {
+              "user_input": "What issue is still active and needs investigation?",
+              "expected_retrievals": [
+                "retry loop overflow"
+              ],
+              "retrieved_items": [
+                "Log: worker-7 retry loop overflow after checkpoint resume."
+              ],
+              "matched_expected": [
+                "retry loop overflow"
+              ],
+              "matched_retrieved_items": [
+                "Log: worker-7 retry loop overflow after checkpoint resume."
+              ],
+              "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?",
+              "expected_response_signals": [
+                "retry loop"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 1,
+            "matched_count": 1,
+            "retrieved_count": 1,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 1,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "artifact_graph": {
+            "node_count": 2,
+            "edge_count": 0,
+            "nodes": [
+              {
+                "artifact_id": "log_84e906201b",
+                "artifact_type": "log",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "log_43c01c8272",
+                "artifact_type": "log",
+                "linked_task": "retry loop",
+                "turn_index": 2
+              }
+            ],
+            "edges": []
+          },
+          "hypergraph_view": {
+            "node_count": 4,
+            "edge_count": 0,
+            "hyperedge_count": 2,
+            "nodes": [
+              {
+                "node_id": "log_84e906201b",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "node_id": "turn1_write0",
+                "node_type": "context",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "node_id": "log_43c01c8272",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dce989be91",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "retry loop",
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "issue",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 3
+              }
+            ],
+            "edges": [],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "log_84e906201b",
+                  "turn1_write0"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_dce989be91",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "retry loop",
+                "member_node_ids": [
+                  "log_43c01c8272"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "retry loop"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "multiple artifacts stored but no relation edges recovered",
+            "suspected_cause": "response omitted expected signals: retry loop"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 3,
+        "matched_count": 3,
+        "retrieved_count": 4,
+        "retrieved_hit_count": 3,
+        "irrelevant_retrieved_count": 1,
+        "recall": 1.0,
+        "precision_proxy": 0.75,
+        "irrelevant_context_rate": 0.25,
+        "response_signal_count": 3,
+        "response_signal_hits": 1,
+        "provider_error_count": 0,
+        "response_recall": 0.333
+      }
+    },
+    "recent_history_baseline": {
+      "name": "recent_history_baseline",
+      "scenarios": [
+        {
+          "name": "conflicted_hypothesis_debugging",
+          "description": "State-aware retrieval should keep conflicting hypotheses active during debugging.",
+          "turns": [
+            {
+              "user_input": "Return to the profile-sync incident and compare the root causes.",
+              "expected_retrievals": [
+                "stale cursor state",
+                "cursor reset happens too early"
+              ],
+              "retrieved_items": [
+                "Log: profile-sync job times out after redis reconnect.",
+                "[baseline] Log: profile-sync job times out after redis reconnect.",
+                "Hypothesis: the reconnect path leaves stale cursor state in the sync worker.",
+                "[baseline] Hypothesis: the reconnect path leaves stale cursor state in the sync worker."
+              ],
+              "matched_expected": [
+                "stale cursor state"
+              ],
+              "matched_retrieved_items": [
+                "Hypothesis: the reconnect path leaves stale cursor state in the sync worker."
+              ],
+              "assistant_response": "",
+              "expected_response_signals": null,
+              "matched_response_signals": null,
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 1,
+            "retrieved_count": 4,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 3,
+            "recall": 0.5,
+            "precision_proxy": 0.25,
+            "irrelevant_context_rate": 0.75,
+            "response_signal_count": 0,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "cursor reset happens too early"
+            ],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "no artifact graph available",
+            "suspected_cause": "query overlap or kind scoring was too weak for: cursor reset happens too early"
+          }
+        },
+        {
+          "name": "resolved_issue_deprioritization",
+          "description": "State-aware retrieval should deprioritize resolved work in favor of active issues.",
+          "turns": [
+            {
+              "user_input": "What issue is still active and needs investigation?",
+              "expected_retrievals": [
+                "retry loop overflow"
+              ],
+              "retrieved_items": [],
+              "matched_expected": [],
+              "matched_retrieved_items": [],
+              "assistant_response": "",
+              "expected_response_signals": null,
+              "matched_response_signals": null,
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 1,
+            "matched_count": 0,
+            "retrieved_count": 0,
+            "retrieved_hit_count": 0,
+            "irrelevant_retrieved_count": 0,
+            "recall": 0.0,
+            "precision_proxy": 0.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 0,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "retry loop overflow"
+            ],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "no artifact graph available",
+            "suspected_cause": "query overlap or kind scoring was too weak for: retry loop overflow"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 3,
+        "matched_count": 1,
+        "retrieved_count": 4,
+        "retrieved_hit_count": 1,
+        "irrelevant_retrieved_count": 3,
+        "recall": 0.333,
+        "precision_proxy": 0.25,
+        "irrelevant_context_rate": 0.75,
+        "response_signal_count": 3,
+        "response_signal_hits": 0,
+        "provider_error_count": 0,
+        "response_recall": 0.0
+      }
+    },
+    "comparison": {
+      "state_aware_vs_state_blind": {
+        "recall_delta": 0.0,
+        "precision_proxy_delta": 0.0,
+        "irrelevant_context_rate_delta": 0.0,
+        "response_recall_delta": 0.0,
+        "avg_retrieved_delta": 0.0
+      },
+      "state_aware_vs_baseline": {
+        "recall_delta": 0.667,
+        "precision_proxy_delta": 0.5,
+        "irrelevant_context_rate_delta": -0.5,
+        "response_recall_delta": 0.333,
+        "avg_retrieved_delta": 0.0
+      }
+    }
+  }
+}

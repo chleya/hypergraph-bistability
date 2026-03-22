@@ -1,0 +1,783 @@
+{
+  "runtime": {
+    "name": "runtime",
+    "scenarios": [
+      {
+        "name": "robustness_incident_story_bundle",
+        "description": "Robustness sidecar: the agent should recover the surviving incident story without relying on explicit handoff/closeout trigger words.",
+        "turns": [
+          {
+            "user_input": "What story still holds, what fix still holds, and which proof points are still worth citing?",
+            "expected_retrievals": [
+              "stale cursor state remains after reconnect",
+              "stale cursor cleanup patch reproduces cleanly",
+              "reconnect ordering looks stable in staging",
+              "checkpoint flush"
+            ],
+            "retrieved_items": [
+              "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush.",
+              "Incident handoff bundle: carry forward the surviving explanation, surviving patch, reconnect evidence, and checkpoint-flush evidence.",
+              "Plan: patch stale cursor cleanup, verify reconnect ordering in staging, then prepare the incident handoff.",
+              "Log: profile-sync job times out after redis reconnect and stalls before checkpoint flush.",
+              "Hypothesis: cursor reset timing is causing the timeout in the sync worker."
+            ],
+            "matched_expected": [
+              "stale cursor state remains after reconnect",
+              "checkpoint flush"
+            ],
+            "matched_retrieved_items": [
+              "Hypothesis: stale cursor state remains after reconnect and blocks the sync worker before checkpoint flush."
+            ],
+            "assistant_response": "[Focused mode, \u03bb=0.0371] Based on your input, here's my recommendation: ...\n\nNext checks:\n- The explanation that survived is stale cursor state after reconnect.\n- The patch that survived is stale cursor cleanup on reconnect.\n- Cite reconnect ordering stability as active evidence.\n- Cite the checkpoint flush stall as backing evidence.",
+            "expected_response_signals": [
+              "stale cursor state",
+              "stale cursor cleanup",
+              "reconnect ordering",
+              "checkpoint flush"
+            ],
+            "matched_response_signals": [
+              "stale cursor state",
+              "stale cursor cleanup",
+              "reconnect ordering",
+              "checkpoint flush"
+            ],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 4,
+          "matched_count": 2,
+          "retrieved_count": 5,
+          "retrieved_hit_count": 1,
+          "irrelevant_retrieved_count": 4,
+          "recall": 0.5,
+          "precision_proxy": 0.2,
+          "irrelevant_context_rate": 0.8,
+          "response_signal_count": 4,
+          "response_signal_hits": 4,
+          "provider_error_count": 0,
+          "response_recall": 1.0
+        },
+        "continuity": {
+          "task_continuation": 1.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 0.0,
+          "procedure_continuity": 0.0,
+          "repeated_work_avoidance_proxy": 1.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 1,
+          "procedure_eligible_count": 0
+        },
+        "artifact_graph": {
+          "node_count": 4,
+          "edge_count": 3,
+          "nodes": [
+            {
+              "artifact_id": "log_88fb7c8feb",
+              "artifact_type": "log",
+              "linked_task": "user profile service",
+              "turn_index": 0
+            },
+            {
+              "artifact_id": "hypothesis_1011f7812d",
+              "artifact_type": "hypothesis",
+              "linked_task": "user profile service",
+              "turn_index": 1
+            },
+            {
+              "artifact_id": "hypothesis_39abef07d7",
+              "artifact_type": "hypothesis",
+              "linked_task": "user profile service",
+              "turn_index": 3
+            },
+            {
+              "artifact_id": "plan_0ef80c0d9d",
+              "artifact_type": "plan",
+              "linked_task": "user profile service",
+              "turn_index": 4
+            }
+          ],
+          "edges": [
+            {
+              "source": "log_88fb7c8feb",
+              "target": "hypothesis_1011f7812d",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "log_88fb7c8feb",
+              "target": "hypothesis_39abef07d7",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "hypothesis_39abef07d7",
+              "target": "plan_0ef80c0d9d",
+              "relation_type": "tests",
+              "linked_task": "user profile service"
+            }
+          ]
+        },
+        "hypergraph_view": {
+          "node_count": 10,
+          "edge_count": 5,
+          "hyperedge_count": 4,
+          "conflict_hyperedge_count": 1,
+          "procedure_residue_count": 0,
+          "nodes": [
+            {
+              "node_id": "log_88fb7c8feb",
+              "node_type": "log",
+              "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "turn_index": 0
+            },
+            {
+              "node_id": "hypothesis_1011f7812d",
+              "node_type": "hypothesis",
+              "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "turn_index": 1
+            },
+            {
+              "node_id": "turn2_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": "user profile service",
+              "turn_index": 2
+            },
+            {
+              "node_id": "hypothesis_39abef07d7",
+              "node_type": "hypothesis",
+              "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "turn_index": 3
+            },
+            {
+              "node_id": "plan_0ef80c0d9d",
+              "node_type": "plan",
+              "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "turn_index": 4
+            },
+            {
+              "node_id": "turn5_write0",
+              "node_type": "task",
+              "hyperedge_id": "task_hyperedge_46ca323aae",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": null,
+              "turn_index": 5
+            },
+            {
+              "node_id": "turn6_write0",
+              "node_type": "context",
+              "hyperedge_id": "change_hyperedge_67ed8fa041",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": "user profile service",
+              "turn_index": 6
+            },
+            {
+              "node_id": "turn7_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": null,
+              "turn_index": 7
+            },
+            {
+              "node_id": "turn8_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": null,
+              "turn_index": 8
+            },
+            {
+              "node_id": "turn9_write0",
+              "node_type": "context",
+              "hyperedge_id": "change_hyperedge_a3059909e1",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": "what story still holds",
+              "turn_index": 9
+            }
+          ],
+          "edges": [
+            {
+              "source": "log_88fb7c8feb",
+              "target": "hypothesis_1011f7812d",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "hypothesis_1011f7812d",
+              "target": "turn2_write0",
+              "relation_type": "contradicts",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "log_88fb7c8feb",
+              "target": "hypothesis_39abef07d7",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "hypothesis_39abef07d7",
+              "target": "plan_0ef80c0d9d",
+              "relation_type": "tests",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "plan_0ef80c0d9d",
+              "target": "turn6_write0",
+              "relation_type": "verifies",
+              "linked_task": "user profile service"
+            }
+          ],
+          "hyperedges": [
+            {
+              "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "hyperedge_type": "evidence_hyperedge",
+              "linked_task": "user profile service",
+              "member_node_ids": [
+                "log_88fb7c8feb",
+                "hypothesis_1011f7812d",
+                "hypothesis_39abef07d7",
+                "plan_0ef80c0d9d"
+              ]
+            },
+            {
+              "hyperedge_id": "task_hyperedge_46ca323aae",
+              "hyperedge_type": "task_hyperedge",
+              "linked_task": null,
+              "member_node_ids": [
+                "turn5_write0"
+              ]
+            },
+            {
+              "hyperedge_id": "change_hyperedge_67ed8fa041",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": "user profile service",
+              "member_node_ids": [
+                "turn6_write0"
+              ]
+            },
+            {
+              "hyperedge_id": "change_hyperedge_a3059909e1",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": "what story still holds",
+              "member_node_ids": [
+                "turn9_write0"
+              ]
+            }
+          ],
+          "conflict_hyperedges": [
+            {
+              "conflict_hyperedge_id": "conflict::user profile service::evidence_hyperedge_dd6e3c0c59",
+              "linked_task": "user profile service",
+              "backing_hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+              "status": "active_conflict",
+              "dominant_node_id": "hypothesis_39abef07d7",
+              "hypothesis_node_ids": [
+                "hypothesis_1011f7812d",
+                "hypothesis_39abef07d7"
+              ],
+              "contradicted_node_ids": [
+                "hypothesis_1011f7812d"
+              ],
+              "active_hypothesis_node_ids": [
+                "hypothesis_39abef07d7"
+              ]
+            }
+          ],
+          "procedure_residues": []
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "stale cursor cleanup patch reproduces cleanly",
+            "reconnect ordering looks stable in staging"
+          ],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "relation chain recovered with 3 edge(s) and 1 conflict unit(s)",
+          "suspected_cause": "query overlap or kind scoring was too weak for: stale cursor cleanup patch reproduces cleanly, reconnect ordering looks stable in staging"
+        }
+      },
+      {
+        "name": "robustness_release_scope_bundle",
+        "description": "Robustness sidecar: the agent should recover release scope and deferred follow-up under de-triggered bundle phrasing.",
+        "turns": [
+          {
+            "user_input": "What still belongs in tonight's release story, what is still deferred, and what validation already holds?",
+            "expected_retrievals": [
+              "patch dedupe only",
+              "retry policy rewrite goes into a follow-up patch",
+              "scheduler resume tests are green",
+              "avoid widening the change before tonight's rollout",
+              "diff-style summary"
+            ],
+            "retrieved_items": [
+              "Verified: scheduler resume tests are green after the dedupe patch.",
+              "Plan: patch dedupe, rerun scheduler resume tests, then prepare the release review handoff.",
+              "Decision: keep the scheduler fix scoped to patch dedupe only.",
+              "Release packet procedure: start with a diff-style summary, then list committed scope, deferred retry policy follow-up, validated checks, avoid widening the change, and the ship call.",
+              "Constraint: avoid widening the change before tonight's rollout.",
+              "Alternative: retry policy rewrite goes into a follow-up patch after the hotfix."
+            ],
+            "matched_expected": [
+              "patch dedupe only",
+              "retry policy rewrite goes into a follow-up patch",
+              "scheduler resume tests are green",
+              "avoid widening the change before tonight's rollout",
+              "diff-style summary"
+            ],
+            "matched_retrieved_items": [
+              "Decision: keep the scheduler fix scoped to patch dedupe only.",
+              "Alternative: retry policy rewrite goes into a follow-up patch after the hotfix.",
+              "Verified: scheduler resume tests are green after the dedupe patch.",
+              "Constraint: avoid widening the change before tonight's rollout.",
+              "Release packet procedure: start with a diff-style summary, then list committed scope, deferred retry policy follow-up, validated checks, avoid widening the change, and the ship call."
+            ],
+            "assistant_response": "Next checks:\n- The patch that stays in is patch dedupe for the scheduler fix.\n- The retry policy rewrite stays out as a follow-up change.\n- Validation already banked: scheduler resume tests are green.\n- We are still holding the line against widening the change.\n- Start with a diff-style summary for tonight's packet.",
+            "expected_response_signals": [
+              "diff-style",
+              "patch dedupe",
+              "retry policy",
+              "scheduler resume tests"
+            ],
+            "matched_response_signals": [
+              "diff-style",
+              "patch dedupe",
+              "retry policy",
+              "scheduler resume tests"
+            ],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 5,
+          "matched_count": 5,
+          "retrieved_count": 6,
+          "retrieved_hit_count": 5,
+          "irrelevant_retrieved_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 0.833,
+          "irrelevant_context_rate": 0.167,
+          "response_signal_count": 4,
+          "response_signal_hits": 4,
+          "provider_error_count": 0,
+          "response_recall": 1.0
+        },
+        "continuity": {
+          "task_continuation": 1.0,
+          "blocker_preservation": 0.0,
+          "decision_continuity": 1.0,
+          "procedure_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 1.0,
+          "blocker_eligible_count": 0,
+          "decision_eligible_count": 1,
+          "procedure_eligible_count": 1
+        },
+        "artifact_graph": {
+          "node_count": 5,
+          "edge_count": 0,
+          "nodes": [
+            {
+              "artifact_id": "decision_3436f19046",
+              "artifact_type": "decision",
+              "linked_task": "worker scheduler",
+              "turn_index": 1
+            },
+            {
+              "artifact_id": "constraint_6473251e60",
+              "artifact_type": "constraint",
+              "linked_task": "scheduler hotfix",
+              "turn_index": 2
+            },
+            {
+              "artifact_id": "alternative_e2d8c355b6",
+              "artifact_type": "alternative",
+              "linked_task": "scheduler hotfix",
+              "turn_index": 3
+            },
+            {
+              "artifact_id": "plan_91ee835c5f",
+              "artifact_type": "plan",
+              "linked_task": "worker scheduler",
+              "turn_index": 4
+            },
+            {
+              "artifact_id": "constraint_92599c63f6",
+              "artifact_type": "constraint",
+              "linked_task": "scheduler hotfix",
+              "turn_index": 5
+            }
+          ],
+          "edges": []
+        },
+        "hypergraph_view": {
+          "node_count": 10,
+          "edge_count": 1,
+          "hyperedge_count": 4,
+          "conflict_hyperedge_count": 0,
+          "procedure_residue_count": 0,
+          "nodes": [
+            {
+              "node_id": "turn0_write0",
+              "node_type": "fact",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": null,
+              "turn_index": 0
+            },
+            {
+              "node_id": "decision_3436f19046",
+              "node_type": "decision",
+              "hyperedge_id": "decision_hyperedge_116c356bda",
+              "hyperedge_type": "decision_hyperedge",
+              "linked_task": "worker scheduler",
+              "turn_index": 1
+            },
+            {
+              "node_id": "constraint_6473251e60",
+              "node_type": "constraint",
+              "hyperedge_id": "decision_hyperedge_9db03fa66c",
+              "hyperedge_type": "decision_hyperedge",
+              "linked_task": "scheduler hotfix",
+              "turn_index": 2
+            },
+            {
+              "node_id": "alternative_e2d8c355b6",
+              "node_type": "alternative",
+              "hyperedge_id": "decision_hyperedge_9db03fa66c",
+              "hyperedge_type": "decision_hyperedge",
+              "linked_task": "scheduler hotfix",
+              "turn_index": 3
+            },
+            {
+              "node_id": "plan_91ee835c5f",
+              "node_type": "plan",
+              "hyperedge_id": "change_hyperedge_4804f76f49",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": "worker scheduler",
+              "turn_index": 4
+            },
+            {
+              "node_id": "constraint_92599c63f6",
+              "node_type": "constraint",
+              "hyperedge_id": "procedure_hyperedge_61bfe97cc4",
+              "hyperedge_type": "procedure_hyperedge",
+              "linked_task": "scheduler hotfix",
+              "turn_index": 5
+            },
+            {
+              "node_id": "turn6_write0",
+              "node_type": "context",
+              "hyperedge_id": "change_hyperedge_4804f76f49",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": "worker scheduler",
+              "turn_index": 6
+            },
+            {
+              "node_id": "turn7_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": null,
+              "turn_index": 7
+            },
+            {
+              "node_id": "turn8_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": null,
+              "turn_index": 8
+            },
+            {
+              "node_id": "turn9_write0",
+              "node_type": "context",
+              "hyperedge_id": null,
+              "hyperedge_type": null,
+              "linked_task": null,
+              "turn_index": 9
+            }
+          ],
+          "edges": [
+            {
+              "source": "plan_91ee835c5f",
+              "target": "turn6_write0",
+              "relation_type": "verifies",
+              "linked_task": "worker scheduler"
+            }
+          ],
+          "hyperedges": [
+            {
+              "hyperedge_id": "decision_hyperedge_116c356bda",
+              "hyperedge_type": "decision_hyperedge",
+              "linked_task": "worker scheduler",
+              "member_node_ids": [
+                "decision_3436f19046"
+              ]
+            },
+            {
+              "hyperedge_id": "decision_hyperedge_9db03fa66c",
+              "hyperedge_type": "decision_hyperedge",
+              "linked_task": "scheduler hotfix",
+              "member_node_ids": [
+                "constraint_6473251e60",
+                "alternative_e2d8c355b6"
+              ]
+            },
+            {
+              "hyperedge_id": "change_hyperedge_4804f76f49",
+              "hyperedge_type": "change_hyperedge",
+              "linked_task": "worker scheduler",
+              "member_node_ids": [
+                "plan_91ee835c5f",
+                "turn6_write0"
+              ]
+            },
+            {
+              "hyperedge_id": "procedure_hyperedge_61bfe97cc4",
+              "hyperedge_type": "procedure_hyperedge",
+              "linked_task": "scheduler hotfix",
+              "member_node_ids": [
+                "constraint_92599c63f6"
+              ]
+            }
+          ],
+          "conflict_hyperedges": [],
+          "procedure_residues": []
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "artifact context recovered with 5 node(s)",
+          "suspected_cause": "no issue detected"
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 9,
+      "matched_count": 7,
+      "retrieved_count": 11,
+      "retrieved_hit_count": 6,
+      "irrelevant_retrieved_count": 5,
+      "recall": 0.778,
+      "precision_proxy": 0.545,
+      "irrelevant_context_rate": 0.455,
+      "response_signal_count": 8,
+      "response_signal_hits": 8,
+      "provider_error_count": 0,
+      "response_recall": 1.0
+    },
+    "continuity": {
+      "scenario_count": 2,
+      "blocker_eligible_scenarios": 1,
+      "decision_eligible_scenarios": 2,
+      "procedure_eligible_scenarios": 1,
+      "task_continuation": 1.0,
+      "blocker_preservation": 1.0,
+      "decision_continuity": 0.5,
+      "procedure_continuity": 1.0,
+      "repeated_work_avoidance_proxy": 1.0
+    }
+  },
+  "recent_history_baseline": {
+    "name": "recent_history_baseline",
+    "scenarios": [
+      {
+        "name": "robustness_incident_story_bundle",
+        "description": "Robustness sidecar: the agent should recover the surviving incident story without relying on explicit handoff/closeout trigger words.",
+        "turns": [
+          {
+            "user_input": "What story still holds, what fix still holds, and which proof points are still worth citing?",
+            "expected_retrievals": [
+              "stale cursor state remains after reconnect",
+              "stale cursor cleanup patch reproduces cleanly",
+              "reconnect ordering looks stable in staging",
+              "checkpoint flush"
+            ],
+            "retrieved_items": [
+              "Incident handoff bundle: carry forward the surviving explanation, surviving patch, reconnect evidence, and checkpoint-flush evidence.",
+              "[baseline] Incident handoff bundle: carry forward the surviving explanation, surviving patch, reconnect evidence, and checkpoint-flush evidence.",
+              "Verified: stale cursor cleanup patch reproduces cleanly and reconnect ordering looks stable in staging.",
+              "[baseline] Verified: stale cursor cleanup patch reproduces cleanly and reconnect ordering looks stable in staging."
+            ],
+            "matched_expected": [
+              "stale cursor cleanup patch reproduces cleanly",
+              "reconnect ordering looks stable in staging"
+            ],
+            "matched_retrieved_items": [
+              "Verified: stale cursor cleanup patch reproduces cleanly and reconnect ordering looks stable in staging."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "stale cursor state",
+              "stale cursor cleanup",
+              "reconnect ordering",
+              "checkpoint flush"
+            ],
+            "matched_response_signals": [],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 4,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 1,
+          "irrelevant_retrieved_count": 3,
+          "recall": 0.5,
+          "precision_proxy": 0.25,
+          "irrelevant_context_rate": 0.75,
+          "response_signal_count": 4,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "continuity": {
+          "task_continuation": 0.0,
+          "blocker_preservation": 1.0,
+          "decision_continuity": 1.0,
+          "procedure_continuity": 0.0,
+          "repeated_work_avoidance_proxy": 0.0,
+          "blocker_eligible_count": 1,
+          "decision_eligible_count": 1,
+          "procedure_eligible_count": 0
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "stale cursor state remains after reconnect",
+            "checkpoint flush"
+          ],
+          "missing_response_signals": [
+            "stale cursor state",
+            "stale cursor cleanup",
+            "reconnect ordering",
+            "checkpoint flush"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "query overlap or kind scoring was too weak for: stale cursor state remains after reconnect, checkpoint flush"
+        }
+      },
+      {
+        "name": "robustness_release_scope_bundle",
+        "description": "Robustness sidecar: the agent should recover release scope and deferred follow-up under de-triggered bundle phrasing.",
+        "turns": [
+          {
+            "user_input": "What still belongs in tonight's release story, what is still deferred, and what validation already holds?",
+            "expected_retrievals": [
+              "patch dedupe only",
+              "retry policy rewrite goes into a follow-up patch",
+              "scheduler resume tests are green",
+              "avoid widening the change before tonight's rollout",
+              "diff-style summary"
+            ],
+            "retrieved_items": [
+              "Release packet procedure: start with a diff-style summary, then list committed scope, deferred retry policy follow-up, validated checks, avoid widening the change, and the ship call.",
+              "[baseline] Release packet procedure: start with a diff-style summary, then list committed scope, deferred retry policy follow-up, validated checks, avoid widening the change, and the ship call."
+            ],
+            "matched_expected": [
+              "diff-style summary"
+            ],
+            "matched_retrieved_items": [
+              "Release packet procedure: start with a diff-style summary, then list committed scope, deferred retry policy follow-up, validated checks, avoid widening the change, and the ship call."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": [
+              "diff-style",
+              "patch dedupe",
+              "retry policy",
+              "scheduler resume tests"
+            ],
+            "matched_response_signals": [],
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 5,
+          "matched_count": 1,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 1,
+          "irrelevant_retrieved_count": 1,
+          "recall": 0.2,
+          "precision_proxy": 0.5,
+          "irrelevant_context_rate": 0.5,
+          "response_signal_count": 4,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "continuity": {
+          "task_continuation": 0.0,
+          "blocker_preservation": 0.0,
+          "decision_continuity": 1.0,
+          "procedure_continuity": 1.0,
+          "repeated_work_avoidance_proxy": 0.0,
+          "blocker_eligible_count": 0,
+          "decision_eligible_count": 1,
+          "procedure_eligible_count": 1
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "patch dedupe only",
+            "retry policy rewrite goes into a follow-up patch",
+            "scheduler resume tests are green",
+            "avoid widening the change before tonight's rollout"
+          ],
+          "missing_response_signals": [
+            "diff-style",
+            "patch dedupe",
+            "retry policy",
+            "scheduler resume tests"
+          ],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "query overlap or kind scoring was too weak for: patch dedupe only, retry policy rewrite goes into a follow-up patch, scheduler resume tests are green"
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 9,
+      "matched_count": 3,
+      "retrieved_count": 6,
+      "retrieved_hit_count": 2,
+      "irrelevant_retrieved_count": 4,
+      "recall": 0.333,
+      "precision_proxy": 0.333,
+      "irrelevant_context_rate": 0.667,
+      "response_signal_count": 8,
+      "response_signal_hits": 0,
+      "provider_error_count": 0,
+      "response_recall": 0.0
+    },
+    "continuity": {
+      "scenario_count": 2,
+      "blocker_eligible_scenarios": 1,
+      "decision_eligible_scenarios": 2,
+      "procedure_eligible_scenarios": 1,
+      "task_continuation": 0.0,
+      "blocker_preservation": 1.0,
+      "decision_continuity": 1.0,
+      "procedure_continuity": 1.0,
+      "repeated_work_avoidance_proxy": 0.0
+    }
+  },
+  "comparison": {
+    "recall_delta": 0.445,
+    "precision_proxy_delta": 0.21200000000000002,
+    "response_recall_delta_vs_baseline": 1.0
+  }
+}

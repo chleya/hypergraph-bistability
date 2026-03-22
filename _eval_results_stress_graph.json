@@ -1,0 +1,507 @@
+{
+  "runtime": {
+    "name": "runtime",
+    "scenarios": [
+      {
+        "name": "layered_preferences",
+        "description": "The agent should combine multiple style preferences after unrelated turns.",
+        "turns": [
+          {
+            "user_input": "Now summarize how you should present the rollout plan back to me.",
+            "expected_retrievals": [
+              "prefer concise answers",
+              "bullet lists",
+              "production rollout"
+            ],
+            "retrieved_items": [
+              "I am planning a production rollout for a billing service.",
+              "Also remember that action items should be in bullet lists.",
+              "Remember that I prefer concise answers."
+            ],
+            "matched_expected": [
+              "prefer concise answers",
+              "bullet lists",
+              "production rollout"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I prefer concise answers.",
+              "Also remember that action items should be in bullet lists.",
+              "I am planning a production rollout for a billing service."
+            ],
+            "assistant_response": "- Keep it concise.\n- Use bullet lists for action items.\n- State the rollout plan and next steps directly.",
+            "expected_response_signals": [
+              "concise",
+              "bullet",
+              "rollout plan"
+            ],
+            "matched_response_signals": [
+              "concise",
+              "bullet",
+              "rollout plan"
+            ]
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 3,
+          "retrieved_hit_count": 3,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 3,
+          "response_signal_hits": 3,
+          "response_recall": 1.0
+        }
+      },
+      {
+        "name": "debugging_resume_with_preference",
+        "description": "The agent should resume a debugging issue while honoring a stored diagnostic preference.",
+        "turns": [
+          {
+            "user_input": "Return to the bug and tell me what to investigate first.",
+            "expected_retrievals": [
+              "root cause hypothesis first",
+              "flaky cache invalidation bug",
+              "stale profile data"
+            ],
+            "retrieved_items": [
+              "I am investigating a flaky cache invalidation bug in the user profile service.",
+              "The bug appears after deploys when stale profile data persists.",
+              "Also remind me to book train tickets tomorrow.",
+              "Remember that when debugging, I want the root cause hypothesis first."
+            ],
+            "matched_expected": [
+              "root cause hypothesis first",
+              "flaky cache invalidation bug",
+              "stale profile data"
+            ],
+            "matched_retrieved_items": [
+              "Remember that when debugging, I want the root cause hypothesis first.",
+              "I am investigating a flaky cache invalidation bug in the user profile service.",
+              "The bug appears after deploys when stale profile data persists."
+            ],
+            "assistant_response": "First checks:\n- Root cause hypothesis first.\n- Inspect cache invalidation ordering.\n- Trace stale profile data after deploy.",
+            "expected_response_signals": [
+              "root cause",
+              "cache invalidation",
+              "stale profile data"
+            ],
+            "matched_response_signals": [
+              "root cause",
+              "cache invalidation",
+              "stale profile data"
+            ]
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 3,
+          "recall": 1.0,
+          "precision_proxy": 0.75,
+          "response_signal_count": 3,
+          "response_signal_hits": 3,
+          "response_recall": 1.0
+        }
+      },
+      {
+        "name": "coding_agent_resume",
+        "description": "The agent should resume a coding task after an unrelated interruption and honor formatting preferences.",
+        "turns": [
+          {
+            "user_input": "Back to the scheduler fix. What should I inspect first?",
+            "expected_retrievals": [
+              "short diff-style summary first",
+              "flaky retry loop",
+              "duplicate backoff state"
+            ],
+            "retrieved_items": [
+              "I am fixing a flaky retry loop in the worker scheduler.",
+              "The suspected problem is duplicate backoff state after task resume.",
+              "Also, suggest a lunch option near the office.",
+              "Remember that when giving code changes, I want a short diff-style summary first."
+            ],
+            "matched_expected": [
+              "short diff-style summary first",
+              "flaky retry loop",
+              "duplicate backoff state"
+            ],
+            "matched_retrieved_items": [
+              "Remember that when giving code changes, I want a short diff-style summary first.",
+              "I am fixing a flaky retry loop in the worker scheduler.",
+              "The suspected problem is duplicate backoff state after task resume."
+            ],
+            "assistant_response": "Diff-style summary:\n- Inspect the retry loop state transitions.\n- Check duplicate backoff state after resume.",
+            "expected_response_signals": [
+              "diff-style",
+              "retry loop",
+              "backoff state"
+            ],
+            "matched_response_signals": [
+              "diff-style",
+              "retry loop",
+              "backoff state"
+            ]
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 3,
+          "recall": 1.0,
+          "precision_proxy": 0.75,
+          "response_signal_count": 3,
+          "response_signal_hits": 3,
+          "response_recall": 1.0
+        }
+      },
+      {
+        "name": "artifact_chain_resume",
+        "description": "The agent should recover logs, a debugging hypothesis, and a fix plan after an interruption.",
+        "turns": [
+          {
+            "user_input": "Return to the scheduler incident. What should I inspect first?",
+            "expected_retrievals": [
+              "retry loop overflow",
+              "duplicate scheduler state",
+              "patch dedupe"
+            ],
+            "retrieved_items": [
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.",
+              "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+              "Also remind me to order coffee beans.",
+              "Log: worker-7 retry loop overflow after checkpoint resume."
+            ],
+            "matched_expected": [
+              "retry loop overflow",
+              "duplicate scheduler state",
+              "patch dedupe"
+            ],
+            "matched_retrieved_items": [
+              "Log: worker-7 retry loop overflow after checkpoint resume.",
+              "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+            ],
+            "assistant_response": "First checks:\n- Inspect the retry loop state transitions.\n- Inspect retry state restore.\n- Compare checkpoint IDs before and after resume.\n- Confirm the dedupe patch point before requeue.",
+            "expected_response_signals": [
+              "retry state restore",
+              "checkpoint ids",
+              "dedupe"
+            ],
+            "matched_response_signals": [
+              "retry state restore",
+              "checkpoint ids",
+              "dedupe"
+            ]
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 3,
+          "recall": 1.0,
+          "precision_proxy": 0.75,
+          "response_signal_count": 3,
+          "response_signal_hits": 3,
+          "response_recall": 1.0
+        }
+      },
+      {
+        "name": "artifact_relation_chain",
+        "description": "The agent should preserve the relation chain from log to hypothesis to plan for the same task.",
+        "turns": [
+          {
+            "user_input": "Return to the profile-sync incident and continue the plan.",
+            "expected_retrievals": [
+              "times out after redis reconnect",
+              "stale cursor state",
+              "cursor reset"
+            ],
+            "retrieved_items": [
+              "Plan: inspect cursor reset, verify reconnect ordering, then patch stale cursor cleanup.",
+              "Hypothesis: the reconnect path leaves stale cursor state in the sync worker.",
+              "Log: profile-sync job times out after redis reconnect."
+            ],
+            "matched_expected": [
+              "times out after redis reconnect",
+              "stale cursor state",
+              "cursor reset"
+            ],
+            "matched_retrieved_items": [
+              "Log: profile-sync job times out after redis reconnect.",
+              "Hypothesis: the reconnect path leaves stale cursor state in the sync worker.",
+              "Plan: inspect cursor reset, verify reconnect ordering, then patch stale cursor cleanup."
+            ],
+            "assistant_response": "Plan continuation:\n- Inspect cursor reset first.\n- Verify reconnect ordering next.\n- Patch stale cursor cleanup before rerunning.\n- Confirm the stale cursor state hypothesis against the logs.",
+            "expected_response_signals": [
+              "cursor reset",
+              "reconnect ordering",
+              "stale cursor cleanup"
+            ],
+            "matched_response_signals": [
+              "cursor reset",
+              "reconnect ordering",
+              "stale cursor cleanup"
+            ]
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 3,
+          "retrieved_hit_count": 3,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 3,
+          "response_signal_hits": 3,
+          "response_recall": 1.0
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 15,
+      "matched_count": 15,
+      "retrieved_count": 18,
+      "retrieved_hit_count": 15,
+      "recall": 1.0,
+      "precision_proxy": 0.833,
+      "response_signal_count": 15,
+      "response_signal_hits": 15,
+      "response_recall": 1.0
+    }
+  },
+  "recent_history_baseline": {
+    "name": "recent_history_baseline",
+    "scenarios": [
+      {
+        "name": "layered_preferences",
+        "description": "The agent should combine multiple style preferences after unrelated turns.",
+        "turns": [
+          {
+            "user_input": "Now summarize how you should present the rollout plan back to me.",
+            "expected_retrievals": [
+              "prefer concise answers",
+              "bullet lists",
+              "production rollout"
+            ],
+            "retrieved_items": [
+              "Also remember that action items should be in bullet lists.",
+              "[baseline] Also remember that action items should be in bullet lists.",
+              "I am planning a production rollout for a billing service.",
+              "[baseline] I am planning a production rollout for a billing service."
+            ],
+            "matched_expected": [
+              "bullet lists",
+              "production rollout"
+            ],
+            "matched_retrieved_items": [
+              "Also remember that action items should be in bullet lists.",
+              "I am planning a production rollout for a billing service."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "recall": 0.667,
+          "precision_proxy": 0.5,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        }
+      },
+      {
+        "name": "debugging_resume_with_preference",
+        "description": "The agent should resume a debugging issue while honoring a stored diagnostic preference.",
+        "turns": [
+          {
+            "user_input": "Return to the bug and tell me what to investigate first.",
+            "expected_retrievals": [
+              "root cause hypothesis first",
+              "flaky cache invalidation bug",
+              "stale profile data"
+            ],
+            "retrieved_items": [
+              "Remember that when debugging, I want the root cause hypothesis first.",
+              "[baseline] Remember that when debugging, I want the root cause hypothesis first.",
+              "I am investigating a flaky cache invalidation bug in the user profile service.",
+              "[baseline] I am investigating a flaky cache invalidation bug in the user profile service."
+            ],
+            "matched_expected": [
+              "root cause hypothesis first",
+              "flaky cache invalidation bug"
+            ],
+            "matched_retrieved_items": [
+              "Remember that when debugging, I want the root cause hypothesis first.",
+              "I am investigating a flaky cache invalidation bug in the user profile service."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "recall": 0.667,
+          "precision_proxy": 0.5,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        }
+      },
+      {
+        "name": "coding_agent_resume",
+        "description": "The agent should resume a coding task after an unrelated interruption and honor formatting preferences.",
+        "turns": [
+          {
+            "user_input": "Back to the scheduler fix. What should I inspect first?",
+            "expected_retrievals": [
+              "short diff-style summary first",
+              "flaky retry loop",
+              "duplicate backoff state"
+            ],
+            "retrieved_items": [
+              "I am fixing a flaky retry loop in the worker scheduler.",
+              "[baseline] I am fixing a flaky retry loop in the worker scheduler.",
+              "Remember that when giving code changes, I want a short diff-style summary first.",
+              "[baseline] Remember that when giving code changes, I want a short diff-style summary first."
+            ],
+            "matched_expected": [
+              "short diff-style summary first",
+              "flaky retry loop"
+            ],
+            "matched_retrieved_items": [
+              "Remember that when giving code changes, I want a short diff-style summary first.",
+              "I am fixing a flaky retry loop in the worker scheduler."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "recall": 0.667,
+          "precision_proxy": 0.5,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        }
+      },
+      {
+        "name": "artifact_chain_resume",
+        "description": "The agent should recover logs, a debugging hypothesis, and a fix plan after an interruption.",
+        "turns": [
+          {
+            "user_input": "Return to the scheduler incident. What should I inspect first?",
+            "expected_retrievals": [
+              "retry loop overflow",
+              "duplicate scheduler state",
+              "patch dedupe"
+            ],
+            "retrieved_items": [
+              "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+              "[baseline] Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.",
+              "[baseline] Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+            ],
+            "matched_expected": [
+              "duplicate scheduler state",
+              "patch dedupe"
+            ],
+            "matched_retrieved_items": [
+              "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "recall": 0.667,
+          "precision_proxy": 0.5,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        }
+      },
+      {
+        "name": "artifact_relation_chain",
+        "description": "The agent should preserve the relation chain from log to hypothesis to plan for the same task.",
+        "turns": [
+          {
+            "user_input": "Return to the profile-sync incident and continue the plan.",
+            "expected_retrievals": [
+              "times out after redis reconnect",
+              "stale cursor state",
+              "cursor reset"
+            ],
+            "retrieved_items": [
+              "Log: profile-sync job times out after redis reconnect.",
+              "[baseline] Log: profile-sync job times out after redis reconnect.",
+              "Hypothesis: the reconnect path leaves stale cursor state in the sync worker.",
+              "[baseline] Hypothesis: the reconnect path leaves stale cursor state in the sync worker."
+            ],
+            "matched_expected": [
+              "times out after redis reconnect",
+              "stale cursor state"
+            ],
+            "matched_retrieved_items": [
+              "Log: profile-sync job times out after redis reconnect.",
+              "Hypothesis: the reconnect path leaves stale cursor state in the sync worker."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "recall": 0.667,
+          "precision_proxy": 0.5,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 15,
+      "matched_count": 10,
+      "retrieved_count": 20,
+      "retrieved_hit_count": 10,
+      "recall": 0.667,
+      "precision_proxy": 0.5,
+      "response_signal_count": 15,
+      "response_signal_hits": 0,
+      "response_recall": 0.0
+    }
+  },
+  "comparison": {
+    "recall_delta": 0.33299999999999996,
+    "precision_proxy_delta": 0.33299999999999996,
+    "response_recall_delta_vs_baseline": 1.0
+  }
+}

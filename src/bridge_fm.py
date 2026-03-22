@@ -29,23 +29,21 @@ experiments = {
     'noise_high': {'M': 0.738, 'std': 0.083},
 }
 
-# 理论 F(M) 参数 (从之前拟合得到)
-# dM/dt = α(M - M1*)(M - M0)(M - M2*) + noise
-# M1* ≈ 0.45, M0 ≈ 0.6, M2* ≈ 1.0
-M1_star = 0.45
-M0 = 0.60
-M2_star = 1.0
+# 理论 F(M) 参数 - 修正为正确的双稳形式
+# dM/dt = α · M · (1 - M) · (M - a) + noise
+# 稳定性: M=0 稳定, M=a 不稳定, M=1 稳定
+# 因此有且仅有 2 个稳定吸引子
+a = 0.5  # 中间不稳定点
 
 def F(M, alpha=1.0, noise_level=0.0):
-    """理论 drift 函数"""
-    drift = alpha * (M - M1_star) * (M - M0) * (M - M2_star)
-    # 噪声项
+    """正确的双稳 drift 函数: F(M) = α · M · (1 - M) · (M - a)"""
+    drift = alpha * M * (1 - M) * (M - a)
     noise = np.random.normal(0, noise_level)
     return drift + noise
 
 def F_no_noise(M, alpha=1.0):
     """无噪声的 drift"""
-    return alpha * (M - M1_star) * (M - M0) * (M - M2_star)
+    return alpha * M * (1 - M) * (M - a)
 
 # 分析各扰动的理论解释
 print("\n1. 融合概率扰动 (fusion_square, fusion_sqrt)")
@@ -54,8 +52,8 @@ print("   实验结果: M* = 0.692 (无变化)")
 print("   理论解释:")
 print("   - fusion_prob = f(distance) 的具体形式不影响")
 print("   - 关键参数是 threshold 和 fusion/split 比率")
-print("   - F(M) 的结构不变: 零点在 M≈0.45, 0.6, 1.0")
-print("   - 这些是吸引子结构，由容量约束决定")
+print("   - F(M) 的结构不变: 零点在 M=0, M=a, M=1")
+print("   - M=0和M=1是稳定吸引子, M=a是不稳定分隔")
 
 print("\n2. 分裂机制扰动 (split_random)")
 print("-" * 40)
@@ -63,7 +61,7 @@ print(f"   实验结果: M* = 0.682 (Δ = -0.010)")
 print("   理论解释:")
 print("   - 分裂源选择略有影响")
 print("   - 随机分裂略微增加碎片化")
-print("   - F(M) 的 M1* 可能有微小偏移")
+print("   - F(M) 的 M=a 可能有微小偏移")
 
 print("\n3. 噪声扰动 (noise_low, noise_high)")
 print("-" * 40)
@@ -81,13 +79,13 @@ ax1 = axes[0, 0]
 M_range = np.linspace(0, 1.2, 200)
 F_values = F_no_noise(M_range)
 
-ax1.plot(M_range, F_values, 'b-', linewidth=2, label='F(M) = α(M-0.45)(M-0.6)(M-1.0)')
+ax1.plot(M_range, F_values, 'b-', linewidth=2, label='F(M) = α·M·(1-M)·(M-a)')
 ax1.axhline(0, color='gray', linestyle='--', alpha=0.5)
-ax1.axvline(M1_star, color='green', linestyle=':', label=f'M₁* = {M1_star}')
-ax1.axvline(M0, color='orange', linestyle=':', label=f'M₀ = {M0}')
-ax1.axvline(M2_star, color='red', linestyle=':', label=f'M₂* = {M2_star}')
-ax1.fill_between(M_range[M_range < M0], F_values[M_range < M0], alpha=0.2, color='blue')
-ax1.fill_between(M_range[M_range > M0], F_values[M_range > M0], alpha=0.2, color='red')
+ax1.axvline(0, color='blue', linestyle=':', label='M=0 (stable)')
+ax1.axvline(a, color='orange', linestyle=':', label=f'M=a={a} (unstable)')
+ax1.axvline(1, color='red', linestyle=':', label='M=1 (stable)')
+ax1.fill_between(M_range[M_range < a], F_values[M_range < a], alpha=0.2, color='blue')
+ax1.fill_between(M_range[M_range > a], F_values[M_range > a], alpha=0.2, color='red')
 ax1.set_xlabel('M (order parameter)', fontsize=12)
 ax1.set_ylabel('F(M) (drift)', fontsize=12)
 ax1.set_title('理论 Drift 函数 F(M)', fontsize=14)
@@ -133,13 +131,11 @@ ax3.grid(True, alpha=0.3)
 # 图4: 概念图 - 吸引子结构
 ax4 = axes[1, 1]
 
-# 势函数 V(M) = -∫F(M)dM
+# 势函数 V(M) = -∫F(M)dM = -∫α·M·(1-M)·(M-a)dM
 def V(M):
-    """势函数 (粗略)"""
-    # V(M) = α/4 * M^4 - α*(0.45+0.6+1.0)/3 * M^3 + ...
-    # 简化版本
+    """势函数 V(M) = α[M⁴/4 - (a+1)M³/3 + aM²/2]"""
     alpha = 1.0
-    return (alpha/4) * M**4 - alpha*(M1_star+M0+M2_star)/3 * M**3 + alpha*(M1_star*M0+M1_star*M2_star+M0*M2_star)/2 * M**2 - alpha*M1_star*M0*M2_star*M
+    return alpha * (M**4/4 - (a+1)*M**3/3 + a*M**2/2)
 
 M_range = np.linspace(0, 1.2, 200)
 V_values = [V(m) for m in M_range]
@@ -149,13 +145,13 @@ V_values = np.array(V_values)
 V_values = V_values - V_values.min()
 
 ax4.plot(M_range, V_values, 'b-', linewidth=2)
-ax4.axvline(M1_star, color='green', linestyle=':', alpha=0.7)
-ax4.axvline(M0, color='orange', linestyle=':', alpha=0.7)
-ax4.axvline(M2_star, color='red', linestyle=':', alpha=0.7)
-ax4.fill_between(M_range[M_range < M0], V_values[M_range < M0], alpha=0.3, color='blue', label='LOW basin')
-ax4.fill_between(M_range[M_range >= M0], V_values[M_range >= M0], alpha=0.3, color='red', label='HIGH basin')
-ax4.scatter([M1_star, M2_star], [V(M1_star), V(M2_star)], s=100, c='green', zorder=5, label='稳定吸引子')
-ax4.scatter([M0], [V(M0)], s=100, c='orange', marker='x', zorder=5, label='不稳定分隔')
+ax4.axvline(0, color='blue', linestyle=':', alpha=0.7, label='M=0 (stable)')
+ax4.axvline(a, color='orange', linestyle=':', alpha=0.7, label=f'M=a={a} (unstable)')
+ax4.axvline(1, color='red', linestyle=':', alpha=0.7, label='M=1 (stable)')
+ax4.fill_between(M_range[M_range < a], V_values[M_range < a], alpha=0.3, color='blue', label='LOW basin')
+ax4.fill_between(M_range[M_range >= a], V_values[M_range >= a], alpha=0.3, color='red', label='HIGH basin')
+ax4.scatter([0, 1], [V(0), V(1)], s=100, c='green', zorder=5, label='稳定吸引子')
+ax4.scatter([a], [V(a)], s=100, c='orange', marker='x', zorder=5, label='不稳定分隔')
 ax4.set_xlabel('M', fontsize=12)
 ax4.set_ylabel('V(M) (potential)', fontsize=12)
 ax4.set_title('势函数 V(M) 与双稳态结构', fontsize=14)

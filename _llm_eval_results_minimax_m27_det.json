@@ -1,0 +1,553 @@
+{
+  "runtime": {
+    "name": "llm_runtime",
+    "scenarios": [
+      {
+        "name": "preference_recall",
+        "description": "The agent should recall explicit user preferences on a later turn.",
+        "turns": [
+          {
+            "user_input": "How should you respond to me in future planning discussions?",
+            "expected_retrievals": [
+              "prefer concise answers",
+              "bullet lists"
+            ],
+            "retrieved_items": [
+              "Remember that I prefer concise answers and bullet lists."
+            ],
+            "matched_expected": [
+              "prefer concise answers",
+              "bullet lists"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I prefer concise answers and bullet lists."
+            ],
+            "assistant_response": "[LLM error: Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-api-c******************************************************************************************************************3NgI. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}] I understand your message. How can I help?",
+            "expected_response_signals": [
+              "concise",
+              "bullet"
+            ],
+            "matched_response_signals": []
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 1,
+          "retrieved_hit_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 2,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        }
+      },
+      {
+        "name": "task_continuity",
+        "description": "The agent should surface an in-progress task when the user resumes it.",
+        "turns": [
+          {
+            "user_input": "Pick up that release work again and tell me what matters most.",
+            "expected_retrievals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback.",
+              "I am preparing a release checklist for version 2.1."
+            ],
+            "matched_expected": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback."
+            ],
+            "assistant_response": "[LLM error: Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-api-c******************************************************************************************************************3NgI. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}] I understand your message. How can I help?",
+            "expected_response_signals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_response_signals": []
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        }
+      },
+      {
+        "name": "context_switching",
+        "description": "The agent should recover both the active task and a stable preference after topic shifts.",
+        "turns": [
+          {
+            "user_input": "Back to the onboarding plan. Keep my preference in mind.",
+            "expected_retrievals": [
+              "prefer concise code reviews",
+              "onboarding checklist"
+            ],
+            "retrieved_items": [
+              "Remember that I prefer concise code reviews.",
+              "I need help planning an onboarding checklist for a new backend engineer."
+            ],
+            "matched_expected": [
+              "prefer concise code reviews",
+              "onboarding checklist"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I prefer concise code reviews.",
+              "I need help planning an onboarding checklist for a new backend engineer."
+            ],
+            "assistant_response": "[LLM error: Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-api-c******************************************************************************************************************3NgI. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}] I understand your message. How can I help?",
+            "expected_response_signals": [
+              "concise",
+              "onboarding checklist"
+            ],
+            "matched_response_signals": []
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 2,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        }
+      },
+      {
+        "name": "session_recovery",
+        "description": "The agent should recover task context after a persisted session reload.",
+        "turns": [
+          {
+            "user_input": "After reloading this session, what issue was I working on?",
+            "expected_retrievals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "retrieved_items": [
+              "The failure happens during the database migration step.",
+              "Remember that I am debugging a flaky deployment pipeline."
+            ],
+            "matched_expected": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I am debugging a flaky deployment pipeline.",
+              "The failure happens during the database migration step."
+            ],
+            "assistant_response": "[LLM error: Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-api-c******************************************************************************************************************3NgI. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}] I understand your message. How can I help?",
+            "expected_response_signals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "matched_response_signals": []
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 2,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 9,
+      "matched_count": 9,
+      "retrieved_count": 7,
+      "retrieved_hit_count": 6,
+      "recall": 1.0,
+      "precision_proxy": 0.857,
+      "response_signal_count": 9,
+      "response_signal_hits": 0,
+      "response_recall": 0.0
+    }
+  },
+  "recent_history_baseline": {
+    "name": "recent_history_baseline",
+    "scenarios": [
+      {
+        "name": "preference_recall",
+        "description": "The agent should recall explicit user preferences on a later turn.",
+        "turns": [
+          {
+            "user_input": "How should you respond to me in future planning discussions?",
+            "expected_retrievals": [
+              "prefer concise answers",
+              "bullet lists"
+            ],
+            "retrieved_items": [],
+            "matched_expected": [],
+            "matched_retrieved_items": [],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 0,
+          "retrieved_count": 0,
+          "retrieved_hit_count": 0,
+          "recall": 0.0,
+          "precision_proxy": 0.0,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        }
+      },
+      {
+        "name": "task_continuity",
+        "description": "The agent should surface an in-progress task when the user resumes it.",
+        "turns": [
+          {
+            "user_input": "Pick up that release work again and tell me what matters most.",
+            "expected_retrievals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback.",
+              "[baseline] The release checklist should include docs, migration notes, and rollback.",
+              "I am preparing a release checklist for version 2.1.",
+              "[baseline] I am preparing a release checklist for version 2.1."
+            ],
+            "matched_expected": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 0.25,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        }
+      },
+      {
+        "name": "context_switching",
+        "description": "The agent should recover both the active task and a stable preference after topic shifts.",
+        "turns": [
+          {
+            "user_input": "Back to the onboarding plan. Keep my preference in mind.",
+            "expected_retrievals": [
+              "prefer concise code reviews",
+              "onboarding checklist"
+            ],
+            "retrieved_items": [
+              "I need help planning an onboarding checklist for a new backend engineer.",
+              "[baseline] I need help planning an onboarding checklist for a new backend engineer."
+            ],
+            "matched_expected": [
+              "onboarding checklist"
+            ],
+            "matched_retrieved_items": [
+              "I need help planning an onboarding checklist for a new backend engineer."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 1,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 1,
+          "recall": 0.5,
+          "precision_proxy": 0.5,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        }
+      },
+      {
+        "name": "session_recovery",
+        "description": "The agent should recover task context after a persisted session reload.",
+        "turns": [
+          {
+            "user_input": "After reloading this session, what issue was I working on?",
+            "expected_retrievals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "retrieved_items": [],
+            "matched_expected": [],
+            "matched_retrieved_items": [],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 0,
+          "retrieved_count": 0,
+          "retrieved_hit_count": 0,
+          "recall": 0.0,
+          "precision_proxy": 0.0,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 9,
+      "matched_count": 4,
+      "retrieved_count": 6,
+      "retrieved_hit_count": 2,
+      "recall": 0.444,
+      "precision_proxy": 0.333,
+      "response_signal_count": 9,
+      "response_signal_hits": 0,
+      "response_recall": 0.0
+    }
+  },
+  "llm_runtime": {
+    "name": "llm_runtime",
+    "scenarios": [
+      {
+        "name": "preference_recall",
+        "description": "The agent should recall explicit user preferences on a later turn.",
+        "turns": [
+          {
+            "user_input": "How should you respond to me in future planning discussions?",
+            "expected_retrievals": [
+              "prefer concise answers",
+              "bullet lists"
+            ],
+            "retrieved_items": [
+              "<think> The user is giving me a preference/instruction to remember. They want me to use concise answers and bullet lists. This is similar to what's already in my active contexts, so I should acknowledge this and update my memory state accordingly. Since this is a direct instruction about preferences, I should: 1. Acknowledge the preference briefly 2. Keep my response concise (following their own preference) 3. Maybe use a bullet point format to demonstrate I'm following their style Let me respond concisely as instructed. </think> Understood. I'll keep responses concise and use bullet lists when appropriate.",
+              "Remember that I prefer concise answers and bullet lists."
+            ],
+            "matched_expected": [
+              "prefer concise answers",
+              "bullet lists"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I prefer concise answers and bullet lists.",
+              "<think> The user is giving me a preference/instruction to remember. They want me to use concise answers and bullet lists. This is similar to what's already in my active contexts, so I should acknowledge this and update my memory state accordingly. Since this is a direct instruction about preferences, I should: 1. Acknowledge the preference briefly 2. Keep my response concise (following their own preference) 3. Maybe use a bullet point format to demonstrate I'm following their style Let me respond concisely as instructed. </think> Understood. I'll keep responses concise and use bullet lists when appropriate."
+            ],
+            "assistant_response": "<think>\nThe user is asking how I should respond to them in future planning discussions. This is a meta-question about my approach. They want concise answers and bullet lists based on the preference they just set.\n\nLooking at my retrieved memory, I have:\n1. A preference to keep responses concise and use bullet lists\n2. A response contract that says to be concise unless the user asks for detail\n\nSo I should give a concise answer with bullet points about how I'll approach planning discussions.\n</think>\n\n- Lead with actionable steps, not generic framing\n- Flag dependencies and risks upfront\n- Confirm your priorities before diving deep\n- Keep it brief unless you signal you want more detail",
+            "expected_response_signals": [
+              "concise",
+              "bullet"
+            ],
+            "matched_response_signals": [
+              "concise",
+              "bullet"
+            ]
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 2,
+          "response_signal_hits": 2,
+          "response_recall": 1.0
+        }
+      },
+      {
+        "name": "task_continuity",
+        "description": "The agent should surface an in-progress task when the user resumes it.",
+        "turns": [
+          {
+            "user_input": "Pick up that release work again and tell me what matters most.",
+            "expected_retrievals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "retrieved_items": [
+              "<think> The user has mentioned they are preparing a release checklist for version 2.1. Looking at my active memory state, I can see that this is indeed stored there: \"group_0: I am preparing a release checklist for version 2.1.\" Since this matches my active context, I should acknowledge this task directly and help them with it, rather than asking a generic clarifying question. I should draw on this recalled task and offer relevant assistance. Let me provide a helpful, concise response that acknowledges this work and offers to help. </think> I recall you're working on a release checklist for version 2.1. Here's a quick starter template: **Pre-release** - [ ] All stories/tickets in this release are QA-approved - [ ] Regression tests passing - [ ] No critical or high bugs open for this release - [ ] Changelog/release notes drafted **Build & Deploy** - [ ] Version bumped to 2.1.0 - [ ] Build artifacts generated and verified - [ ] Staging deployment complete and smoke tested - [ ] Database migrations reviewed (if any) **Sign-offs** - [ ] Product owner approval - [ ] QA lead sign-off - [ ] Security review (if applicable) **Post-release** - [ ] Deploy to production - [ ] Monitor error rates / performance - [ ] Announce to stakeholders/users - [ ] Clean up old branches/tags Do you want me to expand on any section, or adjust this for a specific tech stack or workflow?",
+              "<think> The user is providing specific requirements for the release checklist. They want it to include: 1. Docs 2. Migration notes 3. Rollback I should update the checklist to incorporate these elements. I'll organize it clearly and make sure these three areas are prominently featured. </think> Got it \u2014 here's the updated checklist with docs, migration notes, and rollback: **Pre-release** - [ ] All stories/tickets QA-approved - [ ] Regression tests passing - [ ] No critical/high bugs open - [ ] Changelog/release notes drafted **Documentation** - [ ] Release notes published - [ ] Updated API docs (if applicable) - [ ] Updated user-facing guides or runbooks - [ ] Internal dev docs updated (breaking changes, new configs, etc.) **Migration Notes** - [ ] Breaking changes documented - [ ] Migration steps for existing users/customers - [ ] Required config changes noted - [ ] Deprecation warnings checked - [ ] Database migration scripts reviewed and tested **Build & Deploy** - [ ] Version bumped to 2.1.0 - [ ] Build artifacts verified - [ ] Staging deployment + smoke test - [ ] Migration scripts dry-run on staging **Rollback Plan** - [ ] Rollback procedure documented - [ ] Previous version (2.0.x) artifacts available - [ ] Database rollback scripts prepared - [ ] Communication plan for rollback scenario defined **Sign-offs** - [ ] Product owner approval - [ ] QA lead sign-off - [ ] Security review (if applicable) **Post-release** - [ ] Deploy to production - [ ] Monitor error rates / performance - [ ] Announce to stakeholders - [ ] Clean up old branches/tags Need me to expand the rollback section or tailor this further?",
+              "I am preparing a release checklist for version 2.1.",
+              "The release checklist should include docs, migration notes, and rollback."
+            ],
+            "matched_expected": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_retrieved_items": [
+              "<think> The user has mentioned they are preparing a release checklist for version 2.1. Looking at my active memory state, I can see that this is indeed stored there: \"group_0: I am preparing a release checklist for version 2.1.\" Since this matches my active context, I should acknowledge this task directly and help them with it, rather than asking a generic clarifying question. I should draw on this recalled task and offer relevant assistance. Let me provide a helpful, concise response that acknowledges this work and offers to help. </think> I recall you're working on a release checklist for version 2.1. Here's a quick starter template: **Pre-release** - [ ] All stories/tickets in this release are QA-approved - [ ] Regression tests passing - [ ] No critical or high bugs open for this release - [ ] Changelog/release notes drafted **Build & Deploy** - [ ] Version bumped to 2.1.0 - [ ] Build artifacts generated and verified - [ ] Staging deployment complete and smoke tested - [ ] Database migrations reviewed (if any) **Sign-offs** - [ ] Product owner approval - [ ] QA lead sign-off - [ ] Security review (if applicable) **Post-release** - [ ] Deploy to production - [ ] Monitor error rates / performance - [ ] Announce to stakeholders/users - [ ] Clean up old branches/tags Do you want me to expand on any section, or adjust this for a specific tech stack or workflow?",
+              "<think> The user is providing specific requirements for the release checklist. They want it to include: 1. Docs 2. Migration notes 3. Rollback I should update the checklist to incorporate these elements. I'll organize it clearly and make sure these three areas are prominently featured. </think> Got it \u2014 here's the updated checklist with docs, migration notes, and rollback: **Pre-release** - [ ] All stories/tickets QA-approved - [ ] Regression tests passing - [ ] No critical/high bugs open - [ ] Changelog/release notes drafted **Documentation** - [ ] Release notes published - [ ] Updated API docs (if applicable) - [ ] Updated user-facing guides or runbooks - [ ] Internal dev docs updated (breaking changes, new configs, etc.) **Migration Notes** - [ ] Breaking changes documented - [ ] Migration steps for existing users/customers - [ ] Required config changes noted - [ ] Deprecation warnings checked - [ ] Database migration scripts reviewed and tested **Build & Deploy** - [ ] Version bumped to 2.1.0 - [ ] Build artifacts verified - [ ] Staging deployment + smoke test - [ ] Migration scripts dry-run on staging **Rollback Plan** - [ ] Rollback procedure documented - [ ] Previous version (2.0.x) artifacts available - [ ] Database rollback scripts prepared - [ ] Communication plan for rollback scenario defined **Sign-offs** - [ ] Product owner approval - [ ] QA lead sign-off - [ ] Security review (if applicable) **Post-release** - [ ] Deploy to production - [ ] Monitor error rates / performance - [ ] Announce to stakeholders - [ ] Clean up old branches/tags Need me to expand the rollback section or tailor this further?"
+            ],
+            "assistant_response": "<think>\nThe user is asking me to \"pick up that release work again\" - they're referring to the release checklist for version 2.1 that we've been working on. They want me to identify what matters most.\n\nBased on my retrieved memory, I can see we've already built a comprehensive checklist including docs, migration notes, and rollback. Now they want prioritization - what's most important.\n\nLet me think about what actually matters most for a release:\n\n1. **Rollback readiness** - This is often the most critical because if something goes wrong in production, you need to be able to recover quickly. This should be the #1 priority.\n\n2. **Migration notes and testing** - If customers can't migrate smoothly, you get blocked deployments and support nightmares.\n\n3. **QA sign-off** - Without this, you're releasing blind.\n\n4. **Documentation** - Important but often can be patched post-release if needed.\n\nLet me give them a concise, prioritized answer focusing on the top 3-4 things that really matter most.\n</think>\n\nBack to the v2.1 release \u2014 here's what matters most, ranked by risk if skipped:\n\n**1. Rollback plan (non-negotiable)**\nYou can delay docs. You cannot release without a tested way to revert. If 2.1 breaks production, you need:\n- Previous version artifacts ready\n- Database rollback scripts tested on staging\n- A clear decision tree for when to roll back vs. fix forward\n\n**2. Migration notes & dry-run**\nTalk to anyone who released a breaking change without clear migration steps. If existing customers can't upgrade, you're blocked \u2014 and probably getting support tickets.\n\n**3. QA sign-off on the critical path**\nDon't release until the features that *cannot* fail are verified. Everything else is lower priority.\n\n**4. Smoke test on staging before you deploy**\nOne simple test pass can catch the obvious regressions. Don't skip this.\n\n---\n\nEverything else (internal docs, full release notes, cleanup) can be patched post-launch if needed.\n\nWant me to focus the checklist on just these core items, or is there a specific area of the v2.1 release you're most worried about?",
+            "expected_response_signals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_response_signals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ]
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 3,
+          "response_recall": 1.0
+        }
+      },
+      {
+        "name": "context_switching",
+        "description": "The agent should recover both the active task and a stable preference after topic shifts.",
+        "turns": [
+          {
+            "user_input": "Back to the onboarding plan. Keep my preference in mind.",
+            "expected_retrievals": [
+              "prefer concise code reviews",
+              "onboarding checklist"
+            ],
+            "retrieved_items": [
+              "<think> The user is asking for help planning an onboarding checklist for a new backend engineer. I have a memory entry noting this as an active context. I should help them create this checklist in a concise manner since that's their stated preference. Let me create a practical backend engineer onboarding checklist. </think> Here's a concise backend engineer onboarding checklist: **Week 1: Access & Setup** - [ ] GitHub/GitLab access + SSH keys - [ ] IDE setup (VS Code, IntelliJ, etc.) - [ ] Dev environment (Docker, local DB) - [ ] Cloud console access (AWS/GCP/Azure) **Week 1-2: Codebase Orientation** - [ ] Repo walkthrough + architecture docs - [ ] Local repo clone + first build - [ ] Database schema review - [ ] API docs (Swagger/OpenAPI) **Week 2-3: Process & Tools** - [ ] CI/CD pipeline overview - [ ] Testing framework setup + first test - [ ] Monitoring/logging tools (Datadog, Grafana, etc.) - [ ] On-call rotation shadow (optional) **Week 3-4: First Contribution** - [ ] Pick starter bug/feature - [ ] PR review process explained - [ ] Submit first PR **Ongoing** - [ ] Code review participation - [ ] Pair programming sessions - [ ] 1:1 check-ins scheduled Want me to expand on any section or tailor it to a specific stack (language, framework, cloud)?",
+              "<think> The user is explicitly telling me to remember that they prefer concise code reviews. I should update my memory/understanding accordingly and confirm this preference. This seems like a direct instruction to remember a preference for future interactions. I should acknowledge this and store it in my memory state in a way that influences future responses. </think> Got it \u2014 concise code reviews noted. I'll keep feedback focused and to the point going forward.",
+              "Remember that I prefer concise code reviews.",
+              "<think> The user is asking for dinner ideas. This is a simple request, so I should keep it concise. I'll give a few quick options without overthinking it. </think> Quick dinner ideas: 1. **Sheet pan chicken + roasted veggies** \u2014 30 min, minimal cleanup 2. **Pasta aglio e olio** \u2014 garlic, olive oil, chili flakes, pasta. 15 min 3. **Tacos or burrito bowls** \u2014 ground beef/turkey, rice, beans, whatever toppings 4. **Stir fry** \u2014 frozen veggies + protein + soy sauce over rice 5. **Avocado toast + poached eggs** \u2014 if you're keeping it light What are you in the mood for? I can suggest something more specific.",
+              "I need help planning an onboarding checklist for a new backend engineer."
+            ],
+            "matched_expected": [
+              "prefer concise code reviews",
+              "onboarding checklist"
+            ],
+            "matched_retrieved_items": [
+              "<think> The user is explicitly telling me to remember that they prefer concise code reviews. I should update my memory/understanding accordingly and confirm this preference. This seems like a direct instruction to remember a preference for future interactions. I should acknowledge this and store it in my memory state in a way that influences future responses. </think> Got it \u2014 concise code reviews noted. I'll keep feedback focused and to the point going forward.",
+              "<think> The user is asking for help planning an onboarding checklist for a new backend engineer. I have a memory entry noting this as an active context. I should help them create this checklist in a concise manner since that's their stated preference. Let me create a practical backend engineer onboarding checklist. </think> Here's a concise backend engineer onboarding checklist: **Week 1: Access & Setup** - [ ] GitHub/GitLab access + SSH keys - [ ] IDE setup (VS Code, IntelliJ, etc.) - [ ] Dev environment (Docker, local DB) - [ ] Cloud console access (AWS/GCP/Azure) **Week 1-2: Codebase Orientation** - [ ] Repo walkthrough + architecture docs - [ ] Local repo clone + first build - [ ] Database schema review - [ ] API docs (Swagger/OpenAPI) **Week 2-3: Process & Tools** - [ ] CI/CD pipeline overview - [ ] Testing framework setup + first test - [ ] Monitoring/logging tools (Datadog, Grafana, etc.) - [ ] On-call rotation shadow (optional) **Week 3-4: First Contribution** - [ ] Pick starter bug/feature - [ ] PR review process explained - [ ] Submit first PR **Ongoing** - [ ] Code review participation - [ ] Pair programming sessions - [ ] 1:1 check-ins scheduled Want me to expand on any section or tailor it to a specific stack (language, framework, cloud)?"
+            ],
+            "assistant_response": "<think>\nThe user wants me to go back to the onboarding plan and keep their preference in mind. Looking at the retrieved memory, there's a preference noted: \"concise code reviews noted\" - but that's about code reviews, not specifically about onboarding plans.\n\nWait, the memory state says \"group_0: Back to the onboarding plan. Keep my preference in mind.\" - so this seems like a note to myself to remember this context.\n\nAlso the response contract says to keep answers concise unless the user asks for detail. So I should give a concise version of the onboarding plan or ask what specifically they need help with.\n\nThe user might want me to refine the backend engineer onboarding checklist I provided earlier, or maybe make it more concise. Let me provide a more condensed version or ask what aspect they want to focus on.\n\nActually, since they said \"keep my preference in mind\" and I noted they prefer concise responses, I should give a more concise version or ask what part of the onboarding plan they want to work on.\n</think>\n\nOn it. Do you want me to:\n\n1. **Condense** the checklist further\n2. **Expand** a specific section (e.g., more detail on testing, CI/CD, security)\n3. **Tailor it** to a specific stack (language, framework, cloud provider)\n\nWhich direction is most useful right now?",
+            "expected_response_signals": [
+              "concise",
+              "onboarding checklist"
+            ],
+            "matched_response_signals": [
+              "concise",
+              "onboarding checklist"
+            ]
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 5,
+          "retrieved_hit_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 0.4,
+          "response_signal_count": 2,
+          "response_signal_hits": 2,
+          "response_recall": 1.0
+        }
+      },
+      {
+        "name": "session_recovery",
+        "description": "The agent should recover task context after a persisted session reload.",
+        "turns": [
+          {
+            "user_input": "After reloading this session, what issue was I working on?",
+            "expected_retrievals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "retrieved_items": [
+              "<think> The user is adding more context about their deployment pipeline debugging. They're telling me the failure specifically happens during the database migration step. This is new information that I should incorporate into my memory state. Looking at my current memory state: - group_0: already has the flaky deployment pipeline context - group_1: this seems to be where the new info should go - group_2: \"The failure happens during the database migration step.\" - this is now in group 2 - group_3: empty I should acknowledge this and update my context. This narrows the debugging scope significantly - from \"flaky deployment pipeline\" to \"flaky deployment pipeline specifically during database migration.\" Let me respond concisely, acknowledging the specific failure point, which helps focus the debugging effort. </think> Good detail\u2014database migration is a common culprit for pipeline flakiness. Common causes to check: - **Connection timeouts** to the DB during migration - **Lock contention** (long-running migrations blocking or being blocked) - **State bleed** between runs (old migration state not cleaned up) - **Environment differences** (dev vs. prod DB versions or configs) - **Parallel execution issues** (multiple runners hitting the same DB) What's the migration tool you're using? And what's the actual error or behavior you're seeing?",
+              "<think> The user is explicitly setting a memory context. They want me to remember that they're debugging a flaky deployment pipeline. This is a direct instruction to update my memory state. Let me acknowledge this and update the relevant context group (likely work or technical). </think> Understood. I've stored that you're currently debugging a flaky deployment pipeline. When you share details, logs, or questions, I'll keep that context active and help you work through it\u2014focusing on the specific failure patterns or race conditions that typically cause pipeline flakiness.",
+              "The failure happens during the database migration step.",
+              "Remember that I am debugging a flaky deployment pipeline."
+            ],
+            "matched_expected": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "matched_retrieved_items": [
+              "<think> The user is adding more context about their deployment pipeline debugging. They're telling me the failure specifically happens during the database migration step. This is new information that I should incorporate into my memory state. Looking at my current memory state: - group_0: already has the flaky deployment pipeline context - group_1: this seems to be where the new info should go - group_2: \"The failure happens during the database migration step.\" - this is now in group 2 - group_3: empty I should acknowledge this and update my context. This narrows the debugging scope significantly - from \"flaky deployment pipeline\" to \"flaky deployment pipeline specifically during database migration.\" Let me respond concisely, acknowledging the specific failure point, which helps focus the debugging effort. </think> Good detail\u2014database migration is a common culprit for pipeline flakiness. Common causes to check: - **Connection timeouts** to the DB during migration - **Lock contention** (long-running migrations blocking or being blocked) - **State bleed** between runs (old migration state not cleaned up) - **Environment differences** (dev vs. prod DB versions or configs) - **Parallel execution issues** (multiple runners hitting the same DB) What's the migration tool you're using? And what's the actual error or behavior you're seeing?"
+            ],
+            "assistant_response": "<think>\nThe user is asking me to recall what issue they were working on. Looking at my retrieved memory:\n\n1. Preference context: \"Remember that I am debugging a flaky deployment pipeline.\"\n2. Fact context: \"The failure happens during the database migration step.\"\n\nSo I should recall both pieces of information - the main issue (flaky deployment pipeline) and the specific failure point (database migration step).\n\nI should be direct and concise, not give generic responses, and explicitly name the recalled issue.\n</think>\n\nYou were debugging a flaky deployment pipeline, with the failure occurring specifically during the **database migration step**.\n\nIf you have new logs or details to share, I'm ready to help dig into what's causing the migration to fail intermittently.",
+            "expected_response_signals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "matched_response_signals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ]
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 0.25,
+          "response_signal_count": 2,
+          "response_signal_hits": 2,
+          "response_recall": 1.0
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 9,
+      "matched_count": 9,
+      "retrieved_count": 15,
+      "retrieved_hit_count": 7,
+      "recall": 1.0,
+      "precision_proxy": 0.467,
+      "response_signal_count": 9,
+      "response_signal_hits": 9,
+      "response_recall": 1.0
+    },
+    "used_real_llm": true
+  },
+  "comparison": {
+    "recall_delta": 0.556,
+    "precision_proxy_delta": 0.524,
+    "response_recall_delta_vs_baseline": 0.0
+  }
+}

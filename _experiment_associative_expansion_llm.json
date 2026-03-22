@@ -1,0 +1,2594 @@
+{
+  "experiment": "associative_expansion",
+  "description": "Associative expansion vs single-hit retrieval on chain-heavy scenarios.",
+  "scenario_names": [
+    "debugging_resume_with_preference",
+    "coding_agent_resume",
+    "artifact_chain_resume",
+    "artifact_relation_chain"
+  ],
+  "results": {
+    "parent_expansion": {
+      "name": "llm_runtime",
+      "scenarios": [
+        {
+          "name": "debugging_resume_with_preference",
+          "description": "The agent should resume a debugging issue while honoring a stored diagnostic preference.",
+          "turns": [
+            {
+              "user_input": "Return to the bug and tell me what to investigate first.",
+              "expected_retrievals": [
+                "root cause hypothesis first",
+                "flaky cache invalidation bug",
+                "stale profile data"
+              ],
+              "retrieved_items": [
+                "Remember that when debugging, I want the root cause hypothesis first.",
+                "I am investigating a flaky cache invalidation bug in the user profile service.",
+                "Also remind me to book train tickets tomorrow.",
+                "The bug appears after deploys when stale profile data persists."
+              ],
+              "matched_expected": [
+                "root cause hypothesis first",
+                "flaky cache invalidation bug",
+                "stale profile data"
+              ],
+              "matched_retrieved_items": [
+                "Remember that when debugging, I want the root cause hypothesis first.",
+                "I am investigating a flaky cache invalidation bug in the user profile service.",
+                "The bug appears after deploys when stale profile data persists."
+              ],
+              "assistant_response": "**Recalled issue:** Flaky cache invalidation bug in the user profile service causing stale profile data after deploys.\n\n---\n\n**Root cause hypothesis:**\nCache invalidation signals are race-conditions between the deploy process and in-flight requests, OR the invalidation event isn't propagating to all cache nodes before traffic shifts.\n\n**First concrete checks:**\n\n1. **Check invalidation event logging** \u9225\ufffd Are `CACHE_INVALIDATE` events firing at deploy time? Look for gaps or missed nodes in the logs.\n\n2. **Check cache key pattern** \u9225\ufffd Are profile cache keys using a stable naming scheme across deploys, or does the key format change (e.g., version suffix mismatch)?\n\n3. **Check TTL vs deploy window** \u9225\ufffd If TTL is long (e.g., hours), stale entries from pre-deploy will survive even with correct invalidation.\n\n4. **Check rollout timing** \u9225\ufffd Is the cache clear step happening *after* or *before* traffic switches? Invert if needed.\n\nWhat do you want to investigate first?",
+              "expected_response_signals": [
+                "root cause",
+                "cache invalidation",
+                "stale profile data"
+              ],
+              "matched_response_signals": [
+                "root cause",
+                "cache invalidation",
+                "stale profile data"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user is resuming work on a cache invalidation bug. Based on the retrieved memory and response contract, I need to:\n\n1. Explicitly name the recalled issue (flaky cache invalidation bug in user profile service)\n2. State the root cause hypothesis first as they requested\n3. Keep it concise\n4. Mention the first concrete checks to investigate\n\nLet me think about what could cause stale profile data after deploys:\n- Cache keys not being invalidated during deployment\n- Old cache entries surviving because TTL hasn't expired\n- Cache warm-up logic pulling stale data\n- Race condition between cache update and deployment\n- Deployment not triggering cache flush\n- Stale data in distributed cache from before invalidation event\n\nThe most likely root cause for post-deploy stale data is:\n1. Cache entries aren't invalidated on deploy (cache keys remain with old data)\n2. Or invalidation signals aren't received by all cache nodes during rollout\n\nLet me provide the hypothesis and first investigation steps."
+                  },
+                  {
+                    "type": "text",
+                    "text": "**Recalled issue:** Flaky cache invalidation bug in the user profile service causing stale profile data after deploys.\n\n---\n\n**Root cause hypothesis:**\nCache invalidation signals are race-conditions between the deploy process and in-flight requests, OR the invalidation event isn't propagating to all cache nodes before traffic shifts.\n\n**First concrete checks:**\n\n1. **Check invalidation event logging** \u9225\ufffd Are `CACHE_INVALIDATE` events firing at deploy time? Look for gaps or missed nodes in the logs.\n\n2. **Check cache key pattern** \u9225\ufffd Are profile cache keys using a stable naming scheme across deploys, or does the key format change (e.g., version suffix mismatch)?\n\n3. **Check TTL vs deploy window** \u9225\ufffd If TTL is long (e.g., hours), stale entries from pre-deploy will survive even with correct invalidation.\n\n4. **Check rollout timing** \u9225\ufffd Is the cache clear step happening *after* or *before* traffic switches? Invert if needed.\n\nWhat do you want to investigate first?",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 3,
+            "retrieved_count": 4,
+            "retrieved_hit_count": 3,
+            "irrelevant_retrieved_count": 1,
+            "recall": 1.0,
+            "precision_proxy": 0.75,
+            "irrelevant_context_rate": 0.25,
+            "response_signal_count": 3,
+            "response_signal_hits": 3,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "artifact_graph": {
+            "node_count": 1,
+            "edge_count": 0,
+            "nodes": [
+              {
+                "artifact_id": "hypothesis_8e14454a81",
+                "artifact_type": "hypothesis",
+                "linked_task": null,
+                "turn_index": 0
+              }
+            ],
+            "edges": []
+          },
+          "hypergraph_view": {
+            "node_count": 5,
+            "edge_count": 0,
+            "hyperedge_count": 4,
+            "nodes": [
+              {
+                "node_id": "hypothesis_8e14454a81",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_baf0c684b3",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "turn_index": 0
+              },
+              {
+                "node_id": "turn1_write0",
+                "node_type": "context",
+                "hyperedge_id": "evidence_hyperedge_e1a91884f4",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "cache invalidation",
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "context",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 3
+              },
+              {
+                "node_id": "turn4_write0",
+                "node_type": "context",
+                "hyperedge_id": "evidence_hyperedge_4314532078",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "turn_index": 4
+              }
+            ],
+            "edges": [],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_baf0c684b3",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "member_node_ids": [
+                  "hypothesis_8e14454a81"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_e1a91884f4",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "cache invalidation",
+                "member_node_ids": [
+                  "turn1_write0"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "turn2_write0"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_4314532078",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "member_node_ids": [
+                  "turn4_write0"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "none",
+            "missing_expected": [],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "artifact context recovered with 1 node(s)",
+            "suspected_cause": "no issue detected"
+          }
+        },
+        {
+          "name": "coding_agent_resume",
+          "description": "The agent should resume a coding task after an unrelated interruption and honor formatting preferences.",
+          "turns": [
+            {
+              "user_input": "Back to the scheduler fix. What should I inspect first?",
+              "expected_retrievals": [
+                "short diff-style summary first",
+                "flaky retry loop",
+                "duplicate backoff state"
+              ],
+              "retrieved_items": [
+                "I am fixing a flaky retry loop in the worker scheduler.",
+                "The suspected problem is duplicate backoff state after task resume.",
+                "Also, suggest a lunch option near the office.",
+                "Remember that when giving code changes, I want a short diff-style summary first."
+              ],
+              "matched_expected": [
+                "short diff-style summary first",
+                "flaky retry loop",
+                "duplicate backoff state"
+              ],
+              "matched_retrieved_items": [
+                "Remember that when giving code changes, I want a short diff-style summary first.",
+                "I am fixing a flaky retry loop in the worker scheduler.",
+                "The suspected problem is duplicate backoff state after task resume."
+              ],
+              "assistant_response": "Diff-style summary:\n**Active issue:** Flaky retry loop in worker scheduler \u9225\ufffd suspected duplicate backoff state after task resume.\n\n**First inspection targets:**\n\n1. **Task resume path** \u9225\ufffd Look for where `on_resume()` or equivalent is called. Check if backoff state is re-initialized there *in addition* to initial setup.\n\n2. **Backoff state storage** \u9225\ufffd Inspect how backoff state is persisted (e.g., `task.backoff_attempts`, `last_retry_ts`). Look for a second write site after deserialization/resume.\n\n3. **Retry loop entry point** \u9225\ufffd Trace the loop that calls `schedule_retry()`. Verify it doesn't reset/increment backoff counters when resuming rather than starting fresh.\n\n**Quick check:** Search for `backoff` assignments. If you find two paths setting the same field (one in init/resume, one in the retry path), that's your duplicate.\n\n---\n\n**Lunch:** *Sushi Nakazawa* \u9225\ufffd 4-minute walk from the office, solid lunch omakase if you're craving Japanese. If you want something quicker, *Le Caf\u8305 de la Paix* has decent sandwiches nearby.",
+              "expected_response_signals": [
+                "diff-style",
+                "retry loop",
+                "backoff state"
+              ],
+              "matched_response_signals": [
+                "diff-style",
+                "retry loop",
+                "backoff state"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user is asking me to:\n1. Resume work on fixing a flaky retry loop in the worker scheduler\n2. The suspected problem is duplicate backoff state after task resume\n3. They want a short diff-style summary first when giving code changes\n4. They want lunch suggestion\n5. They're asking what to inspect first for the scheduler fix\n\nBased on the retrieved memory, I should:\n- Mention the active issue (flaky retry loop, duplicate backoff state after task resume)\n- Be concise\n- Not output <think> tags\n- Prioritize the recalled task over generic advice\n\nFor the scheduler fix, the duplicate backoff state after task resume is the key clue. I should give practical first inspection steps."
+                  },
+                  {
+                    "type": "text",
+                    "text": "**Active issue:** Flaky retry loop in worker scheduler \u9225\ufffd suspected duplicate backoff state after task resume.\n\n**First inspection targets:**\n\n1. **Task resume path** \u9225\ufffd Look for where `on_resume()` or equivalent is called. Check if backoff state is re-initialized there *in addition* to initial setup.\n\n2. **Backoff state storage** \u9225\ufffd Inspect how backoff state is persisted (e.g., `task.backoff_attempts`, `last_retry_ts`). Look for a second write site after deserialization/resume.\n\n3. **Retry loop entry point** \u9225\ufffd Trace the loop that calls `schedule_retry()`. Verify it doesn't reset/increment backoff counters when resuming rather than starting fresh.\n\n**Quick check:** Search for `backoff` assignments. If you find two paths setting the same field (one in init/resume, one in the retry path), that's your duplicate.\n\n---\n\n**Lunch:** *Sushi Nakazawa* \u9225\ufffd 4-minute walk from the office, solid lunch omakase if you're craving Japanese. If you want something quicker, *Le Caf\u8305 de la Paix* has decent sandwiches nearby.",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 3,
+            "retrieved_count": 4,
+            "retrieved_hit_count": 3,
+            "irrelevant_retrieved_count": 1,
+            "recall": 1.0,
+            "precision_proxy": 0.75,
+            "irrelevant_context_rate": 0.25,
+            "response_signal_count": 3,
+            "response_signal_hits": 3,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "artifact_graph": {
+            "node_count": 1,
+            "edge_count": 0,
+            "nodes": [
+              {
+                "artifact_id": "hypothesis_7e86f38fd9",
+                "artifact_type": "hypothesis",
+                "linked_task": null,
+                "turn_index": 2
+              }
+            ],
+            "edges": []
+          },
+          "hypergraph_view": {
+            "node_count": 5,
+            "edge_count": 0,
+            "hyperedge_count": 3,
+            "nodes": [
+              {
+                "node_id": "turn0_write0",
+                "node_type": "fact",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 0
+              },
+              {
+                "node_id": "turn1_write0",
+                "node_type": "context",
+                "hyperedge_id": "change_hyperedge_4804f76f49",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "node_id": "hypothesis_7e86f38fd9",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_ef3fc3a0f1",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 3
+              },
+              {
+                "node_id": "turn4_write0",
+                "node_type": "task",
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 4
+              }
+            ],
+            "edges": [],
+            "hyperedges": [
+              {
+                "hyperedge_id": "change_hyperedge_4804f76f49",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn1_write0"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_ef3fc3a0f1",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "member_node_ids": [
+                  "hypothesis_7e86f38fd9"
+                ]
+              },
+              {
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn4_write0"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "none",
+            "missing_expected": [],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "artifact context recovered with 1 node(s)",
+            "suspected_cause": "no issue detected"
+          }
+        },
+        {
+          "name": "artifact_chain_resume",
+          "description": "The agent should recover logs, a debugging hypothesis, and a fix plan after an interruption.",
+          "turns": [
+            {
+              "user_input": "Return to the scheduler incident. What should I inspect first?",
+              "expected_retrievals": [
+                "retry loop overflow",
+                "duplicate scheduler state",
+                "patch dedupe"
+              ],
+              "retrieved_items": [
+                "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.",
+                "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+                "Also remind me to order coffee beans.",
+                "Log: worker-7 retry loop overflow after checkpoint resume."
+              ],
+              "matched_expected": [
+                "retry loop overflow",
+                "duplicate scheduler state",
+                "patch dedupe"
+              ],
+              "matched_retrieved_items": [
+                "Log: worker-7 retry loop overflow after checkpoint resume.",
+                "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+                "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+              ],
+              "assistant_response": "Back on the scheduler incident \u9225\ufffd duplicate scheduler state rehydrating the same backoff entry twice.\n\n**First inspection: retry state restore**\n\nCheck the worker-7 resume path for:\n1. Whether the backoff timer state is being restored without deduplication\n2. If `checkpoint_id` is compared against the in-memory retry map before insertion\n\nAfter that, compare checkpoint IDs to confirm whether two entries share the same ID, which would confirm the rehydration duplication.\n\nAlso \u9225\ufffd reminder: order coffee beans.\n\nNext checks:\n- Inspect the retry loop state transitions first.\n- Confirm the dedupe patch point before requeue.",
+              "expected_response_signals": [
+                "retry state restore",
+                "checkpoint ids",
+                "dedupe"
+              ],
+              "matched_response_signals": [
+                "retry state restore",
+                "checkpoint ids",
+                "dedupe"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user is returning to a scheduler incident. Let me check what memory was retrieved:\n\nContext:\n- [working_memory] Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.\n- [relation_parent] Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.\n\nThe user is asking \"What should I inspect first?\" and has the plan clearly in memory: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.\n\nAccording to the response contract, I should:\n1. Explicitly name the recalled issue before asking follow-up questions\n2. Keep answer concise\n3. Prioritize recalled tasks over generic advice\n4. Follow the plan order (inspect retry state restore first)\n\nSo I should mention we're back on the scheduler incident with the duplicate scheduler state hypothesis, and the first step is inspecting the retry state restore.\n\nAlso, there's a reminder to order coffee beans that I should include."
+                  },
+                  {
+                    "type": "text",
+                    "text": "Back on the scheduler incident \u9225\ufffd duplicate scheduler state rehydrating the same backoff entry twice.\n\n**First inspection: retry state restore**\n\nCheck the worker-7 resume path for:\n1. Whether the backoff timer state is being restored without deduplication\n2. If `checkpoint_id` is compared against the in-memory retry map before insertion\n\nAfter that, compare checkpoint IDs to confirm whether two entries share the same ID, which would confirm the rehydration duplication.\n\nAlso \u9225\ufffd reminder: order coffee beans.",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 3,
+            "retrieved_count": 4,
+            "retrieved_hit_count": 3,
+            "irrelevant_retrieved_count": 1,
+            "recall": 1.0,
+            "precision_proxy": 0.75,
+            "irrelevant_context_rate": 0.25,
+            "response_signal_count": 3,
+            "response_signal_hits": 3,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "artifact_graph": {
+            "node_count": 3,
+            "edge_count": 1,
+            "nodes": [
+              {
+                "artifact_id": "log_43c01c8272",
+                "artifact_type": "log",
+                "linked_task": "retry loop",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_8f6ae46b7c",
+                "artifact_type": "hypothesis",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "plan_851fbd998b",
+                "artifact_type": "plan",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              }
+            ],
+            "edges": [
+              {
+                "source": "hypothesis_8f6ae46b7c",
+                "target": "plan_851fbd998b",
+                "relation_type": "tests",
+                "linked_task": "worker scheduler"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 5,
+            "edge_count": 1,
+            "hyperedge_count": 4,
+            "nodes": [
+              {
+                "node_id": "log_43c01c8272",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dce989be91",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "retry loop",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_8f6ae46b7c",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "node_id": "plan_851fbd998b",
+                "node_type": "plan",
+                "hyperedge_id": "change_hyperedge_5dc5ad4870",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 3
+              },
+              {
+                "node_id": "turn4_write0",
+                "node_type": "task",
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 4
+              }
+            ],
+            "edges": [
+              {
+                "source": "hypothesis_8f6ae46b7c",
+                "target": "plan_851fbd998b",
+                "relation_type": "tests",
+                "linked_task": "worker scheduler"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dce989be91",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "retry loop",
+                "member_node_ids": [
+                  "log_43c01c8272"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "hypothesis_8f6ae46b7c"
+                ]
+              },
+              {
+                "hyperedge_id": "change_hyperedge_5dc5ad4870",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "plan_851fbd998b"
+                ]
+              },
+              {
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn4_write0"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "none",
+            "missing_expected": [],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 1 edge(s)",
+            "suspected_cause": "no issue detected"
+          }
+        },
+        {
+          "name": "artifact_relation_chain",
+          "description": "The agent should preserve the relation chain from log to hypothesis to plan for the same task.",
+          "turns": [
+            {
+              "user_input": "Return to the profile-sync incident and continue the plan.",
+              "expected_retrievals": [
+                "times out after redis reconnect",
+                "stale cursor state",
+                "cursor reset"
+              ],
+              "retrieved_items": [
+                "Plan: inspect cursor reset, verify reconnect ordering, then patch stale cursor cleanup.",
+                "Hypothesis: the reconnect path leaves stale cursor state in the sync worker.",
+                "Log: profile-sync job times out after redis reconnect."
+              ],
+              "matched_expected": [
+                "times out after redis reconnect",
+                "stale cursor state",
+                "cursor reset"
+              ],
+              "matched_retrieved_items": [
+                "Log: profile-sync job times out after redis reconnect.",
+                "Hypothesis: the reconnect path leaves stale cursor state in the sync worker.",
+                "Plan: inspect cursor reset, verify reconnect ordering, then patch stale cursor cleanup."
+              ],
+              "assistant_response": "**Resuming: profile-sync timeout after redis reconnect**\n\nHypothesis: stale cursor state in sync worker after reconnect.\n\n**Plan steps remaining:**\n1. **Inspect cursor reset** \u9225\ufffd find where cursor state is initialized/reset in the worker\n2. **Verify reconnect ordering** \u9225\ufffd check if cursor is cleared before or after reconnection\n3. **Patch stale cursor cleanup** \u9225\ufffd add proper reset on reconnect path\n\n**First check:** Locate the reconnect handler in the sync worker. Does it reset the cursor before re-subscribing, or does it reuse the old cursor reference?\n\nWant me to inspect the reconnect path in the sync worker code, or do you have the relevant file(s) to share?",
+              "expected_response_signals": [
+                "cursor reset",
+                "reconnect ordering",
+                "stale cursor cleanup"
+              ],
+              "matched_response_signals": [
+                "cursor reset",
+                "reconnect ordering",
+                "stale cursor cleanup"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user is resuming work on a debugging incident. Let me parse what's happening:\n\n1. **Issue**: profile-sync job times out after redis reconnect\n2. **Hypothesis**: reconnect path leaves stale cursor state in the sync worker\n3. **Plan**: inspect cursor reset, verify reconnect ordering, then patch stale cursor cleanup\n4. **Status**: Return to the profile-sync incident and continue the plan\n\nI need to:\n1. Explicitly name the recalled issue\n2. Surface the next concrete steps from the plan\n3. Keep it concise - this is a debugging resume answer\n\nThe plan has 3 steps:\n1. Inspect cursor reset\n2. Verify reconnect ordering\n3. Patch stale cursor cleanup\n\nI should ask what they want to tackle first, or surface the first check. Given the memory contract says to \"mention it directly rather than replying generically\" and \"explicitly surface the next plan steps\", I should be direct about where we are.\n\nLet me give a concise response that:\n- Names the issue and hypothesis\n- Surfaces the first step to take\n- Asks for direction or confirms they want to proceed"
+                  },
+                  {
+                    "type": "text",
+                    "text": "**Resuming: profile-sync timeout after redis reconnect**\n\nHypothesis: stale cursor state in sync worker after reconnect.\n\n**Plan steps remaining:**\n1. **Inspect cursor reset** \u9225\ufffd find where cursor state is initialized/reset in the worker\n2. **Verify reconnect ordering** \u9225\ufffd check if cursor is cleared before or after reconnection\n3. **Patch stale cursor cleanup** \u9225\ufffd add proper reset on reconnect path\n\n**First check:** Locate the reconnect handler in the sync worker. Does it reset the cursor before re-subscribing, or does it reuse the old cursor reference?\n\nWant me to inspect the reconnect path in the sync worker code, or do you have the relevant file(s) to share?",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 3,
+            "retrieved_count": 3,
+            "retrieved_hit_count": 3,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 3,
+            "response_signal_hits": 3,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "artifact_graph": {
+            "node_count": 3,
+            "edge_count": 2,
+            "nodes": [
+              {
+                "artifact_id": "log_84e906201b",
+                "artifact_type": "log",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_1c62df2e05",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "plan_08acad5eb1",
+                "artifact_type": "plan",
+                "linked_task": "user profile service",
+                "turn_index": 2
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1c62df2e05",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "hypothesis_1c62df2e05",
+                "target": "plan_08acad5eb1",
+                "relation_type": "tests",
+                "linked_task": "user profile service"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 4,
+            "edge_count": 2,
+            "hyperedge_count": 3,
+            "nodes": [
+              {
+                "node_id": "log_84e906201b",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_1c62df2e05",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "node_id": "plan_08acad5eb1",
+                "node_type": "plan",
+                "hyperedge_id": "change_hyperedge_67ed8fa041",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "task",
+                "hyperedge_id": "task_hyperedge_58df664c79",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1c62df2e05",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "hypothesis_1c62df2e05",
+                "target": "plan_08acad5eb1",
+                "relation_type": "tests",
+                "linked_task": "user profile service"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "log_84e906201b",
+                  "hypothesis_1c62df2e05"
+                ]
+              },
+              {
+                "hyperedge_id": "change_hyperedge_67ed8fa041",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "plan_08acad5eb1"
+                ]
+              },
+              {
+                "hyperedge_id": "task_hyperedge_58df664c79",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "turn3_write0"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "none",
+            "missing_expected": [],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 2 edge(s)",
+            "suspected_cause": "no issue detected"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 12,
+        "matched_count": 12,
+        "retrieved_count": 15,
+        "retrieved_hit_count": 12,
+        "irrelevant_retrieved_count": 3,
+        "recall": 1.0,
+        "precision_proxy": 0.8,
+        "irrelevant_context_rate": 0.2,
+        "response_signal_count": 12,
+        "response_signal_hits": 12,
+        "provider_error_count": 0,
+        "response_recall": 1.0
+      },
+      "used_real_llm": true
+    },
+    "single_hit": {
+      "name": "single_hit_llm",
+      "scenarios": [
+        {
+          "name": "debugging_resume_with_preference",
+          "description": "The agent should resume a debugging issue while honoring a stored diagnostic preference.",
+          "turns": [
+            {
+              "user_input": "Return to the bug and tell me what to investigate first.",
+              "expected_retrievals": [
+                "root cause hypothesis first",
+                "flaky cache invalidation bug",
+                "stale profile data"
+              ],
+              "retrieved_items": [
+                "Remember that when debugging, I want the root cause hypothesis first."
+              ],
+              "matched_expected": [
+                "root cause hypothesis first"
+              ],
+              "matched_retrieved_items": [
+                "Remember that when debugging, I want the root cause hypothesis first."
+              ],
+              "assistant_response": "**Recalled issue:** Flaky cache invalidation in user profile service, stale data persisting after deploys.\n\n**Root cause hypothesis:**\nAfter deploys, new pods start before the cache invalidation publisher has re-registered or re-established its subscription, causing a window where invalidation events are missed.\n\n**Investigation order:**\n\n1. **Check cache key strategy** \u9225\ufffd Are you using cache-aside with TTL, or explicit invalidation events? If explicit, trace the subscription lifecycle during pod restart.\n\n2. **Inspect the invalidation publisher** \u9225\ufffd Does it publish on pod startup, or only on writes? If only on writes, new pods won't get invalidation for pre-existing cache entries.\n\n3. **Look at pod termination/startup sequence** \u9225\ufffd Are graceful shutdowns implemented? A pod terminating mid-invalidation can leave the cache in an inconsistent state.\n\n4. **Check for race conditions in invalidation vs. read** \u9225\ufffd Is a read populating stale data happening concurrently with invalidation?\n\n**Most likely",
+              "expected_response_signals": [
+                "root cause",
+                "cache invalidation",
+                "stale profile data"
+              ],
+              "matched_response_signals": [
+                "root cause",
+                "cache invalidation"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user has provided:\n1. A preference: \"when debugging, I want the root cause hypothesis first\"\n2. An active issue: \"flaky cache invalidation bug in the user profile service\"\n3. Context about the bug: \"appears after deploys when stale profile data persists\"\n4. A reminder task: \"book train tickets tomorrow\"\n5. A direct request: \"Return to the bug and tell me what to investigate first\"\n\nMy retrieved memory confirms:\n- The debugging preference (root cause hypothesis first)\n- The active issue (cache invalidation bug in user profile service)\n- I should prioritize these over generic advice\n\nThe user is asking me to resume debugging work. I should:\n1. Name the recalled issue directly\n2. Provide a root cause hypothesis first (as per their preference)\n3. Give concrete first checks\n\nLet me formulate a hypothesis and investigation plan:\n\nRoot cause hypothesis: After deploys, the cache invalidation signal (likely a message queue event, Redis key deletion, or cache tag invalidation) is racing with or being missed by the new service instances due to a timing issue with deployment pod replacement or event ordering.\n\nFirst checks:\n1. Look at cache key patterns - are they using versioned keys or tags?\n2. Check if there's an event-driven invalidation and if the subscriber reconnects properly after deploy\n3. Examine the TTL vs invalidation logic - is there a fallback to stale data?"
+                  },
+                  {
+                    "type": "text",
+                    "text": "**Recalled issue:** Flaky cache invalidation in user profile service, stale data persisting after deploys.\n\n**Root cause hypothesis:**\nAfter deploys, new pods start before the cache invalidation publisher has re-registered or re-established its subscription, causing a window where invalidation events are missed.\n\n**Investigation order:**\n\n1. **Check cache key strategy** \u9225\ufffd Are you using cache-aside with TTL, or explicit invalidation events? If explicit, trace the subscription lifecycle during pod restart.\n\n2. **Inspect the invalidation publisher** \u9225\ufffd Does it publish on pod startup, or only on writes? If only on writes, new pods won't get invalidation for pre-existing cache entries.\n\n3. **Look at pod termination/startup sequence** \u9225\ufffd Are graceful shutdowns implemented? A pod terminating mid-invalidation can leave the cache in an inconsistent state.\n\n4. **Check for race conditions in invalidation vs. read** \u9225\ufffd Is a read populating stale data happening concurrently with invalidation?\n\n**Most likely",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "max_tokens",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 1,
+            "retrieved_count": 1,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 0,
+            "recall": 0.333,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 3,
+            "response_signal_hits": 2,
+            "provider_error_count": 0,
+            "response_recall": 0.667
+          },
+          "artifact_graph": {
+            "node_count": 1,
+            "edge_count": 0,
+            "nodes": [
+              {
+                "artifact_id": "hypothesis_8e14454a81",
+                "artifact_type": "hypothesis",
+                "linked_task": null,
+                "turn_index": 0
+              }
+            ],
+            "edges": []
+          },
+          "hypergraph_view": {
+            "node_count": 5,
+            "edge_count": 0,
+            "hyperedge_count": 4,
+            "nodes": [
+              {
+                "node_id": "hypothesis_8e14454a81",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_baf0c684b3",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "turn_index": 0
+              },
+              {
+                "node_id": "turn1_write0",
+                "node_type": "context",
+                "hyperedge_id": "evidence_hyperedge_e1a91884f4",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "cache invalidation",
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "context",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 3
+              },
+              {
+                "node_id": "turn4_write0",
+                "node_type": "context",
+                "hyperedge_id": "evidence_hyperedge_4314532078",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "turn_index": 4
+              }
+            ],
+            "edges": [],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_baf0c684b3",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "member_node_ids": [
+                  "hypothesis_8e14454a81"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_e1a91884f4",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "cache invalidation",
+                "member_node_ids": [
+                  "turn1_write0"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "turn2_write0"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_4314532078",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "member_node_ids": [
+                  "turn4_write0"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "flaky cache invalidation bug",
+              "stale profile data"
+            ],
+            "missing_response_signals": [
+              "stale profile data"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "hypothesis artifact present but source log missing",
+            "suspected_cause": "query overlap or kind scoring was too weak for: flaky cache invalidation bug, stale profile data"
+          }
+        },
+        {
+          "name": "coding_agent_resume",
+          "description": "The agent should resume a coding task after an unrelated interruption and honor formatting preferences.",
+          "turns": [
+            {
+              "user_input": "Back to the scheduler fix. What should I inspect first?",
+              "expected_retrievals": [
+                "short diff-style summary first",
+                "flaky retry loop",
+                "duplicate backoff state"
+              ],
+              "retrieved_items": [
+                "I am fixing a flaky retry loop in the worker scheduler."
+              ],
+              "matched_expected": [
+                "flaky retry loop"
+              ],
+              "matched_retrieved_items": [
+                "I am fixing a flaky retry loop in the worker scheduler."
+              ],
+              "assistant_response": "**Recall:** Active issue is the flaky retry loop with suspected duplicate backoff state after task resume.\n\n**Inspect first:** Look for where backoff state is initialized/set in both the task's constructor/initialization path AND the resume path. Specifically:\n\n```\nDiff-style summary:\n- Check task_scheduler.cpp:ResumeTask() \u9225\ufffd look for duplicate backoff state restoration\n- Check if backoff timer is set in both TaskState::Resume() AND TaskState::Init()\n- Verify no double-application of backoff when task transitions: pending \u922b\ufffd running \u922b\ufffd paused \u922b\ufffd running\n```\n\n**Suggested lunch options near typical office locations:** What area is your office in? I can suggest something specific. Common options near tech offices: ramen, poke bowls, or a quick sandwich spot depending on time budget.",
+              "expected_response_signals": [
+                "diff-style",
+                "retry loop",
+                "backoff state"
+              ],
+              "matched_response_signals": [
+                "diff-style",
+                "retry loop",
+                "backoff state"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user has multiple requests here:\n1. They want code changes in diff-style summary format\n2. They're fixing a flaky retry loop in the worker scheduler\n3. Suspected issue: duplicate backoff state after task resume\n4. Also want lunch suggestions near the office\n5. Asking what to inspect first for the scheduler fix\n\nFrom the memory context:\n- The active issue is the flaky retry loop with suspected duplicate backoff state after task resume\n- User prefers diff-style summaries for code changes\n- This is resuming prior work on the scheduler\n\nI should:\n1. Acknowledge the active issue directly (flaky retry loop with duplicate backoff state)\n2. Give focused technical advice on what to inspect\n3. Include lunch suggestion\n4. Keep it concise\n\nThe memory state shows r=0.85 (high relevance), approaching-critical regime, so I should be focused and concrete.\n\nKey inspection points for duplicate backoff state after task resume:\n- Check if backoff state is being restored/initialized twice\n- Look at where task resume happens and where backoff is set\n- Check for initialization in constructor AND in resume path\n- Look for state merge conflicts or double-application of backoff timers"
+                  },
+                  {
+                    "type": "text",
+                    "text": "**Recall:** Active issue is the flaky retry loop with suspected duplicate backoff state after task resume.\n\n**Inspect first:** Look for where backoff state is initialized/set in both the task's constructor/initialization path AND the resume path. Specifically:\n\n```\nDiff-style summary:\n- Check task_scheduler.cpp:ResumeTask() \u9225\ufffd look for duplicate backoff state restoration\n- Check if backoff timer is set in both TaskState::Resume() AND TaskState::Init()\n- Verify no double-application of backoff when task transitions: pending \u922b\ufffd running \u922b\ufffd paused \u922b\ufffd running\n```\n\n**Suggested lunch options near typical office locations:** What area is your office in? I can suggest something specific. Common options near tech offices: ramen, poke bowls, or a quick sandwich spot depending on time budget.",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 1,
+            "retrieved_count": 1,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 0,
+            "recall": 0.333,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 3,
+            "response_signal_hits": 3,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "artifact_graph": {
+            "node_count": 1,
+            "edge_count": 0,
+            "nodes": [
+              {
+                "artifact_id": "hypothesis_7e86f38fd9",
+                "artifact_type": "hypothesis",
+                "linked_task": null,
+                "turn_index": 2
+              }
+            ],
+            "edges": []
+          },
+          "hypergraph_view": {
+            "node_count": 5,
+            "edge_count": 0,
+            "hyperedge_count": 3,
+            "nodes": [
+              {
+                "node_id": "turn0_write0",
+                "node_type": "fact",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 0
+              },
+              {
+                "node_id": "turn1_write0",
+                "node_type": "context",
+                "hyperedge_id": "change_hyperedge_4804f76f49",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "node_id": "hypothesis_7e86f38fd9",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_ef3fc3a0f1",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 3
+              },
+              {
+                "node_id": "turn4_write0",
+                "node_type": "task",
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 4
+              }
+            ],
+            "edges": [],
+            "hyperedges": [
+              {
+                "hyperedge_id": "change_hyperedge_4804f76f49",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn1_write0"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_ef3fc3a0f1",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "member_node_ids": [
+                  "hypothesis_7e86f38fd9"
+                ]
+              },
+              {
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn4_write0"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "short diff-style summary first",
+              "duplicate backoff state"
+            ],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "hypothesis artifact present but source log missing",
+            "suspected_cause": "query overlap or kind scoring was too weak for: short diff-style summary first, duplicate backoff state"
+          }
+        },
+        {
+          "name": "artifact_chain_resume",
+          "description": "The agent should recover logs, a debugging hypothesis, and a fix plan after an interruption.",
+          "turns": [
+            {
+              "user_input": "Return to the scheduler incident. What should I inspect first?",
+              "expected_retrievals": [
+                "retry loop overflow",
+                "duplicate scheduler state",
+                "patch dedupe"
+              ],
+              "retrieved_items": [
+                "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+              ],
+              "matched_expected": [
+                "patch dedupe"
+              ],
+              "matched_retrieved_items": [
+                "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+              ],
+              "assistant_response": "**Recall:** worker-7 retry loop overflow after checkpoint resume.\n\n**Hypothesis:** Duplicate scheduler state rehydrating the same backoff entry twice.\n\n**Plan:** inspect retry state restore \u922b\ufffd compare checkpoint IDs \u922b\ufffd patch dedupe before requeue.\n\n**First check:** Inspect the retry state restore logic. Look for:\n- How backoff entries are deserialized from the checkpoint\n- Whether duplicate keys are being inserted into the retry queue\n- The `restore()` method in the scheduler's checkpoint handler\n\n**Concrete next step:** Add a log statement or breakpoint at the state restore entry point to capture the incoming checkpoint payload and compare it against the current in-memory retry queue state. Check for duplicate `entry_id`s or backoff keys.\n\nAfter that, compare checkpoint IDs between the failed run and the resumed run to confirm whether the same checkpoint is being loaded twice.",
+              "expected_response_signals": [
+                "retry state restore",
+                "checkpoint ids",
+                "dedupe"
+              ],
+              "matched_response_signals": [
+                "retry state restore",
+                "checkpoint ids",
+                "dedupe"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user is returning to a scheduler incident. Let me check the memory state.\n\nFrom retrieved memory:\n- Context: \"Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.\"\n- There's an active issue: \"worker-7 retry loop overflow after checkpoint resume\"\n- Hypothesis: duplicate scheduler state rehydrating same backoff entry twice\n\nThe user is asking what to inspect first. Based on the plan and the memory contract, I should:\n1. Explicitly name the recalled issue\n2. Follow the plan order - inspect retry state restore first\n\nLet me provide a concise answer following the debugging resume protocol."
+                  },
+                  {
+                    "type": "text",
+                    "text": "**Recall:** worker-7 retry loop overflow after checkpoint resume.\n\n**Hypothesis:** Duplicate scheduler state rehydrating the same backoff entry twice.\n\n**Plan:** inspect retry state restore \u922b\ufffd compare checkpoint IDs \u922b\ufffd patch dedupe before requeue.\n\n**First check:** Inspect the retry state restore logic. Look for:\n- How backoff entries are deserialized from the checkpoint\n- Whether duplicate keys are being inserted into the retry queue\n- The `restore()` method in the scheduler's checkpoint handler\n\n**Concrete next step:** Add a log statement or breakpoint at the state restore entry point to capture the incoming checkpoint payload and compare it against the current in-memory retry queue state. Check for duplicate `entry_id`s or backoff keys.\n\nAfter that, compare checkpoint IDs between the failed run and the resumed run to confirm whether the same checkpoint is being loaded twice.",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 1,
+            "retrieved_count": 1,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 0,
+            "recall": 0.333,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 3,
+            "response_signal_hits": 3,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "artifact_graph": {
+            "node_count": 3,
+            "edge_count": 1,
+            "nodes": [
+              {
+                "artifact_id": "log_43c01c8272",
+                "artifact_type": "log",
+                "linked_task": "retry loop",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_8f6ae46b7c",
+                "artifact_type": "hypothesis",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "plan_851fbd998b",
+                "artifact_type": "plan",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              }
+            ],
+            "edges": [
+              {
+                "source": "hypothesis_8f6ae46b7c",
+                "target": "plan_851fbd998b",
+                "relation_type": "tests",
+                "linked_task": "worker scheduler"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 5,
+            "edge_count": 1,
+            "hyperedge_count": 4,
+            "nodes": [
+              {
+                "node_id": "log_43c01c8272",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dce989be91",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "retry loop",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_8f6ae46b7c",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "node_id": "plan_851fbd998b",
+                "node_type": "plan",
+                "hyperedge_id": "change_hyperedge_5dc5ad4870",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 3
+              },
+              {
+                "node_id": "turn4_write0",
+                "node_type": "task",
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 4
+              }
+            ],
+            "edges": [
+              {
+                "source": "hypothesis_8f6ae46b7c",
+                "target": "plan_851fbd998b",
+                "relation_type": "tests",
+                "linked_task": "worker scheduler"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dce989be91",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "retry loop",
+                "member_node_ids": [
+                  "log_43c01c8272"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "hypothesis_8f6ae46b7c"
+                ]
+              },
+              {
+                "hyperedge_id": "change_hyperedge_5dc5ad4870",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "plan_851fbd998b"
+                ]
+              },
+              {
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn4_write0"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "retry loop overflow",
+              "duplicate scheduler state"
+            ],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 1 edge(s)",
+            "suspected_cause": "query overlap or kind scoring was too weak for: retry loop overflow, duplicate scheduler state"
+          }
+        },
+        {
+          "name": "artifact_relation_chain",
+          "description": "The agent should preserve the relation chain from log to hypothesis to plan for the same task.",
+          "turns": [
+            {
+              "user_input": "Return to the profile-sync incident and continue the plan.",
+              "expected_retrievals": [
+                "times out after redis reconnect",
+                "stale cursor state",
+                "cursor reset"
+              ],
+              "retrieved_items": [
+                "Plan: inspect cursor reset, verify reconnect ordering, then patch stale cursor cleanup."
+              ],
+              "matched_expected": [
+                "cursor reset"
+              ],
+              "matched_retrieved_items": [
+                "Plan: inspect cursor reset, verify reconnect ordering, then patch stale cursor cleanup."
+              ],
+              "assistant_response": "**Returning to profile-sync incident.**\n\n**Plan progress:**\n\n1. **Inspect cursor reset** \u922b\ufffd next\n2. Verify reconnect ordering\n3. Patch stale cursor cleanup\n\n---\n\n**First concrete checks:**\n\nWhat does the sync worker's reconnect path look like? Specifically:\n\n- Is `cursor` reset *before* or *after* the new redis connection is established?\n- Is there a stateful cursor variable (e.g., `self.cursor`, `scan_iter`) that survives the reconnect without being cleared?\n\nCan you share the reconnect handler / `on_reconnect` logic from the sync worker?",
+              "expected_response_signals": [
+                "cursor reset",
+                "reconnect ordering",
+                "stale cursor cleanup"
+              ],
+              "matched_response_signals": [
+                "cursor reset",
+                "reconnect ordering",
+                "stale cursor cleanup"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user wants to return to the profile-sync incident and continue the plan. Let me recall what was retrieved:\n\n- Context: profile-sync job times out after redis reconnect\n- Hypothesis: reconnect path leaves stale cursor state in the sync worker\n- Plan: inspect cursor reset, verify reconnect ordering, then patch stale cursor cleanup\n\nI should continue with this plan, starting with inspecting cursor reset."
+                  },
+                  {
+                    "type": "text",
+                    "text": "**Returning to profile-sync incident.**\n\n**Plan progress:**\n\n1. **Inspect cursor reset** \u922b\ufffd next\n2. Verify reconnect ordering\n3. Patch stale cursor cleanup\n\n---\n\n**First concrete checks:**\n\nWhat does the sync worker's reconnect path look like? Specifically:\n\n- Is `cursor` reset *before* or *after* the new redis connection is established?\n- Is there a stateful cursor variable (e.g., `self.cursor`, `scan_iter`) that survives the reconnect without being cleared?\n\nCan you share the reconnect handler / `on_reconnect` logic from the sync worker?",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 1,
+            "retrieved_count": 1,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 0,
+            "recall": 0.333,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 3,
+            "response_signal_hits": 3,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "artifact_graph": {
+            "node_count": 3,
+            "edge_count": 2,
+            "nodes": [
+              {
+                "artifact_id": "log_84e906201b",
+                "artifact_type": "log",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_1c62df2e05",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "plan_08acad5eb1",
+                "artifact_type": "plan",
+                "linked_task": "user profile service",
+                "turn_index": 2
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1c62df2e05",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "hypothesis_1c62df2e05",
+                "target": "plan_08acad5eb1",
+                "relation_type": "tests",
+                "linked_task": "user profile service"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 4,
+            "edge_count": 2,
+            "hyperedge_count": 3,
+            "nodes": [
+              {
+                "node_id": "log_84e906201b",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_1c62df2e05",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "node_id": "plan_08acad5eb1",
+                "node_type": "plan",
+                "hyperedge_id": "change_hyperedge_67ed8fa041",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "task",
+                "hyperedge_id": "task_hyperedge_58df664c79",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1c62df2e05",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "hypothesis_1c62df2e05",
+                "target": "plan_08acad5eb1",
+                "relation_type": "tests",
+                "linked_task": "user profile service"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "log_84e906201b",
+                  "hypothesis_1c62df2e05"
+                ]
+              },
+              {
+                "hyperedge_id": "change_hyperedge_67ed8fa041",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "plan_08acad5eb1"
+                ]
+              },
+              {
+                "hyperedge_id": "task_hyperedge_58df664c79",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "turn3_write0"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "times out after redis reconnect",
+              "stale cursor state"
+            ],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 2 edge(s)",
+            "suspected_cause": "query overlap or kind scoring was too weak for: times out after redis reconnect, stale cursor state"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 12,
+        "matched_count": 4,
+        "retrieved_count": 4,
+        "retrieved_hit_count": 4,
+        "irrelevant_retrieved_count": 0,
+        "recall": 0.333,
+        "precision_proxy": 1.0,
+        "irrelevant_context_rate": 0.0,
+        "response_signal_count": 12,
+        "response_signal_hits": 11,
+        "provider_error_count": 0,
+        "response_recall": 0.917
+      }
+    },
+    "hyperedge_expansion": {
+      "name": "hyperedge_expansion_llm",
+      "scenarios": [
+        {
+          "name": "debugging_resume_with_preference",
+          "description": "The agent should resume a debugging issue while honoring a stored diagnostic preference.",
+          "turns": [
+            {
+              "user_input": "Return to the bug and tell me what to investigate first.",
+              "expected_retrievals": [
+                "root cause hypothesis first",
+                "flaky cache invalidation bug",
+                "stale profile data"
+              ],
+              "retrieved_items": [
+                "Remember that when debugging, I want the root cause hypothesis first.",
+                "I am investigating a flaky cache invalidation bug in the user profile service.",
+                "The bug appears after deploys when stale profile data persists."
+              ],
+              "matched_expected": [
+                "root cause hypothesis first",
+                "flaky cache invalidation bug",
+                "stale profile data"
+              ],
+              "matched_retrieved_items": [
+                "Remember that when debugging, I want the root cause hypothesis first.",
+                "I am investigating a flaky cache invalidation bug in the user profile service.",
+                "The bug appears after deploys when stale profile data persists."
+              ],
+              "assistant_response": "**Recalled issue:** Flaky cache invalidation bug in user profile service \u9225\ufffd stale profile data persisting after deploys.\n\n---\n\n**Root cause hypothesis:**\n\nThe most likely culprit is a **cache key mismatch or namespace collision after deployment**, specifically:\n\n- **Deployment changes the service version or pod identity**, which shifts the cache key prefix/namespace\n- Old cached entries under the previous namespace remain in the cache backend (Redis/Memcached) while new requests route to the new namespace\n- The invalidation job targets the wrong namespace or uses stale keys, leaving old entries orphaned\n\nSecondary hypothesis: **lazy-loading race condition** \u9225\ufffd profile is fetched and cached *before* invalidation completes post-deploy, then the invalidation signal arrives but the entry is re-populated from the DB before cleanup.\n\n---\n\n**First checks (in order):**\n\n1. **Compare cache key formats** pre/post deploy in your Redis/Memcached \u9225\ufffd look for namespace or version markers in keys that changed.\n\n2. **Trace the invalidation signal** \u9225\ufffd log or verify which keys the invalidation job is targeting at deploy time. Does it catch all keys, or skip orphaned entries?\n\n3. **Check for stale entries** in the cache *right after* a deploy completes but *before* traffic spikes \u9225\ufffd this window often shows the gap.\n\n4. **Review deployment config** for any cache flush vs. selective invalidation logic that may have changed.\n\n---\n\nWant me to dig into any of these, or help draft the Redis query to find orphaned keys?",
+              "expected_response_signals": [
+                "root cause",
+                "cache invalidation",
+                "stale profile data"
+              ],
+              "matched_response_signals": [
+                "root cause",
+                "cache invalidation",
+                "stale profile data"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user is resuming work on a flaky cache invalidation bug in the user profile service. They want:\n1. Root cause hypothesis first (retrieved preference)\n2. First concrete investigation steps\n\nThe bug context: stale profile data persists after deploys.\n\nI should lead with the most likely root cause hypothesis for post-deploy cache invalidation issues, then give concrete first checks."
+                  },
+                  {
+                    "type": "text",
+                    "text": "**Recalled issue:** Flaky cache invalidation bug in user profile service \u9225\ufffd stale profile data persisting after deploys.\n\n---\n\n**Root cause hypothesis:**\n\nThe most likely culprit is a **cache key mismatch or namespace collision after deployment**, specifically:\n\n- **Deployment changes the service version or pod identity**, which shifts the cache key prefix/namespace\n- Old cached entries under the previous namespace remain in the cache backend (Redis/Memcached) while new requests route to the new namespace\n- The invalidation job targets the wrong namespace or uses stale keys, leaving old entries orphaned\n\nSecondary hypothesis: **lazy-loading race condition** \u9225\ufffd profile is fetched and cached *before* invalidation completes post-deploy, then the invalidation signal arrives but the entry is re-populated from the DB before cleanup.\n\n---\n\n**First checks (in order):**\n\n1. **Compare cache key formats** pre/post deploy in your Redis/Memcached \u9225\ufffd look for namespace or version markers in keys that changed.\n\n2. **Trace the invalidation signal** \u9225\ufffd log or verify which keys the invalidation job is targeting at deploy time. Does it catch all keys, or skip orphaned entries?\n\n3. **Check for stale entries** in the cache *right after* a deploy completes but *before* traffic spikes \u9225\ufffd this window often shows the gap.\n\n4. **Review deployment config** for any cache flush vs. selective invalidation logic that may have changed.\n\n---\n\nWant me to dig into any of these, or help draft the Redis query to find orphaned keys?",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 3,
+            "retrieved_count": 3,
+            "retrieved_hit_count": 3,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 3,
+            "response_signal_hits": 3,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "artifact_graph": {
+            "node_count": 1,
+            "edge_count": 0,
+            "nodes": [
+              {
+                "artifact_id": "hypothesis_8e14454a81",
+                "artifact_type": "hypothesis",
+                "linked_task": null,
+                "turn_index": 0
+              }
+            ],
+            "edges": []
+          },
+          "hypergraph_view": {
+            "node_count": 5,
+            "edge_count": 0,
+            "hyperedge_count": 4,
+            "nodes": [
+              {
+                "node_id": "hypothesis_8e14454a81",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_baf0c684b3",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "turn_index": 0
+              },
+              {
+                "node_id": "turn1_write0",
+                "node_type": "context",
+                "hyperedge_id": "evidence_hyperedge_e1a91884f4",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "cache invalidation",
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "context",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 3
+              },
+              {
+                "node_id": "turn4_write0",
+                "node_type": "context",
+                "hyperedge_id": "evidence_hyperedge_4314532078",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "turn_index": 4
+              }
+            ],
+            "edges": [],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_baf0c684b3",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "member_node_ids": [
+                  "hypothesis_8e14454a81"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_e1a91884f4",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "cache invalidation",
+                "member_node_ids": [
+                  "turn1_write0"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "turn2_write0"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_4314532078",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "member_node_ids": [
+                  "turn4_write0"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "none",
+            "missing_expected": [],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "artifact context recovered with 1 node(s)",
+            "suspected_cause": "no issue detected"
+          }
+        },
+        {
+          "name": "coding_agent_resume",
+          "description": "The agent should resume a coding task after an unrelated interruption and honor formatting preferences.",
+          "turns": [
+            {
+              "user_input": "Back to the scheduler fix. What should I inspect first?",
+              "expected_retrievals": [
+                "short diff-style summary first",
+                "flaky retry loop",
+                "duplicate backoff state"
+              ],
+              "retrieved_items": [
+                "The suspected problem is duplicate backoff state after task resume.",
+                "Remember that when giving code changes, I want a short diff-style summary first.",
+                "I am fixing a flaky retry loop in the worker scheduler."
+              ],
+              "matched_expected": [
+                "short diff-style summary first",
+                "flaky retry loop",
+                "duplicate backoff state"
+              ],
+              "matched_retrieved_items": [
+                "Remember that when giving code changes, I want a short diff-style summary first.",
+                "I am fixing a flaky retry loop in the worker scheduler.",
+                "The suspected problem is duplicate backoff state after task resume."
+              ],
+              "assistant_response": "Diff-style summary:\n**Active issue:** Duplicate backoff state after task resume in the worker scheduler retry loop.\n\n**What to inspect first:**\n\n1. **State restoration path** \u9225\ufffd When a task resumes, check if `backoff_ms` (or equivalent) is being loaded from persistence/suspension state *and* initialized fresh from defaults. The duplicate likely comes from a merge where both paths run.\n\n2. **Resume entry point** \u9225\ufffd Look for any code like:\n   ```python\n   # If both of these run, you get double backoff\n   self.backoff_ms = saved_state.backoff  # from resume\n   self.backoff_ms = self.initial_backoff  # from __init__ or reset\n   ```\n\n3. **Logging checkpoint** \u9225\ufffd Add a trace at resume time logging the backoff value being loaded vs. the current value. If they differ, that's your gap.\n\n**Quick diagnostic question:** Does the flakiness correlate with longer task suspend durations? That would confirm state deduplication is the culprit.\n\n---\n\n**Lunch:** If you're near a typical tech office area, a noodle bar or sandwich spot keeps it quick and light. What's your general location?",
+              "expected_response_signals": [
+                "diff-style",
+                "retry loop",
+                "backoff state"
+              ],
+              "matched_response_signals": [
+                "diff-style",
+                "retry loop",
+                "backoff state"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user is asking me to continue fixing a flaky retry loop in the worker scheduler. They want me to:\n1. Focus on the scheduler fix\n2. Start with the suspected problem: duplicate backoff state after task resume\n3. They want a short diff-style summary when giving code changes\n4. Also mention a lunch option near the office\n\nLet me recall the memory state and retrieved information:\n- Active context: fixing flaky retry loop in worker scheduler\n- Suspected problem: duplicate backoff state after task resume\n- They want diff-style summary for code changes\n- Memory state is approaching-critical with r=0.85\n\nI should:\n1. Name the recalled issue explicitly\n2. Give focused guidance on inspecting the duplicate backoff state\n3. Be concise\n\nFor the lunch suggestion, I need to be generic since I don't have location info. I should mention this briefly since they asked.\n\nThe user wants practical debugging guidance for the duplicate backoff state issue."
+                  },
+                  {
+                    "type": "text",
+                    "text": "**Active issue:** Duplicate backoff state after task resume in the worker scheduler retry loop.\n\n**What to inspect first:**\n\n1. **State restoration path** \u9225\ufffd When a task resumes, check if `backoff_ms` (or equivalent) is being loaded from persistence/suspension state *and* initialized fresh from defaults. The duplicate likely comes from a merge where both paths run.\n\n2. **Resume entry point** \u9225\ufffd Look for any code like:\n   ```python\n   # If both of these run, you get double backoff\n   self.backoff_ms = saved_state.backoff  # from resume\n   self.backoff_ms = self.initial_backoff  # from __init__ or reset\n   ```\n\n3. **Logging checkpoint** \u9225\ufffd Add a trace at resume time logging the backoff value being loaded vs. the current value. If they differ, that's your gap.\n\n**Quick diagnostic question:** Does the flakiness correlate with longer task suspend durations? That would confirm state deduplication is the culprit.\n\n---\n\n**Lunch:** If you're near a typical tech office area, a noodle bar or sandwich spot keeps it quick and light. What's your general location?",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 3,
+            "retrieved_count": 3,
+            "retrieved_hit_count": 3,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 3,
+            "response_signal_hits": 3,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "artifact_graph": {
+            "node_count": 1,
+            "edge_count": 0,
+            "nodes": [
+              {
+                "artifact_id": "hypothesis_7e86f38fd9",
+                "artifact_type": "hypothesis",
+                "linked_task": null,
+                "turn_index": 2
+              }
+            ],
+            "edges": []
+          },
+          "hypergraph_view": {
+            "node_count": 5,
+            "edge_count": 0,
+            "hyperedge_count": 3,
+            "nodes": [
+              {
+                "node_id": "turn0_write0",
+                "node_type": "fact",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 0
+              },
+              {
+                "node_id": "turn1_write0",
+                "node_type": "context",
+                "hyperedge_id": "change_hyperedge_4804f76f49",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "node_id": "hypothesis_7e86f38fd9",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_ef3fc3a0f1",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 3
+              },
+              {
+                "node_id": "turn4_write0",
+                "node_type": "task",
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 4
+              }
+            ],
+            "edges": [],
+            "hyperedges": [
+              {
+                "hyperedge_id": "change_hyperedge_4804f76f49",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn1_write0"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_ef3fc3a0f1",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": null,
+                "member_node_ids": [
+                  "hypothesis_7e86f38fd9"
+                ]
+              },
+              {
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn4_write0"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "none",
+            "missing_expected": [],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "artifact context recovered with 1 node(s)",
+            "suspected_cause": "no issue detected"
+          }
+        },
+        {
+          "name": "artifact_chain_resume",
+          "description": "The agent should recover logs, a debugging hypothesis, and a fix plan after an interruption.",
+          "turns": [
+            {
+              "user_input": "Return to the scheduler incident. What should I inspect first?",
+              "expected_retrievals": [
+                "retry loop overflow",
+                "duplicate scheduler state",
+                "patch dedupe"
+              ],
+              "retrieved_items": [
+                "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+                "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.",
+                "Log: worker-7 retry loop overflow after checkpoint resume."
+              ],
+              "matched_expected": [
+                "retry loop overflow",
+                "duplicate scheduler state",
+                "patch dedupe"
+              ],
+              "matched_retrieved_items": [
+                "Log: worker-7 retry loop overflow after checkpoint resume.",
+                "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+                "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+              ],
+              "assistant_response": "Resuming the scheduler incident.\n\n**Worker-7 retry loop overflow** \u9225\ufffd hypothesis: duplicate scheduler state rehydrating the same backoff entry twice.\n\nBased on your plan, inspect **retry state restore** first. Specifically:\n\n1. **Inspect retry state restore** \u9225\ufffd find the code path where checkpoint data rehydrates the retry/backoff state for worker-7. Look for where entries are inserted into the retry queue or backoff map.\n\n2. **Compare checkpoint IDs** \u9225\ufffd check if the same checkpoint ID appears twice in the restore path, or if the same backoff entry key is being generated for two distinct checkpoints.\n\n3. **Patch dedupe before requeue** \u9225\ufffd once confirmed, add a dedupe check or unique-constraint on the retry entry key to prevent the duplicate rehydration.\n\nAlso: remind me to order coffee beans.",
+              "expected_response_signals": [
+                "retry state restore",
+                "checkpoint ids",
+                "dedupe"
+              ],
+              "matched_response_signals": [
+                "retry state restore",
+                "checkpoint ids",
+                "dedupe"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user is resuming work on the scheduler incident. Let me parse what's being asked:\n\n1. They're working on a worker-7 retry loop overflow after checkpoint resume\n2. They have a hypothesis about duplicate scheduler state rehydrating the same backoff entry twice\n3. They have a plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue\n4. They want to return to the scheduler incident and know what to inspect first\n\nAccording to my retrieved memory and response contract:\n- The active issue is: \"scheduler incident\" / \"worker-7 retry loop overflow after checkpoint resume\"\n- The hypothesis is: \"duplicate scheduler state is rehydrating the same backoff entry twice\"\n- The plan is: \"inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue\"\n- There's also a reminder about ordering coffee beans\n\nThe user is asking what to inspect first. Based on the plan, the first step is to \"inspect retry state restore.\"\n\nI should:\n1. Explicitly name the recalled issue (worker-7 retry loop overflow)\n2. Follow the plan order - inspect retry state restore first\n3. Be concise\n4. Mention the hypothesis and next steps from the plan\n5. Also note the coffee beans reminder\n\nLet me craft a concise response that follows the response contract."
+                  },
+                  {
+                    "type": "text",
+                    "text": "Resuming the scheduler incident.\n\n**Worker-7 retry loop overflow** \u9225\ufffd hypothesis: duplicate scheduler state rehydrating the same backoff entry twice.\n\nBased on your plan, inspect **retry state restore** first. Specifically:\n\n1. **Inspect retry state restore** \u9225\ufffd find the code path where checkpoint data rehydrates the retry/backoff state for worker-7. Look for where entries are inserted into the retry queue or backoff map.\n\n2. **Compare checkpoint IDs** \u9225\ufffd check if the same checkpoint ID appears twice in the restore path, or if the same backoff entry key is being generated for two distinct checkpoints.\n\n3. **Patch dedupe before requeue** \u9225\ufffd once confirmed, add a dedupe check or unique-constraint on the retry entry key to prevent the duplicate rehydration.\n\nAlso: remind me to order coffee beans.",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 3,
+            "retrieved_count": 3,
+            "retrieved_hit_count": 3,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 3,
+            "response_signal_hits": 3,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "artifact_graph": {
+            "node_count": 3,
+            "edge_count": 1,
+            "nodes": [
+              {
+                "artifact_id": "log_43c01c8272",
+                "artifact_type": "log",
+                "linked_task": "retry loop",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_8f6ae46b7c",
+                "artifact_type": "hypothesis",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "plan_851fbd998b",
+                "artifact_type": "plan",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              }
+            ],
+            "edges": [
+              {
+                "source": "hypothesis_8f6ae46b7c",
+                "target": "plan_851fbd998b",
+                "relation_type": "tests",
+                "linked_task": "worker scheduler"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 5,
+            "edge_count": 1,
+            "hyperedge_count": 4,
+            "nodes": [
+              {
+                "node_id": "log_43c01c8272",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dce989be91",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "retry loop",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_8f6ae46b7c",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "node_id": "plan_851fbd998b",
+                "node_type": "plan",
+                "hyperedge_id": "change_hyperedge_5dc5ad4870",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 3
+              },
+              {
+                "node_id": "turn4_write0",
+                "node_type": "task",
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 4
+              }
+            ],
+            "edges": [
+              {
+                "source": "hypothesis_8f6ae46b7c",
+                "target": "plan_851fbd998b",
+                "relation_type": "tests",
+                "linked_task": "worker scheduler"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dce989be91",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "retry loop",
+                "member_node_ids": [
+                  "log_43c01c8272"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "hypothesis_8f6ae46b7c"
+                ]
+              },
+              {
+                "hyperedge_id": "change_hyperedge_5dc5ad4870",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "plan_851fbd998b"
+                ]
+              },
+              {
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn4_write0"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "none",
+            "missing_expected": [],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 1 edge(s)",
+            "suspected_cause": "no issue detected"
+          }
+        },
+        {
+          "name": "artifact_relation_chain",
+          "description": "The agent should preserve the relation chain from log to hypothesis to plan for the same task.",
+          "turns": [
+            {
+              "user_input": "Return to the profile-sync incident and continue the plan.",
+              "expected_retrievals": [
+                "times out after redis reconnect",
+                "stale cursor state",
+                "cursor reset"
+              ],
+              "retrieved_items": [
+                "Hypothesis: the reconnect path leaves stale cursor state in the sync worker.",
+                "Plan: inspect cursor reset, verify reconnect ordering, then patch stale cursor cleanup.",
+                "Log: profile-sync job times out after redis reconnect."
+              ],
+              "matched_expected": [
+                "times out after redis reconnect",
+                "stale cursor state",
+                "cursor reset"
+              ],
+              "matched_retrieved_items": [
+                "Log: profile-sync job times out after redis reconnect.",
+                "Hypothesis: the reconnect path leaves stale cursor state in the sync worker.",
+                "Plan: inspect cursor reset, verify reconnect ordering, then patch stale cursor cleanup."
+              ],
+              "assistant_response": "Returning to the profile-sync reconnect incident.\n\n**Recalled issue:** Profile-sync job times out after redis reconnect, with a hypothesis that the reconnect path leaves stale cursor state in the sync worker.\n\n**Continuing the plan - first concrete checks:**\n\n### 1. Inspect cursor reset\n\nFind the reconnect handler in the sync worker:\n\n```\ngrep -rn \"reconnect\\|onReconnect\\|RedisError\\|ConnectionError\" --include=\"*.ts\" src/ workers/ lib/\n```\n\nLook specifically for:\n- Does `cursor = null` or `cursor = undefined` appear in the reconnect path?\n- Is `SCAN_COUNT` or any iteration state reset?\n- Example pattern to find:\n  ```ts\n  // Missing reset on reconnect?\n  async onRedisReconnect() {\n    // No cursor reset here - BUG\n    await this.ensureConnection();\n  }\n  ```\n\n### 2. Verify reconnect ordering\n\nCheck the reconnect sequence:\n\n```\n\u9239\u5c78\u6522\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd     \u9239\u5c78\u6522\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\u603dn\u9239\ufffd Redis socket \u9239\u5097\u6522\u9239\ufffd\u9239\ufffd\u9239\ufffd\u923b\u579b\u6524 reconnect event  \u9239\u4fd3n\u9239\ufffd   drops      \u9239\ufffd     \u9239\ufffd                  \u9239\u4fd3n\u9239\u65ba\u6522\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd     \u9239\u65ba\u6522\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\u698en                              \u923b\u7cean                   \u9239\u5c78\u6522\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\u603dn                   \u9239\ufffd 1. cursor reset?    \u9239\u4fd3n                   \u9239\ufffd 2. connection init? \u9239\u4fd3n                   \u9239\ufffd 3. sync resume?     \u9239\u4fd3n                   \u9239\u65ba\u6522\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\u698en```\n\nVerify: Is the cursor state cleared *before* the connection is re-established, or is it attempted with a stale cursor on the new connection?\n\n### 3. First patch candidate\n\nIf stale cursor is found, the fix:\n\n```ts\nasync onRedisReconnect() {\n  // Reset cursor state before reconnecting\n  this.cursor = null;          // \u922b\ufffd add this\n  this.scanOffset = 0;         // \u922b\ufffd add this if exists\n  this.isFirstBatch = true;    // \u922b\ufffd add\n\nNext checks:\n- Patch stale cursor cleanup before closing the incident.",
+              "expected_response_signals": [
+                "cursor reset",
+                "reconnect ordering",
+                "stale cursor cleanup"
+              ],
+              "matched_response_signals": [
+                "cursor reset",
+                "reconnect ordering",
+                "stale cursor cleanup"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user is asking me to continue the plan from the retrieved memory context. The plan involves:\n\n1. Inspect cursor reset - check how cursors are reset (or not) during reconnection\n2. Verify reconnect ordering - ensure the reconnect sequence is correct\n3. Patch stale cursor cleanup - fix the code to properly clean up stale cursors\n\nThis is a debugging resume scenario. I should explicitly mention the recalled issue and start with the first concrete checks.\n\nLet me provide a structured approach to continue this investigation."
+                  },
+                  {
+                    "type": "text",
+                    "text": "Returning to the profile-sync reconnect incident.\n\n**Recalled issue:** Profile-sync job times out after redis reconnect, with a hypothesis that the reconnect path leaves stale cursor state in the sync worker.\n\n**Continuing the plan - first concrete checks:**\n\n### 1. Inspect cursor reset\n\nFind the reconnect handler in the sync worker:\n\n```\ngrep -rn \"reconnect\\|onReconnect\\|RedisError\\|ConnectionError\" --include=\"*.ts\" src/ workers/ lib/\n```\n\nLook specifically for:\n- Does `cursor = null` or `cursor = undefined` appear in the reconnect path?\n- Is `SCAN_COUNT` or any iteration state reset?\n- Example pattern to find:\n  ```ts\n  // Missing reset on reconnect?\n  async onRedisReconnect() {\n    // No cursor reset here - BUG\n    await this.ensureConnection();\n  }\n  ```\n\n### 2. Verify reconnect ordering\n\nCheck the reconnect sequence:\n\n```\n\u9239\u5c78\u6522\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd     \u9239\u5c78\u6522\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\u603dn\u9239\ufffd Redis socket \u9239\u5097\u6522\u9239\ufffd\u9239\ufffd\u9239\ufffd\u923b\u579b\u6524 reconnect event  \u9239\u4fd3n\u9239\ufffd   drops      \u9239\ufffd     \u9239\ufffd                  \u9239\u4fd3n\u9239\u65ba\u6522\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd     \u9239\u65ba\u6522\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\u698en                              \u923b\u7cean                   \u9239\u5c78\u6522\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\u603dn                   \u9239\ufffd 1. cursor reset?    \u9239\u4fd3n                   \u9239\ufffd 2. connection init? \u9239\u4fd3n                   \u9239\ufffd 3. sync resume?     \u9239\u4fd3n                   \u9239\u65ba\u6522\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\ufffd\u9239\u698en```\n\nVerify: Is the cursor state cleared *before* the connection is re-established, or is it attempted with a stale cursor on the new connection?\n\n### 3. First patch candidate\n\nIf stale cursor is found, the fix:\n\n```ts\nasync onRedisReconnect() {\n  // Reset cursor state before reconnecting\n  this.cursor = null;          // \u922b\ufffd add this\n  this.scanOffset = 0;         // \u922b\ufffd add this if exists\n  this.isFirstBatch = true;    // \u922b\ufffd add",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "max_tokens",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 3,
+            "retrieved_count": 3,
+            "retrieved_hit_count": 3,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 3,
+            "response_signal_hits": 3,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "artifact_graph": {
+            "node_count": 3,
+            "edge_count": 2,
+            "nodes": [
+              {
+                "artifact_id": "log_84e906201b",
+                "artifact_type": "log",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_1c62df2e05",
+                "artifact_type": "hypothesis",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "plan_08acad5eb1",
+                "artifact_type": "plan",
+                "linked_task": "user profile service",
+                "turn_index": 2
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1c62df2e05",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "hypothesis_1c62df2e05",
+                "target": "plan_08acad5eb1",
+                "relation_type": "tests",
+                "linked_task": "user profile service"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 4,
+            "edge_count": 2,
+            "hyperedge_count": 3,
+            "nodes": [
+              {
+                "node_id": "log_84e906201b",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_1c62df2e05",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 1
+              },
+              {
+                "node_id": "plan_08acad5eb1",
+                "node_type": "plan",
+                "hyperedge_id": "change_hyperedge_67ed8fa041",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "task",
+                "hyperedge_id": "task_hyperedge_58df664c79",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "user profile service",
+                "turn_index": 3
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_84e906201b",
+                "target": "hypothesis_1c62df2e05",
+                "relation_type": "derived_from",
+                "linked_task": "user profile service"
+              },
+              {
+                "source": "hypothesis_1c62df2e05",
+                "target": "plan_08acad5eb1",
+                "relation_type": "tests",
+                "linked_task": "user profile service"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_dd6e3c0c59",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "log_84e906201b",
+                  "hypothesis_1c62df2e05"
+                ]
+              },
+              {
+                "hyperedge_id": "change_hyperedge_67ed8fa041",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "plan_08acad5eb1"
+                ]
+              },
+              {
+                "hyperedge_id": "task_hyperedge_58df664c79",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "user profile service",
+                "member_node_ids": [
+                  "turn3_write0"
+                ]
+              }
+            ]
+          },
+          "analysis": {
+            "stage_failure": "none",
+            "missing_expected": [],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 2 edge(s)",
+            "suspected_cause": "no issue detected"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 12,
+        "matched_count": 12,
+        "retrieved_count": 12,
+        "retrieved_hit_count": 12,
+        "irrelevant_retrieved_count": 0,
+        "recall": 1.0,
+        "precision_proxy": 1.0,
+        "irrelevant_context_rate": 0.0,
+        "response_signal_count": 12,
+        "response_signal_hits": 12,
+        "provider_error_count": 0,
+        "response_recall": 1.0
+      }
+    },
+    "recent_history_baseline": {
+      "name": "recent_history_baseline",
+      "scenarios": [
+        {
+          "name": "debugging_resume_with_preference",
+          "description": "The agent should resume a debugging issue while honoring a stored diagnostic preference.",
+          "turns": [
+            {
+              "user_input": "Return to the bug and tell me what to investigate first.",
+              "expected_retrievals": [
+                "root cause hypothesis first",
+                "flaky cache invalidation bug",
+                "stale profile data"
+              ],
+              "retrieved_items": [
+                "Remember that when debugging, I want the root cause hypothesis first.",
+                "[baseline] Remember that when debugging, I want the root cause hypothesis first.",
+                "I am investigating a flaky cache invalidation bug in the user profile service.",
+                "[baseline] I am investigating a flaky cache invalidation bug in the user profile service."
+              ],
+              "matched_expected": [
+                "root cause hypothesis first",
+                "flaky cache invalidation bug"
+              ],
+              "matched_retrieved_items": [
+                "Remember that when debugging, I want the root cause hypothesis first.",
+                "I am investigating a flaky cache invalidation bug in the user profile service."
+              ],
+              "assistant_response": "",
+              "expected_response_signals": null,
+              "matched_response_signals": null,
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 2,
+            "retrieved_count": 4,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 2,
+            "recall": 0.667,
+            "precision_proxy": 0.5,
+            "irrelevant_context_rate": 0.5,
+            "response_signal_count": 0,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "stale profile data"
+            ],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "no artifact graph available",
+            "suspected_cause": "query overlap or kind scoring was too weak for: stale profile data"
+          }
+        },
+        {
+          "name": "coding_agent_resume",
+          "description": "The agent should resume a coding task after an unrelated interruption and honor formatting preferences.",
+          "turns": [
+            {
+              "user_input": "Back to the scheduler fix. What should I inspect first?",
+              "expected_retrievals": [
+                "short diff-style summary first",
+                "flaky retry loop",
+                "duplicate backoff state"
+              ],
+              "retrieved_items": [
+                "I am fixing a flaky retry loop in the worker scheduler.",
+                "[baseline] I am fixing a flaky retry loop in the worker scheduler.",
+                "Remember that when giving code changes, I want a short diff-style summary first.",
+                "[baseline] Remember that when giving code changes, I want a short diff-style summary first."
+              ],
+              "matched_expected": [
+                "short diff-style summary first",
+                "flaky retry loop"
+              ],
+              "matched_retrieved_items": [
+                "Remember that when giving code changes, I want a short diff-style summary first.",
+                "I am fixing a flaky retry loop in the worker scheduler."
+              ],
+              "assistant_response": "",
+              "expected_response_signals": null,
+              "matched_response_signals": null,
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 2,
+            "retrieved_count": 4,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 2,
+            "recall": 0.667,
+            "precision_proxy": 0.5,
+            "irrelevant_context_rate": 0.5,
+            "response_signal_count": 0,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "duplicate backoff state"
+            ],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "no artifact graph available",
+            "suspected_cause": "query overlap or kind scoring was too weak for: duplicate backoff state"
+          }
+        },
+        {
+          "name": "artifact_chain_resume",
+          "description": "The agent should recover logs, a debugging hypothesis, and a fix plan after an interruption.",
+          "turns": [
+            {
+              "user_input": "Return to the scheduler incident. What should I inspect first?",
+              "expected_retrievals": [
+                "retry loop overflow",
+                "duplicate scheduler state",
+                "patch dedupe"
+              ],
+              "retrieved_items": [
+                "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+                "[baseline] Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+                "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.",
+                "[baseline] Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+              ],
+              "matched_expected": [
+                "duplicate scheduler state",
+                "patch dedupe"
+              ],
+              "matched_retrieved_items": [
+                "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+                "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+              ],
+              "assistant_response": "",
+              "expected_response_signals": null,
+              "matched_response_signals": null,
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 2,
+            "retrieved_count": 4,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 2,
+            "recall": 0.667,
+            "precision_proxy": 0.5,
+            "irrelevant_context_rate": 0.5,
+            "response_signal_count": 0,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "retry loop overflow"
+            ],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "no artifact graph available",
+            "suspected_cause": "query overlap or kind scoring was too weak for: retry loop overflow"
+          }
+        },
+        {
+          "name": "artifact_relation_chain",
+          "description": "The agent should preserve the relation chain from log to hypothesis to plan for the same task.",
+          "turns": [
+            {
+              "user_input": "Return to the profile-sync incident and continue the plan.",
+              "expected_retrievals": [
+                "times out after redis reconnect",
+                "stale cursor state",
+                "cursor reset"
+              ],
+              "retrieved_items": [
+                "Log: profile-sync job times out after redis reconnect.",
+                "[baseline] Log: profile-sync job times out after redis reconnect.",
+                "Hypothesis: the reconnect path leaves stale cursor state in the sync worker.",
+                "[baseline] Hypothesis: the reconnect path leaves stale cursor state in the sync worker."
+              ],
+              "matched_expected": [
+                "times out after redis reconnect",
+                "stale cursor state"
+              ],
+              "matched_retrieved_items": [
+                "Log: profile-sync job times out after redis reconnect.",
+                "Hypothesis: the reconnect path leaves stale cursor state in the sync worker."
+              ],
+              "assistant_response": "",
+              "expected_response_signals": null,
+              "matched_response_signals": null,
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 2,
+            "retrieved_count": 4,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 2,
+            "recall": 0.667,
+            "precision_proxy": 0.5,
+            "irrelevant_context_rate": 0.5,
+            "response_signal_count": 0,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "cursor reset"
+            ],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "no artifact graph available",
+            "suspected_cause": "query overlap or kind scoring was too weak for: cursor reset"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 12,
+        "matched_count": 8,
+        "retrieved_count": 16,
+        "retrieved_hit_count": 8,
+        "irrelevant_retrieved_count": 8,
+        "recall": 0.667,
+        "precision_proxy": 0.5,
+        "irrelevant_context_rate": 0.5,
+        "response_signal_count": 12,
+        "response_signal_hits": 0,
+        "provider_error_count": 0,
+        "response_recall": 0.0
+      }
+    },
+    "comparison": {
+      "parent_vs_single_hit": {
+        "recall_delta": 0.667,
+        "precision_proxy_delta": -0.19999999999999996,
+        "irrelevant_context_rate_delta": 0.2,
+        "response_recall_delta": 0.08299999999999996,
+        "avg_retrieved_delta": 0.917
+      },
+      "hyperedge_vs_parent": {
+        "recall_delta": 0.0,
+        "precision_proxy_delta": 0.19999999999999996,
+        "irrelevant_context_rate_delta": -0.2,
+        "response_recall_delta": 0.0,
+        "avg_retrieved_delta": -0.25
+      },
+      "hyperedge_vs_single_hit": {
+        "recall_delta": 0.667,
+        "precision_proxy_delta": 0.0,
+        "irrelevant_context_rate_delta": 0.0,
+        "response_recall_delta": 0.08299999999999996,
+        "avg_retrieved_delta": 0.667
+      },
+      "parent_vs_baseline": {
+        "recall_delta": 0.33299999999999996,
+        "precision_proxy_delta": 0.30000000000000004,
+        "irrelevant_context_rate_delta": -0.3,
+        "response_recall_delta": 1.0,
+        "avg_retrieved_delta": -0.08299999999999996
+      }
+    }
+  }
+}

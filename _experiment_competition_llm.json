@@ -1,0 +1,977 @@
+{
+  "experiment": "competition",
+  "description": "Competition vs direct retrieval on preference/task continuity scenarios.",
+  "scenario_names": [
+    "preference_recall",
+    "task_continuity",
+    "context_switching",
+    "layered_preferences"
+  ],
+  "results": {
+    "competition_retrieval": {
+      "name": "llm_runtime",
+      "scenarios": [
+        {
+          "name": "preference_recall",
+          "description": "The agent should recall explicit user preferences on a later turn.",
+          "turns": [
+            {
+              "user_input": "How should you respond to me in future planning discussions?",
+              "expected_retrievals": [
+                "prefer concise answers",
+                "bullet lists"
+              ],
+              "retrieved_items": [
+                "Remember that I prefer concise answers and bullet lists."
+              ],
+              "matched_expected": [
+                "prefer concise answers",
+                "bullet lists"
+              ],
+              "matched_retrieved_items": [
+                "Remember that I prefer concise answers and bullet lists."
+              ],
+              "assistant_response": "In planning discussions, I'll:\n\n- Keep answers **concise** \u2014 no lengthy preambles\n- Use **bullet lists** for actionable items, steps, or checks\n- State the **current task or issue** explicitly if we're continuing prior work\n- Avoid generic clarifiers when there's an active context to build on\n- Provide **direct next steps** rather than broad advice\n\nExample format:\n```\nIssue: [name]\nNext steps:\n- [action 1]\n- [action 2]\n```\n\nGot a specific planning topic to start with?",
+              "expected_response_signals": [
+                "concise",
+                "bullet"
+              ],
+              "matched_response_signals": [
+                "concise",
+                "bullet"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user is asking me to confirm how I should respond in future planning discussions, and they've reminded me of their preference for concise answers and bullet lists.\n\nFrom the retrieved memory, I can see:\n- Preference: \"Remember that I prefer concise answers and bullet lists.\"\n\nSo I should confirm this preference and describe how I'll apply it to planning discussions specifically. I need to be concise and use bullet points."
+                  },
+                  {
+                    "type": "text",
+                    "text": "In planning discussions, I'll:\n\n- Keep answers **concise** \u2014 no lengthy preambles\n- Use **bullet lists** for actionable items, steps, or checks\n- State the **current task or issue** explicitly if we're continuing prior work\n- Avoid generic clarifiers when there's an active context to build on\n- Provide **direct next steps** rather than broad advice\n\nExample format:\n```\nIssue: [name]\nNext steps:\n- [action 1]\n- [action 2]\n```\n\nGot a specific planning topic to start with?",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 1,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 2,
+            "response_signal_hits": 2,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "artifact_graph": {
+            "node_count": 0,
+            "edge_count": 0,
+            "nodes": [],
+            "edges": []
+          },
+          "analysis": {
+            "stage_failure": "none",
+            "missing_expected": [],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "artifact graph empty",
+            "suspected_cause": "no issue detected"
+          }
+        },
+        {
+          "name": "task_continuity",
+          "description": "The agent should surface an in-progress task when the user resumes it.",
+          "turns": [
+            {
+              "user_input": "Pick up that release work again and tell me what matters most.",
+              "expected_retrievals": [
+                "release checklist",
+                "migration notes",
+                "rollback"
+              ],
+              "retrieved_items": [
+                "The release checklist should include docs, migration notes, and rollback.",
+                "I am preparing a release checklist for version 2.1."
+              ],
+              "matched_expected": [
+                "release checklist",
+                "migration notes",
+                "rollback"
+              ],
+              "matched_retrieved_items": [
+                "The release checklist should include docs, migration notes, and rollback."
+              ],
+              "assistant_response": "Resuming the **version 2.1 release checklist**.\n\n**What matters most, in order:**\n\n1. **Migration notes** \u2014 If this release has breaking changes or deprecations, users need them *first*. No migration guide = blocked upgrades.\n\n2. **Rollback plan** \u2014 Document the exact steps to revert, including estimated time and any data migration that can't be undone. Test it before you ship.\n\n3. **Docs** \u2014 Update the relevant docs to match 2.1 behavior. Stale docs are the #1 post-release support driver.\n\n**Suggested checklist skeleton:**\n\n- [ ] Migration notes written and reviewed\n- [ ] Breaking changes flagged with upgrade path\n- [ ] Rollback procedure documented and tested\n- [ ] Docs updated for 2.1 changes\n- [ ] Changelog entry drafted\n- [ ] Version bumped and tagged\n- [ ] Smoke tests pass on staging\n- [ ] Rollback tested on staging\n- [ ] Communication drafted (changelog, blog, email if applicable)\n\n**One question:** Does 2.1 have breaking changes, or is it backward-compatible? That determines how much weight migration notes need.",
+              "expected_response_signals": [
+                "release checklist",
+                "migration notes",
+                "rollback"
+              ],
+              "matched_response_signals": [
+                "release checklist",
+                "migration notes",
+                "rollback"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user is resuming work on a release checklist for version 2.1. Based on the retrieved memory, I have context about what this checklist should include (docs, migration notes, rollback).\n\nI need to:\n1. Acknowledge the recalled task explicitly\n2. Tell them what matters most based on the context\n3. Keep it concise and actionable\n4. Not use <think> tags\n5. Prioritize the active issue (the release checklist)"
+                  },
+                  {
+                    "type": "text",
+                    "text": "Resuming the **version 2.1 release checklist**.\n\n**What matters most, in order:**\n\n1. **Migration notes** \u2014 If this release has breaking changes or deprecations, users need them *first*. No migration guide = blocked upgrades.\n\n2. **Rollback plan** \u2014 Document the exact steps to revert, including estimated time and any data migration that can't be undone. Test it before you ship.\n\n3. **Docs** \u2014 Update the relevant docs to match 2.1 behavior. Stale docs are the #1 post-release support driver.\n\n**Suggested checklist skeleton:**\n\n- [ ] Migration notes written and reviewed\n- [ ] Breaking changes flagged with upgrade path\n- [ ] Rollback procedure documented and tested\n- [ ] Docs updated for 2.1 changes\n- [ ] Changelog entry drafted\n- [ ] Version bumped and tagged\n- [ ] Smoke tests pass on staging\n- [ ] Rollback tested on staging\n- [ ] Communication drafted (changelog, blog, email if applicable)\n\n**One question:** Does 2.1 have breaking changes, or is it backward-compatible? That determines how much weight migration notes need.",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 3,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 1,
+            "recall": 1.0,
+            "precision_proxy": 0.5,
+            "irrelevant_context_rate": 0.5,
+            "response_signal_count": 3,
+            "response_signal_hits": 3,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "artifact_graph": {
+            "node_count": 0,
+            "edge_count": 0,
+            "nodes": [],
+            "edges": []
+          },
+          "analysis": {
+            "stage_failure": "none",
+            "missing_expected": [],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "artifact graph empty",
+            "suspected_cause": "no issue detected"
+          }
+        },
+        {
+          "name": "context_switching",
+          "description": "The agent should recover both the active task and a stable preference after topic shifts.",
+          "turns": [
+            {
+              "user_input": "Back to the onboarding plan. Keep my preference in mind.",
+              "expected_retrievals": [
+                "prefer concise code reviews",
+                "onboarding checklist"
+              ],
+              "retrieved_items": [
+                "Remember that I prefer concise code reviews.",
+                "I need help planning an onboarding checklist for a new backend engineer."
+              ],
+              "matched_expected": [
+                "prefer concise code reviews",
+                "onboarding checklist"
+              ],
+              "matched_retrieved_items": [
+                "Remember that I prefer concise code reviews.",
+                "I need help planning an onboarding checklist for a new backend engineer."
+              ],
+              "assistant_response": "**Backend Engineer Onboarding Checklist**\n\n**Week 1: Access & Setup**\n- [ ] Dev environment setup (IDE, Docker, required tooling)\n- [ ] Access to repo, CI/CD, cloud console, monitoring dashboards\n- [ ] Introduce to team, 1:1s scheduled with key stakeholders\n- [ ] Assign onboarding buddy\n\n**Week 2: Codebase Orientation**\n- [ ] Walk-through of repository structure and key services\n- [ ] Review architecture diagrams and runbooks\n- [ ] First PR: fix a small bug or add a minor feature\n- [ ] Pair on an existing feature with a senior dev\n\n**Week 3: Breadth**\n- [ ] Shadow on-call rotation (no pressure, just observe)\n- [ ] Explore authentication, data layer, and API patterns used\n- [ ] Attend sprint ceremonies and design discussions\n\n**Week 4: Independence Check**\n- [ ] Own a small task end-to-end (ticket \u2192 PR \u2192 deploy \u2192 monitor)\n- [ ] Review a PR from a teammate\n- [ ] Confirm tooling questions resolved\n\n---\n\n**Dinner idea:** Sheet pan lemon-herb chicken with roasted veggies. Minimal cleanup, flexible protein.",
+              "expected_response_signals": [
+                "concise",
+                "onboarding checklist"
+              ],
+              "matched_response_signals": [
+                "onboarding checklist"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user has a clear memory retrieval showing:\n- A preference: \"Remember that I prefer concise code reviews\"\n- A task: \"I need help planning an onboarding checklist for a new backend engineer\"\n- Multiple mentions of the onboarding plan\n- A dinner request\n\nI should prioritize the onboarding task (since they said \"Back to the onboarding plan\") but acknowledge the dinner request briefly. I should keep my response concise per their preference.\n\nLet me create a practical, concise onboarding checklist for a backend engineer."
+                  },
+                  {
+                    "type": "text",
+                    "text": "**Backend Engineer Onboarding Checklist**\n\n**Week 1: Access & Setup**\n- [ ] Dev environment setup (IDE, Docker, required tooling)\n- [ ] Access to repo, CI/CD, cloud console, monitoring dashboards\n- [ ] Introduce to team, 1:1s scheduled with key stakeholders\n- [ ] Assign onboarding buddy\n\n**Week 2: Codebase Orientation**\n- [ ] Walk-through of repository structure and key services\n- [ ] Review architecture diagrams and runbooks\n- [ ] First PR: fix a small bug or add a minor feature\n- [ ] Pair on an existing feature with a senior dev\n\n**Week 3: Breadth**\n- [ ] Shadow on-call rotation (no pressure, just observe)\n- [ ] Explore authentication, data layer, and API patterns used\n- [ ] Attend sprint ceremonies and design discussions\n\n**Week 4: Independence Check**\n- [ ] Own a small task end-to-end (ticket \u2192 PR \u2192 deploy \u2192 monitor)\n- [ ] Review a PR from a teammate\n- [ ] Confirm tooling questions resolved\n\n---\n\n**Dinner idea:** Sheet pan lemon-herb chicken with roasted veggies. Minimal cleanup, flexible protein.",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 2,
+            "response_signal_hits": 1,
+            "provider_error_count": 0,
+            "response_recall": 0.5
+          },
+          "artifact_graph": {
+            "node_count": 0,
+            "edge_count": 0,
+            "nodes": [],
+            "edges": []
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "concise"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "artifact graph empty",
+            "suspected_cause": "response omitted expected signals: concise"
+          }
+        },
+        {
+          "name": "layered_preferences",
+          "description": "The agent should combine multiple style preferences after unrelated turns.",
+          "turns": [
+            {
+              "user_input": "Now summarize how you should present the rollout plan back to me.",
+              "expected_retrievals": [
+                "prefer concise answers",
+                "bullet lists",
+                "production rollout"
+              ],
+              "retrieved_items": [
+                "I am planning a production rollout for a billing service.",
+                "Also remember that action items should be in bullet lists.",
+                "Remember that I prefer concise answers."
+              ],
+              "matched_expected": [
+                "prefer concise answers",
+                "bullet lists",
+                "production rollout"
+              ],
+              "matched_retrieved_items": [
+                "Remember that I prefer concise answers.",
+                "Also remember that action items should be in bullet lists.",
+                "I am planning a production rollout for a billing service."
+              ],
+              "assistant_response": "Got it. Stored your preferences.\n\n**Three dinner ideas:**\n- Lemon garlic salmon with roasted asparagus\n- Chicken stir-fry with vegetables and rice\n- Beef tacos with fresh salsa\n\n**Rollout plan presentation summary:**\n- Executive summary at the top (1-2 sentences)\n- Phased rollout timeline with dates\n- Risk assessment with mitigations\n- Success metrics defined\n- Rollback plan ready\n- Action items in bullet lists\n- Stakeholder communication plan\n- Go/no-go criteria checklist\n\nShould I draft the rollout plan using this structure?",
+              "expected_response_signals": [
+                "concise",
+                "bullet",
+                "rollout plan"
+              ],
+              "matched_response_signals": [
+                "bullet",
+                "rollout plan"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user is asking me to remember a few things and also respond to several requests. Let me break this down:\n\n1. Remember their preference for concise answers\n2. Remember that action items should be in bullet lists\n3. They are planning a production rollout for a billing service\n4. Give three dinner ideas for tonight\n5. Summarize how I should present the rollout plan\n\nI should:\n- Store the preferences and task\n- Be concise\n- Use bullet lists for action items\n- Address the dinner ideas\n- Summarize how to present the rollout plan\n\nLet me keep this concise as requested."
+                  },
+                  {
+                    "type": "text",
+                    "text": "Got it. Stored your preferences.\n\n**Three dinner ideas:**\n- Lemon garlic salmon with roasted asparagus\n- Chicken stir-fry with vegetables and rice\n- Beef tacos with fresh salsa\n\n**Rollout plan presentation summary:**\n- Executive summary at the top (1-2 sentences)\n- Phased rollout timeline with dates\n- Risk assessment with mitigations\n- Success metrics defined\n- Rollback plan ready\n- Action items in bullet lists\n- Stakeholder communication plan\n- Go/no-go criteria checklist\n\nShould I draft the rollout plan using this structure?",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 3,
+            "retrieved_count": 3,
+            "retrieved_hit_count": 3,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 3,
+            "response_signal_hits": 2,
+            "provider_error_count": 0,
+            "response_recall": 0.667
+          },
+          "artifact_graph": {
+            "node_count": 0,
+            "edge_count": 0,
+            "nodes": [],
+            "edges": []
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "concise"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "artifact graph empty",
+            "suspected_cause": "response omitted expected signals: concise"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 10,
+        "matched_count": 10,
+        "retrieved_count": 8,
+        "retrieved_hit_count": 7,
+        "irrelevant_retrieved_count": 1,
+        "recall": 1.0,
+        "precision_proxy": 0.875,
+        "irrelevant_context_rate": 0.125,
+        "response_signal_count": 10,
+        "response_signal_hits": 8,
+        "provider_error_count": 0,
+        "response_recall": 0.8
+      },
+      "used_real_llm": true
+    },
+    "direct_retrieval": {
+      "name": "direct_retrieval_llm",
+      "scenarios": [
+        {
+          "name": "preference_recall",
+          "description": "The agent should recall explicit user preferences on a later turn.",
+          "turns": [
+            {
+              "user_input": "How should you respond to me in future planning discussions?",
+              "expected_retrievals": [
+                "prefer concise answers",
+                "bullet lists"
+              ],
+              "retrieved_items": [
+                "Remember that I prefer concise answers and bullet lists."
+              ],
+              "matched_expected": [
+                "prefer concise answers",
+                "bullet lists"
+              ],
+              "matched_retrieved_items": [
+                "Remember that I prefer concise answers and bullet lists."
+              ],
+              "assistant_response": "I'll respond in planning discussions by:\n\n- Keeping responses brief and direct\n- Using bullet points for actions, checks, or options\n- Naming any recalled task or issue upfront if relevant\n- Asking specific follow-up questions rather than generic ones\n- Prioritizing your active priorities over generic advice",
+              "expected_response_signals": [
+                "concise",
+                "bullet"
+              ],
+              "matched_response_signals": [
+                "bullet"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user is asking me how I should respond in future planning discussions, and they've reminded me of their preference for concise answers and bullet lists.\n\nBased on my retrieved memory:\n- They prefer concise answers and bullet lists\n- This appears to be in context of planning discussions\n\nI should give a direct, concise answer about how I'll respond in planning discussions, using bullet points as requested."
+                  },
+                  {
+                    "type": "text",
+                    "text": "I'll respond in planning discussions by:\n\n- Keeping responses brief and direct\n- Using bullet points for actions, checks, or options\n- Naming any recalled task or issue upfront if relevant\n- Asking specific follow-up questions rather than generic ones\n- Prioritizing your active priorities over generic advice",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 1,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 2,
+            "response_signal_hits": 1,
+            "provider_error_count": 0,
+            "response_recall": 0.5
+          },
+          "artifact_graph": {
+            "node_count": 0,
+            "edge_count": 0,
+            "nodes": [],
+            "edges": []
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "concise"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "artifact graph empty",
+            "suspected_cause": "response omitted expected signals: concise"
+          }
+        },
+        {
+          "name": "task_continuity",
+          "description": "The agent should surface an in-progress task when the user resumes it.",
+          "turns": [
+            {
+              "user_input": "Pick up that release work again and tell me what matters most.",
+              "expected_retrievals": [
+                "release checklist",
+                "migration notes",
+                "rollback"
+              ],
+              "retrieved_items": [
+                "The release checklist should include docs, migration notes, and rollback.",
+                "I am preparing a release checklist for version 2.1."
+              ],
+              "matched_expected": [
+                "release checklist",
+                "migration notes",
+                "rollback"
+              ],
+              "matched_retrieved_items": [
+                "The release checklist should include docs, migration notes, and rollback."
+              ],
+              "assistant_response": "**Resuming: Release checklist for v2.1**\n\nWhat matters most, in order:\n\n1. **Rollback plan** \u2014 If anything breaks, you need a tested path back. Document the exact steps and verify them before shipping. This is your safety net.\n\n2. **Migration notes** \u2014 Users upgrading from previous versions need clear, specific guidance on what changed and what actions *they* must take. Breakage here causes the most support load.\n\n3. **Docs** \u2014 Confirm CHANGELOG is updated, API docs reflect v2.1 changes, and any new features have usage examples. Docs gaps are the #1 post-release friction.\n\n**Quick gut-check:** Do you have a rollback runbook already, or do we need to draft one from scratch?",
+              "expected_response_signals": [
+                "release checklist",
+                "migration notes",
+                "rollback"
+              ],
+              "matched_response_signals": [
+                "release checklist",
+                "migration notes",
+                "rollback"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user is picking up the release checklist work for version 2.1. Based on the retrieved memory, I should:\n1. Acknowledge the recalled task directly (release checklist for version 2.1)\n2. Identify what matters most based on the context\n3. Keep it concise and actionable\n\nFrom the memory, the key elements are:\n- docs\n- migration notes\n- rollback\n\nWhat matters most for a release checklist? I should prioritize the most critical items that prevent release failures or enable quick recovery.\n\nLet me structure what matters most concisely."
+                  },
+                  {
+                    "type": "text",
+                    "text": "**Resuming: Release checklist for v2.1**\n\nWhat matters most, in order:\n\n1. **Rollback plan** \u2014 If anything breaks, you need a tested path back. Document the exact steps and verify them before shipping. This is your safety net.\n\n2. **Migration notes** \u2014 Users upgrading from previous versions need clear, specific guidance on what changed and what actions *they* must take. Breakage here causes the most support load.\n\n3. **Docs** \u2014 Confirm CHANGELOG is updated, API docs reflect v2.1 changes, and any new features have usage examples. Docs gaps are the #1 post-release friction.\n\n**Quick gut-check:** Do you have a rollback runbook already, or do we need to draft one from scratch?",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 3,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 1,
+            "recall": 1.0,
+            "precision_proxy": 0.5,
+            "irrelevant_context_rate": 0.5,
+            "response_signal_count": 3,
+            "response_signal_hits": 3,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "artifact_graph": {
+            "node_count": 0,
+            "edge_count": 0,
+            "nodes": [],
+            "edges": []
+          },
+          "analysis": {
+            "stage_failure": "none",
+            "missing_expected": [],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "artifact graph empty",
+            "suspected_cause": "no issue detected"
+          }
+        },
+        {
+          "name": "context_switching",
+          "description": "The agent should recover both the active task and a stable preference after topic shifts.",
+          "turns": [
+            {
+              "user_input": "Back to the onboarding plan. Keep my preference in mind.",
+              "expected_retrievals": [
+                "prefer concise code reviews",
+                "onboarding checklist"
+              ],
+              "retrieved_items": [
+                "Remember that I prefer concise code reviews.",
+                "I need help planning an onboarding checklist for a new backend engineer.",
+                "Also, I want dinner ideas for tonight."
+              ],
+              "matched_expected": [
+                "prefer concise code reviews",
+                "onboarding checklist"
+              ],
+              "matched_retrieved_items": [
+                "Remember that I prefer concise code reviews.",
+                "I need help planning an onboarding checklist for a new backend engineer."
+              ],
+              "assistant_response": "# Backend Engineer Onboarding Checklist\n\n## Week 1: Setup & Access\n- [ ] Dev environment configured (IDE, Docker, etc.)\n- [ ] Access to repos, CI/CD, cloud console\n- [ ] Introduce to repo structure and branching conventions\n\n## Week 1-2: Core Systems\n- [ ] Architecture overview (services, DBs, queues)\n- [ ] Read key design docs and ADRs\n- [ ] Deploy a simple change (code review preference: brief, focused comments)\n\n## Week 2-4: First Project\n- [ ] Pair with a buddy on first ticket\n- [ ] Shadow a deployment\n- [ ] Present a small feature end-to-end\n\n## Ongoing\n- [ ] 1:1s scheduled\n- [ ] Codeowners and review norms introduced\n- [ ] Logging, monitoring, alerting walkthrough\n\n---\n\n**Dinner idea:** Sheet pan salmon with roasted vegetables. Quick, healthy, minimal cleanup.",
+              "expected_response_signals": [
+                "concise",
+                "onboarding checklist"
+              ],
+              "matched_response_signals": [
+                "onboarding checklist"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user is resuming work on the onboarding checklist for a new backend engineer. They have a stated preference for concise responses. Let me provide a concise onboarding checklist for a backend engineer, keeping my responses brief as they prefer.\n\nI should focus on the backend engineer onboarding checklist and keep it concise as they requested."
+                  },
+                  {
+                    "type": "text",
+                    "text": "# Backend Engineer Onboarding Checklist\n\n## Week 1: Setup & Access\n- [ ] Dev environment configured (IDE, Docker, etc.)\n- [ ] Access to repos, CI/CD, cloud console\n- [ ] Introduce to repo structure and branching conventions\n\n## Week 1-2: Core Systems\n- [ ] Architecture overview (services, DBs, queues)\n- [ ] Read key design docs and ADRs\n- [ ] Deploy a simple change (code review preference: brief, focused comments)\n\n## Week 2-4: First Project\n- [ ] Pair with a buddy on first ticket\n- [ ] Shadow a deployment\n- [ ] Present a small feature end-to-end\n\n## Ongoing\n- [ ] 1:1s scheduled\n- [ ] Codeowners and review norms introduced\n- [ ] Logging, monitoring, alerting walkthrough\n\n---\n\n**Dinner idea:** Sheet pan salmon with roasted vegetables. Quick, healthy, minimal cleanup.",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 3,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 1,
+            "recall": 1.0,
+            "precision_proxy": 0.667,
+            "irrelevant_context_rate": 0.333,
+            "response_signal_count": 2,
+            "response_signal_hits": 1,
+            "provider_error_count": 0,
+            "response_recall": 0.5
+          },
+          "artifact_graph": {
+            "node_count": 0,
+            "edge_count": 0,
+            "nodes": [],
+            "edges": []
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "concise"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "artifact graph empty",
+            "suspected_cause": "response omitted expected signals: concise"
+          }
+        },
+        {
+          "name": "layered_preferences",
+          "description": "The agent should combine multiple style preferences after unrelated turns.",
+          "turns": [
+            {
+              "user_input": "Now summarize how you should present the rollout plan back to me.",
+              "expected_retrievals": [
+                "prefer concise answers",
+                "bullet lists",
+                "production rollout"
+              ],
+              "retrieved_items": [
+                "I am planning a production rollout for a billing service.",
+                "Give me three dinner ideas for later tonight.",
+                "Also remember that action items should be in bullet lists.",
+                "Remember that I prefer concise answers."
+              ],
+              "matched_expected": [
+                "prefer concise answers",
+                "bullet lists",
+                "production rollout"
+              ],
+              "matched_retrieved_items": [
+                "Remember that I prefer concise answers.",
+                "Also remember that action items should be in bullet lists.",
+                "I am planning a production rollout for a billing service."
+              ],
+              "assistant_response": "**Dinner ideas:**\n- Pasta with garlic, olive oil, and parmesan\n- Chicken stir-fry with rice\n- Tacos with black beans and guacamole\n\n---\n\n**Rollout plan presentation:**\n- Executive summary first (one paragraph)\n- Action items in bullet lists\n- Risk section with numbered mitigations\n- Timeline in table or milestone format\n- Decision points clearly labeled\n\nI'll follow this format when you want me to draft the plan.",
+              "expected_response_signals": [
+                "concise",
+                "bullet",
+                "rollout plan"
+              ],
+              "matched_response_signals": [
+                "bullet",
+                "rollout plan"
+              ],
+              "llm_debug": {
+                "transport": "anthropic-powershell",
+                "content_types": [
+                  "thinking",
+                  "text"
+                ],
+                "content_blocks": [
+                  {
+                    "type": "thinking",
+                    "text": null,
+                    "thinking": "The user is asking me to:\n1. Remember their preferences (concise answers, bullet lists for action items)\n2. Remember they're planning a production rollout for a billing service\n3. Give three dinner ideas\n4. Summarize how I should present the rollout plan\n\nLet me address all of these directly and concisely.\n\nDinner ideas: I should give 3 quick options.\nRollout plan presentation: They want me to summarize how I should present it back to them.\n\nI need to be concise and use bullet lists for action items."
+                  },
+                  {
+                    "type": "text",
+                    "text": "**Dinner ideas:**\n- Pasta with garlic, olive oil, and parmesan\n- Chicken stir-fry with rice\n- Tacos with black beans and guacamole\n\n---\n\n**Rollout plan presentation:**\n- Executive summary first (one paragraph)\n- Action items in bullet lists\n- Risk section with numbered mitigations\n- Timeline in table or milestone format\n- Decision points clearly labeled\n\nI'll follow this format when you want me to draft the plan.",
+                    "thinking": null
+                  }
+                ],
+                "stop_reason": "end_turn",
+                "model": "MiniMax-M2.7"
+              }
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 3,
+            "retrieved_count": 4,
+            "retrieved_hit_count": 3,
+            "irrelevant_retrieved_count": 1,
+            "recall": 1.0,
+            "precision_proxy": 0.75,
+            "irrelevant_context_rate": 0.25,
+            "response_signal_count": 3,
+            "response_signal_hits": 2,
+            "provider_error_count": 0,
+            "response_recall": 0.667
+          },
+          "artifact_graph": {
+            "node_count": 0,
+            "edge_count": 0,
+            "nodes": [],
+            "edges": []
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "concise"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "artifact graph empty",
+            "suspected_cause": "response omitted expected signals: concise"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 10,
+        "matched_count": 10,
+        "retrieved_count": 10,
+        "retrieved_hit_count": 7,
+        "irrelevant_retrieved_count": 3,
+        "recall": 1.0,
+        "precision_proxy": 0.7,
+        "irrelevant_context_rate": 0.3,
+        "response_signal_count": 10,
+        "response_signal_hits": 7,
+        "provider_error_count": 0,
+        "response_recall": 0.7
+      }
+    },
+    "recent_history_baseline": {
+      "name": "recent_history_baseline",
+      "scenarios": [
+        {
+          "name": "preference_recall",
+          "description": "The agent should recall explicit user preferences on a later turn.",
+          "turns": [
+            {
+              "user_input": "How should you respond to me in future planning discussions?",
+              "expected_retrievals": [
+                "prefer concise answers",
+                "bullet lists"
+              ],
+              "retrieved_items": [],
+              "matched_expected": [],
+              "matched_retrieved_items": [],
+              "assistant_response": "",
+              "expected_response_signals": null,
+              "matched_response_signals": null,
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 0,
+            "retrieved_count": 0,
+            "retrieved_hit_count": 0,
+            "irrelevant_retrieved_count": 0,
+            "recall": 0.0,
+            "precision_proxy": 0.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 0,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "prefer concise answers",
+              "bullet lists"
+            ],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "no artifact graph available",
+            "suspected_cause": "query overlap or kind scoring was too weak for: prefer concise answers, bullet lists"
+          }
+        },
+        {
+          "name": "task_continuity",
+          "description": "The agent should surface an in-progress task when the user resumes it.",
+          "turns": [
+            {
+              "user_input": "Pick up that release work again and tell me what matters most.",
+              "expected_retrievals": [
+                "release checklist",
+                "migration notes",
+                "rollback"
+              ],
+              "retrieved_items": [
+                "The release checklist should include docs, migration notes, and rollback.",
+                "[baseline] The release checklist should include docs, migration notes, and rollback.",
+                "I am preparing a release checklist for version 2.1.",
+                "[baseline] I am preparing a release checklist for version 2.1."
+              ],
+              "matched_expected": [
+                "release checklist",
+                "migration notes",
+                "rollback"
+              ],
+              "matched_retrieved_items": [
+                "The release checklist should include docs, migration notes, and rollback."
+              ],
+              "assistant_response": "",
+              "expected_response_signals": null,
+              "matched_response_signals": null,
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 3,
+            "retrieved_count": 4,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 3,
+            "recall": 1.0,
+            "precision_proxy": 0.25,
+            "irrelevant_context_rate": 0.75,
+            "response_signal_count": 0,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "analysis": {
+            "stage_failure": "none",
+            "missing_expected": [],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "no artifact graph available",
+            "suspected_cause": "no issue detected"
+          }
+        },
+        {
+          "name": "context_switching",
+          "description": "The agent should recover both the active task and a stable preference after topic shifts.",
+          "turns": [
+            {
+              "user_input": "Back to the onboarding plan. Keep my preference in mind.",
+              "expected_retrievals": [
+                "prefer concise code reviews",
+                "onboarding checklist"
+              ],
+              "retrieved_items": [
+                "I need help planning an onboarding checklist for a new backend engineer.",
+                "[baseline] I need help planning an onboarding checklist for a new backend engineer."
+              ],
+              "matched_expected": [
+                "onboarding checklist"
+              ],
+              "matched_retrieved_items": [
+                "I need help planning an onboarding checklist for a new backend engineer."
+              ],
+              "assistant_response": "",
+              "expected_response_signals": null,
+              "matched_response_signals": null,
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 1,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 1,
+            "recall": 0.5,
+            "precision_proxy": 0.5,
+            "irrelevant_context_rate": 0.5,
+            "response_signal_count": 0,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "prefer concise code reviews"
+            ],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "no artifact graph available",
+            "suspected_cause": "query overlap or kind scoring was too weak for: prefer concise code reviews"
+          }
+        },
+        {
+          "name": "layered_preferences",
+          "description": "The agent should combine multiple style preferences after unrelated turns.",
+          "turns": [
+            {
+              "user_input": "Now summarize how you should present the rollout plan back to me.",
+              "expected_retrievals": [
+                "prefer concise answers",
+                "bullet lists",
+                "production rollout"
+              ],
+              "retrieved_items": [
+                "Also remember that action items should be in bullet lists.",
+                "[baseline] Also remember that action items should be in bullet lists.",
+                "I am planning a production rollout for a billing service.",
+                "[baseline] I am planning a production rollout for a billing service."
+              ],
+              "matched_expected": [
+                "bullet lists",
+                "production rollout"
+              ],
+              "matched_retrieved_items": [
+                "Also remember that action items should be in bullet lists.",
+                "I am planning a production rollout for a billing service."
+              ],
+              "assistant_response": "",
+              "expected_response_signals": null,
+              "matched_response_signals": null,
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 2,
+            "retrieved_count": 4,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 2,
+            "recall": 0.667,
+            "precision_proxy": 0.5,
+            "irrelevant_context_rate": 0.5,
+            "response_signal_count": 0,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "prefer concise answers"
+            ],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "no artifact graph available",
+            "suspected_cause": "query overlap or kind scoring was too weak for: prefer concise answers"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 10,
+        "matched_count": 6,
+        "retrieved_count": 10,
+        "retrieved_hit_count": 4,
+        "irrelevant_retrieved_count": 6,
+        "recall": 0.6,
+        "precision_proxy": 0.4,
+        "irrelevant_context_rate": 0.6,
+        "response_signal_count": 10,
+        "response_signal_hits": 0,
+        "provider_error_count": 0,
+        "response_recall": 0.0
+      }
+    },
+    "comparison": {
+      "competition_vs_direct": {
+        "recall_delta": 0.0,
+        "precision_proxy_delta": 0.17500000000000004,
+        "irrelevant_context_rate_delta": -0.175,
+        "response_recall_delta": 0.10000000000000009,
+        "avg_retrieved_delta": -0.19999999999999996
+      },
+      "competition_vs_baseline": {
+        "recall_delta": 0.4,
+        "precision_proxy_delta": 0.475,
+        "irrelevant_context_rate_delta": -0.475,
+        "response_recall_delta": 0.8,
+        "avg_retrieved_delta": -0.19999999999999996
+      }
+    }
+  }
+}

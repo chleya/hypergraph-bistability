@@ -1,0 +1,896 @@
+{
+  "runtime": {
+    "name": "llm_runtime",
+    "scenarios": [
+      {
+        "name": "preference_recall",
+        "description": "The agent should recall explicit user preferences on a later turn.",
+        "turns": [
+          {
+            "user_input": "How should you respond to me in future planning discussions?",
+            "expected_retrievals": [
+              "prefer concise answers",
+              "bullet lists"
+            ],
+            "retrieved_items": [
+              "Remember that I prefer concise answers and bullet lists."
+            ],
+            "matched_expected": [
+              "prefer concise answers",
+              "bullet lists"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I prefer concise answers and bullet lists."
+            ],
+            "assistant_response": "In future planning discussions, I'll:\n\n- **Lead with action items** \u2014 concise bullet lists of concrete next steps\n- **Prioritize brevity** \u2014 short, direct answers unless you request depth\n- **Structure outputs** \u2014 numbered steps or bullets rather than paragraphs\n- **Focus on decisions** \u2014 flag tradeoffs briefly when relevant, don't over-explain\n- **Confirm alignment** \u2014 briefly restate agreed items so we're aligned\n\nWhat planning topic would you like to start with?",
+            "expected_response_signals": [
+              "concise",
+              "bullet"
+            ],
+            "matched_response_signals": [
+              "concise",
+              "bullet"
+            ],
+            "llm_debug": {
+              "transport": "anthropic-http",
+              "content_types": [
+                "thinking",
+                "text"
+              ],
+              "content_blocks": [
+                {
+                  "type": "thinking",
+                  "text": null,
+                  "thinking": "The user is asking me how I should respond in future planning discussions, and they're reinforcing a preference for concise answers and bullet lists.\n\nBased on the retrieved memory:\n- Preference: [working_memory] Remember that I prefer concise answers and bullet lists.\n- Response contract includes: keep answers concise unless asked for detail, use bullet lists for actions/checks, keep short and direct\n\nSo I should acknowledge this preference and explain briefly how I'll structure my responses in planning discussions."
+                },
+                {
+                  "type": "text",
+                  "text": "In future planning discussions, I'll:\n\n- **Lead with action items** \u2014 concise bullet lists of concrete next steps\n- **Prioritize brevity** \u2014 short, direct answers unless you request depth\n- **Structure outputs** \u2014 numbered steps or bullets rather than paragraphs\n- **Focus on decisions** \u2014 flag tradeoffs briefly when relevant, don't over-explain\n- **Confirm alignment** \u2014 briefly restate agreed items so we're aligned\n\nWhat planning topic would you like to start with?",
+                  "thinking": null
+                }
+              ],
+              "stop_reason": "end_turn",
+              "model": "MiniMax-M2.7"
+            }
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 1,
+          "retrieved_hit_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 2,
+          "response_signal_hits": 2,
+          "provider_error_count": 0,
+          "response_recall": 1.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "no issue detected"
+        }
+      },
+      {
+        "name": "task_continuity",
+        "description": "The agent should surface an in-progress task when the user resumes it.",
+        "turns": [
+          {
+            "user_input": "Pick up that release work again and tell me what matters most.",
+            "expected_retrievals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback.",
+              "I am preparing a release checklist for version 2.1."
+            ],
+            "matched_expected": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback."
+            ],
+            "assistant_response": "Resuming your version 2.1 release checklist work.\n\n**What matters most, in order:**\n\n1. **Rollback plan first** \u2014 Can you safely revert to 2.0? Document the exact steps, including database migrations that are reversible. If rollback isn't clean, you may need to delay.\n\n2. **Migration notes** \u2014 What breaks between 2.0 and 2.1? Users need this *before* they upgrade, not after. Flag any breaking changes prominently.\n\n3. **Docs** \u2014 Are API docs, changelog, and migration guide updated to reflect 2.1 changes? Verify against your diff.\n\n**Quick gut check before shipping:**\n- Are there any irreversible migrations in this release?\n- Is the rollback tested (not just documented)?\n- Who's responsible for each item?\n\nWant me to draft the full checklist, or focus on one of these areas?",
+            "expected_response_signals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_response_signals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "llm_debug": {
+              "transport": "anthropic-http",
+              "content_types": [
+                "thinking",
+                "text"
+              ],
+              "content_blocks": [
+                {
+                  "type": "thinking",
+                  "text": null,
+                  "thinking": "The user is resuming work on the release checklist for version 2.1. My retrieved memory confirms:\n1. This is a release checklist for version 2.1\n2. It should include: docs, migration notes, and rollback\n\nThe user wants me to pick up this work and tell them what matters most. I should:\n- Be concise\n- Lead with what matters most (prioritize)\n- Draw on the specific recalled details (docs, migration notes, rollback)\n- Not give generic advice\n\nLet me think about what actually matters most in a release checklist workflow...\n\nWhat matters most in order:\n1. Rollback plan first - because if you can't roll back safely, nothing else matters\n2. Migration notes - because breaking changes need clear communication before users upgrade\n3. Docs - but need to know what docs exist and what's missing\n\nI should be direct and actionable."
+                },
+                {
+                  "type": "text",
+                  "text": "Resuming your version 2.1 release checklist work.\n\n**What matters most, in order:**\n\n1. **Rollback plan first** \u2014 Can you safely revert to 2.0? Document the exact steps, including database migrations that are reversible. If rollback isn't clean, you may need to delay.\n\n2. **Migration notes** \u2014 What breaks between 2.0 and 2.1? Users need this *before* they upgrade, not after. Flag any breaking changes prominently.\n\n3. **Docs** \u2014 Are API docs, changelog, and migration guide updated to reflect 2.1 changes? Verify against your diff.\n\n**Quick gut check before shipping:**\n- Are there any irreversible migrations in this release?\n- Is the rollback tested (not just documented)?\n- Who's responsible for each item?\n\nWant me to draft the full checklist, or focus on one of these areas?",
+                  "thinking": null
+                }
+              ],
+              "stop_reason": "end_turn",
+              "model": "MiniMax-M2.7"
+            }
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 3,
+          "provider_error_count": 0,
+          "response_recall": 1.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "no issue detected"
+        }
+      },
+      {
+        "name": "context_switching",
+        "description": "The agent should recover both the active task and a stable preference after topic shifts.",
+        "turns": [
+          {
+            "user_input": "Back to the onboarding plan. Keep my preference in mind.",
+            "expected_retrievals": [
+              "prefer concise code reviews",
+              "onboarding checklist"
+            ],
+            "retrieved_items": [
+              "Remember that I prefer concise code reviews.",
+              "I need help planning an onboarding checklist for a new backend engineer."
+            ],
+            "matched_expected": [
+              "prefer concise code reviews",
+              "onboarding checklist"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I prefer concise code reviews.",
+              "I need help planning an onboarding checklist for a new backend engineer."
+            ],
+            "assistant_response": "Here's a concise backend engineer onboarding checklist:\n\n**Week 1: Setup & Access**\n- [ ] Dev environment setup (IDE, tooling, dependencies)\n- [ ] Access to repos, CI/CD, cloud/infra, monitoring\n- [ ] Clone key services and run locally\n- [ ] Meet the team + tech lead 1:1\n\n**Week 1-2: Architecture & Context**\n- [ ] System architecture walkthrough (docs/diagrams)\n- [ ] Codebase tour: key services, patterns, conventions\n- [ ] Read through README, CONTRIBUTING, ADRs\n- [ ] Shadow on-call rotation or review recent incidents\n\n**Week 2-3: First Contribution**\n- [ ] Pick a starter bug or docs fix\n- [ ] Submit first PR (even if small)\n- [ ] Code review with team lead (respect your preference for conciseness)\n- [ ] Merge and deploy to staging\n\n**Week 4: Integration**\n- [ ] Assigned a real ticket from backlog\n- [ ] Pair programming session on non-trivial feature\n- [ ] Review cycle: give and receive at least one review\n\n**Ongoing**\n- [ ] Access to runbooks, postmortems, design docs\n- [ ] Intro to external APIs, vendor dependencies, third-party services\n- [ ] Clarify on-call responsibilities and escalation paths\n\nWant me to expand on any section or tailor it to a specific stack (e.g., Python/Django, Go, Node.js)?",
+            "expected_response_signals": [
+              "concise",
+              "onboarding checklist"
+            ],
+            "matched_response_signals": [
+              "concise",
+              "onboarding checklist"
+            ],
+            "llm_debug": {
+              "transport": "anthropic-http",
+              "content_types": [
+                "thinking",
+                "text"
+              ],
+              "content_blocks": [
+                {
+                  "type": "thinking",
+                  "text": null,
+                  "thinking": "The user wants me to focus on the onboarding checklist for a new backend engineer. They've reminded me they prefer concise responses. They also mentioned dinner ideas, but said \"Back to the onboarding plan\" so I should prioritize that.\n\nLet me create a concise, practical backend engineer onboarding checklist."
+                },
+                {
+                  "type": "text",
+                  "text": "Here's a concise backend engineer onboarding checklist:\n\n**Week 1: Setup & Access**\n- [ ] Dev environment setup (IDE, tooling, dependencies)\n- [ ] Access to repos, CI/CD, cloud/infra, monitoring\n- [ ] Clone key services and run locally\n- [ ] Meet the team + tech lead 1:1\n\n**Week 1-2: Architecture & Context**\n- [ ] System architecture walkthrough (docs/diagrams)\n- [ ] Codebase tour: key services, patterns, conventions\n- [ ] Read through README, CONTRIBUTING, ADRs\n- [ ] Shadow on-call rotation or review recent incidents\n\n**Week 2-3: First Contribution**\n- [ ] Pick a starter bug or docs fix\n- [ ] Submit first PR (even if small)\n- [ ] Code review with team lead (respect your preference for conciseness)\n- [ ] Merge and deploy to staging\n\n**Week 4: Integration**\n- [ ] Assigned a real ticket from backlog\n- [ ] Pair programming session on non-trivial feature\n- [ ] Review cycle: give and receive at least one review\n\n**Ongoing**\n- [ ] Access to runbooks, postmortems, design docs\n- [ ] Intro to external APIs, vendor dependencies, third-party services\n- [ ] Clarify on-call responsibilities and escalation paths\n\nWant me to expand on any section or tailor it to a specific stack (e.g., Python/Django, Go, Node.js)?",
+                  "thinking": null
+                }
+              ],
+              "stop_reason": "end_turn",
+              "model": "MiniMax-M2.7"
+            }
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 2,
+          "response_signal_hits": 2,
+          "provider_error_count": 0,
+          "response_recall": 1.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "no issue detected"
+        }
+      },
+      {
+        "name": "session_recovery",
+        "description": "The agent should recover task context after a persisted session reload.",
+        "turns": [
+          {
+            "user_input": "After reloading this session, what issue was I working on?",
+            "expected_retrievals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "retrieved_items": [
+              "The failure happens during the database migration step.",
+              "Remember that I am debugging a flaky deployment pipeline."
+            ],
+            "matched_expected": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I am debugging a flaky deployment pipeline.",
+              "The failure happens during the database migration step."
+            ],
+            "assistant_response": "You were debugging a flaky deployment pipeline. The failure occurs during the **database migration step**.\n\nReady to continue from there\u2014what do you need?",
+            "expected_response_signals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "matched_response_signals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "llm_debug": {
+              "transport": "anthropic-http",
+              "content_types": [
+                "thinking",
+                "text"
+              ],
+              "content_blocks": [
+                {
+                  "type": "thinking",
+                  "text": null,
+                  "thinking": "The user is asking me to recall what issue they were working on. Based on the retrieved memory:\n\n1. From working_memory: \"The failure happens during the database migration step\"\n2. From turn_log: \"Remember that I am debugging a flaky deployment pipeline\"\n\nSo the issue being worked on is:\n- Debugging a flaky deployment pipeline\n- The failure occurs during the database migration step\n\nI should answer directly and concisely, naming the recalled task before asking any follow-up questions."
+                },
+                {
+                  "type": "text",
+                  "text": "You were debugging a flaky deployment pipeline. The failure occurs during the **database migration step**.\n\nReady to continue from there\u2014what do you need?",
+                  "thinking": null
+                }
+              ],
+              "stop_reason": "end_turn",
+              "model": "MiniMax-M2.7"
+            }
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 2,
+          "response_signal_hits": 2,
+          "provider_error_count": 0,
+          "response_recall": 1.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "no issue detected"
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 9,
+      "matched_count": 9,
+      "retrieved_count": 7,
+      "retrieved_hit_count": 6,
+      "recall": 1.0,
+      "precision_proxy": 0.857,
+      "response_signal_count": 9,
+      "response_signal_hits": 9,
+      "provider_error_count": 0,
+      "response_recall": 1.0
+    }
+  },
+  "recent_history_baseline": {
+    "name": "recent_history_baseline",
+    "scenarios": [
+      {
+        "name": "preference_recall",
+        "description": "The agent should recall explicit user preferences on a later turn.",
+        "turns": [
+          {
+            "user_input": "How should you respond to me in future planning discussions?",
+            "expected_retrievals": [
+              "prefer concise answers",
+              "bullet lists"
+            ],
+            "retrieved_items": [],
+            "matched_expected": [],
+            "matched_retrieved_items": [],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null,
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 0,
+          "retrieved_count": 0,
+          "retrieved_hit_count": 0,
+          "recall": 0.0,
+          "precision_proxy": 0.0,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "prefer concise answers",
+            "bullet lists"
+          ],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "query overlap or kind scoring was too weak for: prefer concise answers, bullet lists"
+        }
+      },
+      {
+        "name": "task_continuity",
+        "description": "The agent should surface an in-progress task when the user resumes it.",
+        "turns": [
+          {
+            "user_input": "Pick up that release work again and tell me what matters most.",
+            "expected_retrievals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback.",
+              "[baseline] The release checklist should include docs, migration notes, and rollback.",
+              "I am preparing a release checklist for version 2.1.",
+              "[baseline] I am preparing a release checklist for version 2.1."
+            ],
+            "matched_expected": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null,
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 0.25,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "no issue detected"
+        }
+      },
+      {
+        "name": "context_switching",
+        "description": "The agent should recover both the active task and a stable preference after topic shifts.",
+        "turns": [
+          {
+            "user_input": "Back to the onboarding plan. Keep my preference in mind.",
+            "expected_retrievals": [
+              "prefer concise code reviews",
+              "onboarding checklist"
+            ],
+            "retrieved_items": [
+              "I need help planning an onboarding checklist for a new backend engineer.",
+              "[baseline] I need help planning an onboarding checklist for a new backend engineer."
+            ],
+            "matched_expected": [
+              "onboarding checklist"
+            ],
+            "matched_retrieved_items": [
+              "I need help planning an onboarding checklist for a new backend engineer."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null,
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 1,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 1,
+          "recall": 0.5,
+          "precision_proxy": 0.5,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "prefer concise code reviews"
+          ],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "query overlap or kind scoring was too weak for: prefer concise code reviews"
+        }
+      },
+      {
+        "name": "session_recovery",
+        "description": "The agent should recover task context after a persisted session reload.",
+        "turns": [
+          {
+            "user_input": "After reloading this session, what issue was I working on?",
+            "expected_retrievals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "retrieved_items": [],
+            "matched_expected": [],
+            "matched_retrieved_items": [],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null,
+            "llm_debug": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 0,
+          "retrieved_count": 0,
+          "retrieved_hit_count": 0,
+          "recall": 0.0,
+          "precision_proxy": 0.0,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "provider_error_count": 0,
+          "response_recall": 0.0
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "flaky deployment pipeline",
+            "database migration step"
+          ],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "query overlap or kind scoring was too weak for: flaky deployment pipeline, database migration step"
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 9,
+      "matched_count": 4,
+      "retrieved_count": 6,
+      "retrieved_hit_count": 2,
+      "recall": 0.444,
+      "precision_proxy": 0.333,
+      "response_signal_count": 9,
+      "response_signal_hits": 0,
+      "provider_error_count": 0,
+      "response_recall": 0.0
+    }
+  },
+  "llm_runtime": {
+    "name": "llm_runtime",
+    "scenarios": [
+      {
+        "name": "preference_recall",
+        "description": "The agent should recall explicit user preferences on a later turn.",
+        "turns": [
+          {
+            "user_input": "How should you respond to me in future planning discussions?",
+            "expected_retrievals": [
+              "prefer concise answers",
+              "bullet lists"
+            ],
+            "retrieved_items": [
+              "Remember that I prefer concise answers and bullet lists."
+            ],
+            "matched_expected": [
+              "prefer concise answers",
+              "bullet lists"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I prefer concise answers and bullet lists."
+            ],
+            "assistant_response": "Got it. Based on my memory:\n\n- **Concise answers** with **bullet lists** when listing actions or checks\n- Planning discussions: I'll keep responses short and direct\n- Prioritize recalled tasks/issues over generic advice\n\nIs there a specific planning discussion context you'd like me to remember for next time?",
+            "expected_response_signals": [
+              "concise",
+              "bullet"
+            ],
+            "matched_response_signals": [
+              "concise",
+              "bullet"
+            ],
+            "llm_debug": {
+              "transport": "anthropic-powershell",
+              "content_types": [
+                "thinking",
+                "text"
+              ],
+              "content_blocks": [
+                {
+                  "type": "thinking",
+                  "text": null,
+                  "thinking": "The user is asking me to confirm how I should respond in future planning discussions. Based on the retrieved memory, there's a specific preference noted in group_1 about how to respond in planning discussions. However, I don't have the actual content of that preference visible to me in this context.\n\nFrom the general memory state, I can see:\n1. User prefers concise answers and bullet lists\n2. There's something in group_1 about planning discussions but the actual content isn't shown\n\nI should:\n- Confirm I understand the preference for concise/bullet point responses\n- Note that I have a memory about planning discussions in group_1, but I should be honest that I don't have the specific content visible right now\n- Keep it brief and direct as per the preferences"
+                },
+                {
+                  "type": "text",
+                  "text": "Got it. Based on my memory:\n\n- **Concise answers** with **bullet lists** when listing actions or checks\n- Planning discussions: I'll keep responses short and direct\n- Prioritize recalled tasks/issues over generic advice\n\nIs there a specific planning discussion context you'd like me to remember for next time?",
+                  "thinking": null
+                }
+              ],
+              "stop_reason": "end_turn",
+              "model": "MiniMax-M2.7"
+            }
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 1,
+          "retrieved_hit_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 2,
+          "response_signal_hits": 2,
+          "provider_error_count": 0,
+          "response_recall": 1.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "no issue detected"
+        }
+      },
+      {
+        "name": "task_continuity",
+        "description": "The agent should surface an in-progress task when the user resumes it.",
+        "turns": [
+          {
+            "user_input": "Pick up that release work again and tell me what matters most.",
+            "expected_retrievals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback.",
+              "I am preparing a release checklist for version 2.1."
+            ],
+            "matched_expected": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_retrieved_items": [
+              "The release checklist should include docs, migration notes, and rollback."
+            ],
+            "assistant_response": "Resuming the **version 2.1 release checklist** work.\n\n**What matters most right now:**\n\n1. **Migration notes first** \u2014 Users hit breaking changes immediately. If migration notes are incomplete, you get a flood of support tickets. Draft those before finalizing anything else.\n\n2. **Rollback plan in parallel** \u2014 Define the rollback trigger criteria (e.g., error rate threshold, specific regressions). This gates the go/no-go decision and should be documented *before* release, not after.\n\n3. **Docs last, but locked** \u2014 Docs updates can slip. Set a hard freeze date and treat docs sign-off as a blocker.\n\n**Suggested priority order:**\n1. Finalize migration notes (blocker for release candidate)\n2. Document rollback procedure + trigger criteria\n3. Docs review and freeze\n4. Smoke test against migration path\n5. Post-release communication plan\n\nWant me to expand on any of these, or start drafting the checklist itself?",
+            "expected_response_signals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "matched_response_signals": [
+              "release checklist",
+              "migration notes",
+              "rollback"
+            ],
+            "llm_debug": {
+              "transport": "anthropic-powershell",
+              "content_types": [
+                "thinking",
+                "text"
+              ],
+              "content_blocks": [
+                {
+                  "type": "thinking",
+                  "text": null,
+                  "thinking": "The user is asking me to continue work on a release checklist for version 2.1. Based on the retrieved memory, I have context about this being a current task with specific requirements: docs, migration notes, and rollback considerations.\n\nI should:\n1. Explicitly reference the recalled task/issue\n2. Be concise\n3. Tell them what matters most based on the context\n\nI won't use <think> tags in my response."
+                },
+                {
+                  "type": "text",
+                  "text": "Resuming the **version 2.1 release checklist** work.\n\n**What matters most right now:**\n\n1. **Migration notes first** \u2014 Users hit breaking changes immediately. If migration notes are incomplete, you get a flood of support tickets. Draft those before finalizing anything else.\n\n2. **Rollback plan in parallel** \u2014 Define the rollback trigger criteria (e.g., error rate threshold, specific regressions). This gates the go/no-go decision and should be documented *before* release, not after.\n\n3. **Docs last, but locked** \u2014 Docs updates can slip. Set a hard freeze date and treat docs sign-off as a blocker.\n\n**Suggested priority order:**\n1. Finalize migration notes (blocker for release candidate)\n2. Document rollback procedure + trigger criteria\n3. Docs review and freeze\n4. Smoke test against migration path\n5. Post-release communication plan\n\nWant me to expand on any of these, or start drafting the checklist itself?",
+                  "thinking": null
+                }
+              ],
+              "stop_reason": "end_turn",
+              "model": "MiniMax-M2.7"
+            }
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 1,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 3,
+          "provider_error_count": 0,
+          "response_recall": 1.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "no issue detected"
+        }
+      },
+      {
+        "name": "context_switching",
+        "description": "The agent should recover both the active task and a stable preference after topic shifts.",
+        "turns": [
+          {
+            "user_input": "Back to the onboarding plan. Keep my preference in mind.",
+            "expected_retrievals": [
+              "prefer concise code reviews",
+              "onboarding checklist"
+            ],
+            "retrieved_items": [
+              "Remember that I prefer concise code reviews.",
+              "I need help planning an onboarding checklist for a new backend engineer."
+            ],
+            "matched_expected": [
+              "prefer concise code reviews",
+              "onboarding checklist"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I prefer concise code reviews.",
+              "I need help planning an onboarding checklist for a new backend engineer."
+            ],
+            "assistant_response": "**Backend Engineer Onboarding Checklist**\n\n**Week 1: Access & Setup**\n- [ ] Dev environment setup (repo access, IDE, local DB)\n- [ ] Access to CI/CD, cloud console, monitoring dashboards\n- [ ] Meet the team, skip-level intro, assigned buddy/mentor\n\n**Week 2: Codebase Orientation**\n- [ ] Architecture walkthrough (system diagrams, ADRs)\n- [ ] Read core services: auth, API layer, data models\n- [ ] First PR: docs fix or small bug (shadow review)\n- [ ] Code review style guide (keeping it concise per your preference)\n\n**Week 3: Feature Ownership**\n- [ ] Pick up first scoped ticket\n- [ ] Pair on implementation with senior dev\n- [ ] Learn deployment pipeline and rollback process\n\n**Week 4: Independent Work**\n- [ ] Solo feature from ticket to PR to production\n- [ ] On-call shadow (optional intro to incidents)\n- [ ] 30-day check-in: blockers, questions, feedback\n\nWant me to expand any section or tailor it to a specific stack (Python, Go, etc.)?",
+            "expected_response_signals": [
+              "concise",
+              "onboarding checklist"
+            ],
+            "matched_response_signals": [
+              "concise",
+              "onboarding checklist"
+            ],
+            "llm_debug": {
+              "transport": "anthropic-powershell",
+              "content_types": [
+                "thinking",
+                "text"
+              ],
+              "content_blocks": [
+                {
+                  "type": "thinking",
+                  "text": null,
+                  "thinking": "The user has given me several context updates and reminders:\n\n1. They prefer concise code reviews\n2. They need help planning an onboarding checklist for a new backend engineer\n3. They want dinner ideas for tonight\n4. They're returning to the onboarding plan and want me to keep their preferences in mind\n\nGiven my memory state shows I have active contexts about onboarding and that I should keep preferences in mind (concise = short and direct), I should focus on the onboarding checklist request since they said \"Back to the onboarding plan.\"\n\nLet me give a concise but useful onboarding checklist for a backend engineer."
+                },
+                {
+                  "type": "text",
+                  "text": "**Backend Engineer Onboarding Checklist**\n\n**Week 1: Access & Setup**\n- [ ] Dev environment setup (repo access, IDE, local DB)\n- [ ] Access to CI/CD, cloud console, monitoring dashboards\n- [ ] Meet the team, skip-level intro, assigned buddy/mentor\n\n**Week 2: Codebase Orientation**\n- [ ] Architecture walkthrough (system diagrams, ADRs)\n- [ ] Read core services: auth, API layer, data models\n- [ ] First PR: docs fix or small bug (shadow review)\n- [ ] Code review style guide (keeping it concise per your preference)\n\n**Week 3: Feature Ownership**\n- [ ] Pick up first scoped ticket\n- [ ] Pair on implementation with senior dev\n- [ ] Learn deployment pipeline and rollback process\n\n**Week 4: Independent Work**\n- [ ] Solo feature from ticket to PR to production\n- [ ] On-call shadow (optional intro to incidents)\n- [ ] 30-day check-in: blockers, questions, feedback\n\nWant me to expand any section or tailor it to a specific stack (Python, Go, etc.)?",
+                  "thinking": null
+                }
+              ],
+              "stop_reason": "end_turn",
+              "model": "MiniMax-M2.7"
+            }
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 2,
+          "response_signal_hits": 2,
+          "provider_error_count": 0,
+          "response_recall": 1.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "no issue detected"
+        }
+      },
+      {
+        "name": "session_recovery",
+        "description": "The agent should recover task context after a persisted session reload.",
+        "turns": [
+          {
+            "user_input": "After reloading this session, what issue was I working on?",
+            "expected_retrievals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "retrieved_items": [
+              "The failure happens during the database migration step.",
+              "Remember that I am debugging a flaky deployment pipeline."
+            ],
+            "matched_expected": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I am debugging a flaky deployment pipeline.",
+              "The failure happens during the database migration step."
+            ],
+            "assistant_response": "You were debugging a **flaky deployment pipeline** where the failure occurs during the **database migration step**.\n\nThat's the issue you were actively working on. What do you need next\u2014logs, hypotheses, or something else?",
+            "expected_response_signals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "matched_response_signals": [
+              "flaky deployment pipeline",
+              "database migration step"
+            ],
+            "llm_debug": {
+              "transport": "anthropic-powershell",
+              "content_types": [
+                "thinking",
+                "text"
+              ],
+              "content_blocks": [
+                {
+                  "type": "thinking",
+                  "text": null,
+                  "thinking": "The user is asking me to recall what issue they were working on. Let me look at the retrieved memory:\n\n1. From the user's message: \"Remember that I am debugging a flaky deployment pipeline\" and \"The failure happens during the database migration step\"\n\n2. From my retrieved memory block:\n- Fact: The failure happens during the database migration step.\n- Turn log: Remember that I am debugging a flaky deployment pipeline.\n\n3. From the current memory state and active contexts, it mentions \"group_0, group_1, group_2: After reloading this session, what issue was I working on?, group_3\"\n\nSo the user is asking what issue they were working on. Based on the retrieved memory, they were debugging a flaky deployment pipeline where the failure happens during the database migration step.\n\nI should give a direct, concise answer without using hidden reasoning or generic responses."
+                },
+                {
+                  "type": "text",
+                  "text": "You were debugging a **flaky deployment pipeline** where the failure occurs during the **database migration step**.\n\nThat's the issue you were actively working on. What do you need next\u2014logs, hypotheses, or something else?",
+                  "thinking": null
+                }
+              ],
+              "stop_reason": "end_turn",
+              "model": "MiniMax-M2.7"
+            }
+          }
+        ],
+        "metrics": {
+          "expected_count": 2,
+          "matched_count": 2,
+          "retrieved_count": 2,
+          "retrieved_hit_count": 2,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 2,
+          "response_signal_hits": 2,
+          "provider_error_count": 0,
+          "response_recall": 1.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "provider_error_count": 0,
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "no issue detected"
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 9,
+      "matched_count": 9,
+      "retrieved_count": 7,
+      "retrieved_hit_count": 6,
+      "recall": 1.0,
+      "precision_proxy": 0.857,
+      "response_signal_count": 9,
+      "response_signal_hits": 9,
+      "provider_error_count": 0,
+      "response_recall": 1.0
+    },
+    "used_real_llm": true
+  },
+  "comparison": {
+    "recall_delta": 0.556,
+    "precision_proxy_delta": 0.524,
+    "response_recall_delta_vs_baseline": 1.0
+  }
+}

@@ -1,0 +1,1305 @@
+{
+  "experiment": "phase_progress",
+  "description": "Phase-aware retrieval vs phase-blind retrieval on progress-state continuity scenarios.",
+  "scenario_names": [
+    "phase_resume_implementation_over_analysis",
+    "phase_resume_verification_over_implementation",
+    "phase_resume_closure_over_verification"
+  ],
+  "results": {
+    "phase_progress_aware": {
+      "name": "phase_progress_aware_llm",
+      "scenarios": [
+        {
+          "name": "phase_resume_implementation_over_analysis",
+          "description": "Phase-aware retrieval should favor implementation steps over earlier analysis when the user asks to continue the plan.",
+          "turns": [
+            {
+              "user_input": "Continue the scheduler plan from where we left off.",
+              "expected_retrievals": [
+                "inspect retry state restore",
+                "compare checkpoint IDs",
+                "patch dedupe"
+              ],
+              "retrieved_items": [
+                "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.",
+                "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice."
+              ],
+              "matched_expected": [
+                "inspect retry state restore",
+                "compare checkpoint IDs",
+                "patch dedupe"
+              ],
+              "matched_retrieved_items": [
+                "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+              ],
+              "assistant_response": "Plan continuation:\n- Inspect retry state restore first.\n- Compare checkpoint IDs before and after resume.\n- Confirm the dedupe patch point before requeue.",
+              "expected_response_signals": [
+                "retry state restore",
+                "checkpoint ids",
+                "dedupe"
+              ],
+              "matched_response_signals": [
+                "retry state restore",
+                "checkpoint ids",
+                "dedupe"
+              ],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 3,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 1,
+            "recall": 1.0,
+            "precision_proxy": 0.5,
+            "irrelevant_context_rate": 0.5,
+            "response_signal_count": 3,
+            "response_signal_hits": 3,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "continuity": {
+            "task_continuation": 1.0,
+            "blocker_preservation": 1.0,
+            "decision_continuity": 1.0,
+            "repeated_work_avoidance_proxy": 1.0,
+            "blocker_eligible_count": 1,
+            "decision_eligible_count": 1
+          },
+          "artifact_graph": {
+            "node_count": 3,
+            "edge_count": 2,
+            "nodes": [
+              {
+                "artifact_id": "log_195d05be0b",
+                "artifact_type": "log",
+                "linked_task": "worker scheduler",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_8f6ae46b7c",
+                "artifact_type": "hypothesis",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "plan_851fbd998b",
+                "artifact_type": "plan",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_8f6ae46b7c",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "hypothesis_8f6ae46b7c",
+                "target": "plan_851fbd998b",
+                "relation_type": "tests",
+                "linked_task": "worker scheduler"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 4,
+            "edge_count": 2,
+            "hyperedge_count": 3,
+            "conflict_hyperedge_count": 0,
+            "nodes": [
+              {
+                "node_id": "log_195d05be0b",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_8f6ae46b7c",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "node_id": "plan_851fbd998b",
+                "node_type": "plan",
+                "hyperedge_id": "change_hyperedge_5dc5ad4870",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "task",
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 3
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_8f6ae46b7c",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "hypothesis_8f6ae46b7c",
+                "target": "plan_851fbd998b",
+                "relation_type": "tests",
+                "linked_task": "worker scheduler"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "log_195d05be0b",
+                  "hypothesis_8f6ae46b7c"
+                ]
+              },
+              {
+                "hyperedge_id": "change_hyperedge_5dc5ad4870",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "plan_851fbd998b"
+                ]
+              },
+              {
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn3_write0"
+                ]
+              }
+            ],
+            "conflict_hyperedges": []
+          },
+          "analysis": {
+            "stage_failure": "none",
+            "missing_expected": [],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 2 edge(s)",
+            "suspected_cause": "no issue detected"
+          }
+        },
+        {
+          "name": "phase_resume_verification_over_implementation",
+          "description": "Phase-aware retrieval should favor verification evidence over older implementation steps when the user asks what to verify next.",
+          "turns": [
+            {
+              "user_input": "Before closing this, what should we verify next?",
+              "expected_retrievals": [
+                "validation passed in staging",
+                "patch dedupe before touching the retry policy"
+              ],
+              "retrieved_items": [
+                "Plan: patch dedupe before touching the retry policy.",
+                "Verified: scheduler dedupe patch reproduces cleanly and validation passed in staging."
+              ],
+              "matched_expected": [
+                "validation passed in staging",
+                "patch dedupe before touching the retry policy"
+              ],
+              "matched_retrieved_items": [
+                "Verified: scheduler dedupe patch reproduces cleanly and validation passed in staging.",
+                "Plan: patch dedupe before touching the retry policy."
+              ],
+              "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?",
+              "expected_response_signals": [
+                "validation",
+                "staging",
+                "patch dedupe"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 3,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "continuity": {
+            "task_continuation": 0.0,
+            "blocker_preservation": 0.0,
+            "decision_continuity": 1.0,
+            "repeated_work_avoidance_proxy": 0.0,
+            "blocker_eligible_count": 0,
+            "decision_eligible_count": 1
+          },
+          "artifact_graph": {
+            "node_count": 2,
+            "edge_count": 0,
+            "nodes": [
+              {
+                "artifact_id": "decision_231d8338cf",
+                "artifact_type": "decision",
+                "linked_task": null,
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "plan_cc23ba640b",
+                "artifact_type": "plan",
+                "linked_task": null,
+                "turn_index": 1
+              }
+            ],
+            "edges": []
+          },
+          "hypergraph_view": {
+            "node_count": 4,
+            "edge_count": 0,
+            "hyperedge_count": 4,
+            "conflict_hyperedge_count": 0,
+            "nodes": [
+              {
+                "node_id": "decision_231d8338cf",
+                "node_type": "decision",
+                "hyperedge_id": "decision_hyperedge_9dc787a738",
+                "hyperedge_type": "decision_hyperedge",
+                "linked_task": null,
+                "turn_index": 0
+              },
+              {
+                "node_id": "plan_cc23ba640b",
+                "node_type": "plan",
+                "hyperedge_id": "change_hyperedge_899ba1f00a",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": null,
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "context",
+                "hyperedge_id": "change_hyperedge_4804f76f49",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "task",
+                "hyperedge_id": "task_hyperedge_55231cbf2b",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": null,
+                "turn_index": 3
+              }
+            ],
+            "edges": [],
+            "hyperedges": [
+              {
+                "hyperedge_id": "decision_hyperedge_9dc787a738",
+                "hyperedge_type": "decision_hyperedge",
+                "linked_task": null,
+                "member_node_ids": [
+                  "decision_231d8338cf"
+                ]
+              },
+              {
+                "hyperedge_id": "change_hyperedge_899ba1f00a",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": null,
+                "member_node_ids": [
+                  "plan_cc23ba640b"
+                ]
+              },
+              {
+                "hyperedge_id": "change_hyperedge_4804f76f49",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn2_write0"
+                ]
+              },
+              {
+                "hyperedge_id": "task_hyperedge_55231cbf2b",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": null,
+                "member_node_ids": [
+                  "turn3_write0"
+                ]
+              }
+            ],
+            "conflict_hyperedges": []
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "validation",
+              "staging",
+              "patch dedupe"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "multiple artifacts stored but no relation edges recovered",
+            "suspected_cause": "response omitted expected signals: validation, staging, patch dedupe"
+          }
+        },
+        {
+          "name": "phase_resume_closure_over_verification",
+          "description": "Phase-aware retrieval should favor closure state over older verification detail when the user asks whether the task is ready to close.",
+          "turns": [
+            {
+              "user_input": "Is this ready to close, or are we still in verification?",
+              "expected_retrievals": [
+                "validation passed in staging",
+                "rollout can be closed"
+              ],
+              "retrieved_items": [
+                "Resolved: the scheduler incident is fixed, validation passed, and the rollout can be closed.",
+                "Verified: scheduler dedupe patch reproduces cleanly and validation passed in staging."
+              ],
+              "matched_expected": [
+                "validation passed in staging",
+                "rollout can be closed"
+              ],
+              "matched_retrieved_items": [
+                "Verified: scheduler dedupe patch reproduces cleanly and validation passed in staging.",
+                "Resolved: the scheduler incident is fixed, validation passed, and the rollout can be closed."
+              ],
+              "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?",
+              "expected_response_signals": [
+                "ready to close",
+                "validation"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 2,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "continuity": {
+            "task_continuation": 0.0,
+            "blocker_preservation": 0.0,
+            "decision_continuity": 0.0,
+            "repeated_work_avoidance_proxy": 0.0,
+            "blocker_eligible_count": 0,
+            "decision_eligible_count": 0
+          },
+          "artifact_graph": {
+            "node_count": 1,
+            "edge_count": 0,
+            "nodes": [
+              {
+                "artifact_id": "plan_cc23ba640b",
+                "artifact_type": "plan",
+                "linked_task": null,
+                "turn_index": 0
+              }
+            ],
+            "edges": []
+          },
+          "hypergraph_view": {
+            "node_count": 4,
+            "edge_count": 0,
+            "hyperedge_count": 3,
+            "conflict_hyperedge_count": 0,
+            "nodes": [
+              {
+                "node_id": "plan_cc23ba640b",
+                "node_type": "plan",
+                "hyperedge_id": "change_hyperedge_899ba1f00a",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": null,
+                "turn_index": 0
+              },
+              {
+                "node_id": "turn1_write0",
+                "node_type": "context",
+                "hyperedge_id": "change_hyperedge_4804f76f49",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "context",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 3
+              }
+            ],
+            "edges": [],
+            "hyperedges": [
+              {
+                "hyperedge_id": "change_hyperedge_899ba1f00a",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": null,
+                "member_node_ids": [
+                  "plan_cc23ba640b"
+                ]
+              },
+              {
+                "hyperedge_id": "change_hyperedge_4804f76f49",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn1_write0"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn2_write0"
+                ]
+              }
+            ],
+            "conflict_hyperedges": []
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "ready to close",
+              "validation"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "plan artifact present but linked hypothesis missing",
+            "suspected_cause": "response omitted expected signals: ready to close, validation"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 7,
+        "matched_count": 7,
+        "retrieved_count": 6,
+        "retrieved_hit_count": 5,
+        "irrelevant_retrieved_count": 1,
+        "recall": 1.0,
+        "precision_proxy": 0.833,
+        "irrelevant_context_rate": 0.167,
+        "response_signal_count": 8,
+        "response_signal_hits": 3,
+        "provider_error_count": 0,
+        "response_recall": 0.375
+      },
+      "continuity": {
+        "scenario_count": 3,
+        "blocker_eligible_scenarios": 1,
+        "decision_eligible_scenarios": 2,
+        "task_continuation": 0.3333333333333333,
+        "blocker_preservation": 1.0,
+        "decision_continuity": 1.0,
+        "repeated_work_avoidance_proxy": 0.3333333333333333
+      }
+    },
+    "phase_progress_blind": {
+      "name": "phase_progress_blind_llm",
+      "scenarios": [
+        {
+          "name": "phase_resume_implementation_over_analysis",
+          "description": "Phase-aware retrieval should favor implementation steps over earlier analysis when the user asks to continue the plan.",
+          "turns": [
+            {
+              "user_input": "Continue the scheduler plan from where we left off.",
+              "expected_retrievals": [
+                "inspect retry state restore",
+                "compare checkpoint IDs",
+                "patch dedupe"
+              ],
+              "retrieved_items": [
+                "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+                "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+              ],
+              "matched_expected": [
+                "inspect retry state restore",
+                "compare checkpoint IDs",
+                "patch dedupe"
+              ],
+              "matched_retrieved_items": [
+                "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+              ],
+              "assistant_response": "Plan continuation:\n- Inspect retry state restore first.\n- Compare checkpoint IDs before and after resume.\n- Confirm the dedupe patch point before requeue.",
+              "expected_response_signals": [
+                "retry state restore",
+                "checkpoint ids",
+                "dedupe"
+              ],
+              "matched_response_signals": [
+                "retry state restore",
+                "checkpoint ids",
+                "dedupe"
+              ],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 3,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 1,
+            "recall": 1.0,
+            "precision_proxy": 0.5,
+            "irrelevant_context_rate": 0.5,
+            "response_signal_count": 3,
+            "response_signal_hits": 3,
+            "provider_error_count": 0,
+            "response_recall": 1.0
+          },
+          "continuity": {
+            "task_continuation": 1.0,
+            "blocker_preservation": 1.0,
+            "decision_continuity": 1.0,
+            "repeated_work_avoidance_proxy": 1.0,
+            "blocker_eligible_count": 1,
+            "decision_eligible_count": 1
+          },
+          "artifact_graph": {
+            "node_count": 3,
+            "edge_count": 2,
+            "nodes": [
+              {
+                "artifact_id": "log_195d05be0b",
+                "artifact_type": "log",
+                "linked_task": "worker scheduler",
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "hypothesis_8f6ae46b7c",
+                "artifact_type": "hypothesis",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "artifact_id": "plan_851fbd998b",
+                "artifact_type": "plan",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_8f6ae46b7c",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "hypothesis_8f6ae46b7c",
+                "target": "plan_851fbd998b",
+                "relation_type": "tests",
+                "linked_task": "worker scheduler"
+              }
+            ]
+          },
+          "hypergraph_view": {
+            "node_count": 4,
+            "edge_count": 2,
+            "hyperedge_count": 3,
+            "conflict_hyperedge_count": 0,
+            "nodes": [
+              {
+                "node_id": "log_195d05be0b",
+                "node_type": "log",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 0
+              },
+              {
+                "node_id": "hypothesis_8f6ae46b7c",
+                "node_type": "hypothesis",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "node_id": "plan_851fbd998b",
+                "node_type": "plan",
+                "hyperedge_id": "change_hyperedge_5dc5ad4870",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "task",
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 3
+              }
+            ],
+            "edges": [
+              {
+                "source": "log_195d05be0b",
+                "target": "hypothesis_8f6ae46b7c",
+                "relation_type": "derived_from",
+                "linked_task": "worker scheduler"
+              },
+              {
+                "source": "hypothesis_8f6ae46b7c",
+                "target": "plan_851fbd998b",
+                "relation_type": "tests",
+                "linked_task": "worker scheduler"
+              }
+            ],
+            "hyperedges": [
+              {
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "log_195d05be0b",
+                  "hypothesis_8f6ae46b7c"
+                ]
+              },
+              {
+                "hyperedge_id": "change_hyperedge_5dc5ad4870",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "plan_851fbd998b"
+                ]
+              },
+              {
+                "hyperedge_id": "task_hyperedge_2d28f89724",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn3_write0"
+                ]
+              }
+            ],
+            "conflict_hyperedges": []
+          },
+          "analysis": {
+            "stage_failure": "none",
+            "missing_expected": [],
+            "missing_response_signals": [],
+            "provider_error_count": 0,
+            "graph_observation": "relation chain recovered with 2 edge(s)",
+            "suspected_cause": "no issue detected"
+          }
+        },
+        {
+          "name": "phase_resume_verification_over_implementation",
+          "description": "Phase-aware retrieval should favor verification evidence over older implementation steps when the user asks what to verify next.",
+          "turns": [
+            {
+              "user_input": "Before closing this, what should we verify next?",
+              "expected_retrievals": [
+                "validation passed in staging",
+                "patch dedupe before touching the retry policy"
+              ],
+              "retrieved_items": [
+                "Plan: patch dedupe before touching the retry policy.",
+                "Verified: scheduler dedupe patch reproduces cleanly and validation passed in staging."
+              ],
+              "matched_expected": [
+                "validation passed in staging",
+                "patch dedupe before touching the retry policy"
+              ],
+              "matched_retrieved_items": [
+                "Verified: scheduler dedupe patch reproduces cleanly and validation passed in staging.",
+                "Plan: patch dedupe before touching the retry policy."
+              ],
+              "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?",
+              "expected_response_signals": [
+                "validation",
+                "staging",
+                "patch dedupe"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 3,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "continuity": {
+            "task_continuation": 0.0,
+            "blocker_preservation": 0.0,
+            "decision_continuity": 1.0,
+            "repeated_work_avoidance_proxy": 0.0,
+            "blocker_eligible_count": 0,
+            "decision_eligible_count": 1
+          },
+          "artifact_graph": {
+            "node_count": 2,
+            "edge_count": 0,
+            "nodes": [
+              {
+                "artifact_id": "decision_231d8338cf",
+                "artifact_type": "decision",
+                "linked_task": null,
+                "turn_index": 0
+              },
+              {
+                "artifact_id": "plan_cc23ba640b",
+                "artifact_type": "plan",
+                "linked_task": null,
+                "turn_index": 1
+              }
+            ],
+            "edges": []
+          },
+          "hypergraph_view": {
+            "node_count": 4,
+            "edge_count": 0,
+            "hyperedge_count": 4,
+            "conflict_hyperedge_count": 0,
+            "nodes": [
+              {
+                "node_id": "decision_231d8338cf",
+                "node_type": "decision",
+                "hyperedge_id": "decision_hyperedge_9dc787a738",
+                "hyperedge_type": "decision_hyperedge",
+                "linked_task": null,
+                "turn_index": 0
+              },
+              {
+                "node_id": "plan_cc23ba640b",
+                "node_type": "plan",
+                "hyperedge_id": "change_hyperedge_899ba1f00a",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": null,
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "context",
+                "hyperedge_id": "change_hyperedge_4804f76f49",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "task",
+                "hyperedge_id": "task_hyperedge_55231cbf2b",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": null,
+                "turn_index": 3
+              }
+            ],
+            "edges": [],
+            "hyperedges": [
+              {
+                "hyperedge_id": "decision_hyperedge_9dc787a738",
+                "hyperedge_type": "decision_hyperedge",
+                "linked_task": null,
+                "member_node_ids": [
+                  "decision_231d8338cf"
+                ]
+              },
+              {
+                "hyperedge_id": "change_hyperedge_899ba1f00a",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": null,
+                "member_node_ids": [
+                  "plan_cc23ba640b"
+                ]
+              },
+              {
+                "hyperedge_id": "change_hyperedge_4804f76f49",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn2_write0"
+                ]
+              },
+              {
+                "hyperedge_id": "task_hyperedge_55231cbf2b",
+                "hyperedge_type": "task_hyperedge",
+                "linked_task": null,
+                "member_node_ids": [
+                  "turn3_write0"
+                ]
+              }
+            ],
+            "conflict_hyperedges": []
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "validation",
+              "staging",
+              "patch dedupe"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "multiple artifacts stored but no relation edges recovered",
+            "suspected_cause": "response omitted expected signals: validation, staging, patch dedupe"
+          }
+        },
+        {
+          "name": "phase_resume_closure_over_verification",
+          "description": "Phase-aware retrieval should favor closure state over older verification detail when the user asks whether the task is ready to close.",
+          "turns": [
+            {
+              "user_input": "Is this ready to close, or are we still in verification?",
+              "expected_retrievals": [
+                "validation passed in staging",
+                "rollout can be closed"
+              ],
+              "retrieved_items": [
+                "Resolved: the scheduler incident is fixed, validation passed, and the rollout can be closed.",
+                "Verified: scheduler dedupe patch reproduces cleanly and validation passed in staging."
+              ],
+              "matched_expected": [
+                "validation passed in staging",
+                "rollout can be closed"
+              ],
+              "matched_retrieved_items": [
+                "Verified: scheduler dedupe patch reproduces cleanly and validation passed in staging.",
+                "Resolved: the scheduler incident is fixed, validation passed, and the rollout can be closed."
+              ],
+              "assistant_response": "[Exploratory mode, \u03bb=0.0131] I hear you exploring multiple ideas. What aspect interests you most?",
+              "expected_response_signals": [
+                "ready to close",
+                "validation"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 2,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 2,
+            "irrelevant_retrieved_count": 0,
+            "recall": 1.0,
+            "precision_proxy": 1.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 2,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "continuity": {
+            "task_continuation": 0.0,
+            "blocker_preservation": 0.0,
+            "decision_continuity": 0.0,
+            "repeated_work_avoidance_proxy": 0.0,
+            "blocker_eligible_count": 0,
+            "decision_eligible_count": 0
+          },
+          "artifact_graph": {
+            "node_count": 1,
+            "edge_count": 0,
+            "nodes": [
+              {
+                "artifact_id": "plan_cc23ba640b",
+                "artifact_type": "plan",
+                "linked_task": null,
+                "turn_index": 0
+              }
+            ],
+            "edges": []
+          },
+          "hypergraph_view": {
+            "node_count": 4,
+            "edge_count": 0,
+            "hyperedge_count": 3,
+            "conflict_hyperedge_count": 0,
+            "nodes": [
+              {
+                "node_id": "plan_cc23ba640b",
+                "node_type": "plan",
+                "hyperedge_id": "change_hyperedge_899ba1f00a",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": null,
+                "turn_index": 0
+              },
+              {
+                "node_id": "turn1_write0",
+                "node_type": "context",
+                "hyperedge_id": "change_hyperedge_4804f76f49",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 1
+              },
+              {
+                "node_id": "turn2_write0",
+                "node_type": "context",
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "turn_index": 2
+              },
+              {
+                "node_id": "turn3_write0",
+                "node_type": "context",
+                "hyperedge_id": null,
+                "hyperedge_type": null,
+                "linked_task": null,
+                "turn_index": 3
+              }
+            ],
+            "edges": [],
+            "hyperedges": [
+              {
+                "hyperedge_id": "change_hyperedge_899ba1f00a",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": null,
+                "member_node_ids": [
+                  "plan_cc23ba640b"
+                ]
+              },
+              {
+                "hyperedge_id": "change_hyperedge_4804f76f49",
+                "hyperedge_type": "change_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn1_write0"
+                ]
+              },
+              {
+                "hyperedge_id": "evidence_hyperedge_0bb7600f50",
+                "hyperedge_type": "evidence_hyperedge",
+                "linked_task": "worker scheduler",
+                "member_node_ids": [
+                  "turn2_write0"
+                ]
+              }
+            ],
+            "conflict_hyperedges": []
+          },
+          "analysis": {
+            "stage_failure": "response",
+            "missing_expected": [],
+            "missing_response_signals": [
+              "ready to close",
+              "validation"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "plan artifact present but linked hypothesis missing",
+            "suspected_cause": "response omitted expected signals: ready to close, validation"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 7,
+        "matched_count": 7,
+        "retrieved_count": 6,
+        "retrieved_hit_count": 5,
+        "irrelevant_retrieved_count": 1,
+        "recall": 1.0,
+        "precision_proxy": 0.833,
+        "irrelevant_context_rate": 0.167,
+        "response_signal_count": 8,
+        "response_signal_hits": 3,
+        "provider_error_count": 0,
+        "response_recall": 0.375
+      },
+      "continuity": {
+        "scenario_count": 3,
+        "blocker_eligible_scenarios": 1,
+        "decision_eligible_scenarios": 2,
+        "task_continuation": 0.3333333333333333,
+        "blocker_preservation": 1.0,
+        "decision_continuity": 1.0,
+        "repeated_work_avoidance_proxy": 0.3333333333333333
+      }
+    },
+    "recent_history_baseline": {
+      "name": "recent_history_baseline",
+      "scenarios": [
+        {
+          "name": "phase_resume_implementation_over_analysis",
+          "description": "Phase-aware retrieval should favor implementation steps over earlier analysis when the user asks to continue the plan.",
+          "turns": [
+            {
+              "user_input": "Continue the scheduler plan from where we left off.",
+              "expected_retrievals": [
+                "inspect retry state restore",
+                "compare checkpoint IDs",
+                "patch dedupe"
+              ],
+              "retrieved_items": [
+                "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+                "[baseline] Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+                "Log: worker scheduler duplicate backoff state still appears after checkpoint resume.",
+                "[baseline] Log: worker scheduler duplicate backoff state still appears after checkpoint resume."
+              ],
+              "matched_expected": [],
+              "matched_retrieved_items": [],
+              "assistant_response": "",
+              "expected_response_signals": [
+                "retry state restore",
+                "checkpoint ids",
+                "dedupe"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 3,
+            "matched_count": 0,
+            "retrieved_count": 4,
+            "retrieved_hit_count": 0,
+            "irrelevant_retrieved_count": 4,
+            "recall": 0.0,
+            "precision_proxy": 0.0,
+            "irrelevant_context_rate": 1.0,
+            "response_signal_count": 3,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "continuity": {
+            "task_continuation": 0.0,
+            "blocker_preservation": 0.0,
+            "decision_continuity": 0.0,
+            "repeated_work_avoidance_proxy": 0.0,
+            "blocker_eligible_count": 1,
+            "decision_eligible_count": 1
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "inspect retry state restore",
+              "compare checkpoint IDs",
+              "patch dedupe"
+            ],
+            "missing_response_signals": [
+              "retry state restore",
+              "checkpoint ids",
+              "dedupe"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "no artifact graph available",
+            "suspected_cause": "query overlap or kind scoring was too weak for: inspect retry state restore, compare checkpoint IDs, patch dedupe"
+          }
+        },
+        {
+          "name": "phase_resume_verification_over_implementation",
+          "description": "Phase-aware retrieval should favor verification evidence over older implementation steps when the user asks what to verify next.",
+          "turns": [
+            {
+              "user_input": "Before closing this, what should we verify next?",
+              "expected_retrievals": [
+                "validation passed in staging",
+                "patch dedupe before touching the retry policy"
+              ],
+              "retrieved_items": [
+                "Plan: patch dedupe before touching the retry policy.",
+                "[baseline] Plan: patch dedupe before touching the retry policy."
+              ],
+              "matched_expected": [
+                "patch dedupe before touching the retry policy"
+              ],
+              "matched_retrieved_items": [
+                "Plan: patch dedupe before touching the retry policy."
+              ],
+              "assistant_response": "",
+              "expected_response_signals": [
+                "validation",
+                "staging",
+                "patch dedupe"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 1,
+            "retrieved_count": 2,
+            "retrieved_hit_count": 1,
+            "irrelevant_retrieved_count": 1,
+            "recall": 0.5,
+            "precision_proxy": 0.5,
+            "irrelevant_context_rate": 0.5,
+            "response_signal_count": 3,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "continuity": {
+            "task_continuation": 0.0,
+            "blocker_preservation": 0.0,
+            "decision_continuity": 1.0,
+            "repeated_work_avoidance_proxy": 0.0,
+            "blocker_eligible_count": 0,
+            "decision_eligible_count": 1
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "validation passed in staging"
+            ],
+            "missing_response_signals": [
+              "validation",
+              "staging",
+              "patch dedupe"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "no artifact graph available",
+            "suspected_cause": "query overlap or kind scoring was too weak for: validation passed in staging"
+          }
+        },
+        {
+          "name": "phase_resume_closure_over_verification",
+          "description": "Phase-aware retrieval should favor closure state over older verification detail when the user asks whether the task is ready to close.",
+          "turns": [
+            {
+              "user_input": "Is this ready to close, or are we still in verification?",
+              "expected_retrievals": [
+                "validation passed in staging",
+                "rollout can be closed"
+              ],
+              "retrieved_items": [],
+              "matched_expected": [],
+              "matched_retrieved_items": [],
+              "assistant_response": "",
+              "expected_response_signals": [
+                "ready to close",
+                "validation"
+              ],
+              "matched_response_signals": [],
+              "llm_debug": null
+            }
+          ],
+          "metrics": {
+            "expected_count": 2,
+            "matched_count": 0,
+            "retrieved_count": 0,
+            "retrieved_hit_count": 0,
+            "irrelevant_retrieved_count": 0,
+            "recall": 0.0,
+            "precision_proxy": 0.0,
+            "irrelevant_context_rate": 0.0,
+            "response_signal_count": 2,
+            "response_signal_hits": 0,
+            "provider_error_count": 0,
+            "response_recall": 0.0
+          },
+          "continuity": {
+            "task_continuation": 0.0,
+            "blocker_preservation": 0.0,
+            "decision_continuity": 0.0,
+            "repeated_work_avoidance_proxy": 0.0,
+            "blocker_eligible_count": 0,
+            "decision_eligible_count": 0
+          },
+          "analysis": {
+            "stage_failure": "retrieval",
+            "missing_expected": [
+              "validation passed in staging",
+              "rollout can be closed"
+            ],
+            "missing_response_signals": [
+              "ready to close",
+              "validation"
+            ],
+            "provider_error_count": 0,
+            "graph_observation": "no artifact graph available",
+            "suspected_cause": "query overlap or kind scoring was too weak for: validation passed in staging, rollout can be closed"
+          }
+        }
+      ],
+      "metrics": {
+        "expected_count": 7,
+        "matched_count": 1,
+        "retrieved_count": 6,
+        "retrieved_hit_count": 1,
+        "irrelevant_retrieved_count": 5,
+        "recall": 0.143,
+        "precision_proxy": 0.167,
+        "irrelevant_context_rate": 0.833,
+        "response_signal_count": 8,
+        "response_signal_hits": 0,
+        "provider_error_count": 0,
+        "response_recall": 0.0
+      },
+      "continuity": {
+        "scenario_count": 3,
+        "blocker_eligible_scenarios": 1,
+        "decision_eligible_scenarios": 2,
+        "task_continuation": 0.0,
+        "blocker_preservation": 0.0,
+        "decision_continuity": 0.5,
+        "repeated_work_avoidance_proxy": 0.0
+      }
+    },
+    "comparison": {
+      "aware_vs_blind": {
+        "recall_delta": 0.0,
+        "precision_proxy_delta": 0.0,
+        "irrelevant_context_rate_delta": 0.0,
+        "response_recall_delta": 0.0,
+        "avg_retrieved_delta": 0.0,
+        "task_continuation_delta": 0.0,
+        "blocker_preservation_delta": 0.0,
+        "decision_continuity_delta": 0.0,
+        "repeated_work_avoidance_delta": 0.0
+      },
+      "aware_vs_baseline": {
+        "recall_delta": 0.857,
+        "precision_proxy_delta": 0.6659999999999999,
+        "irrelevant_context_rate_delta": -0.6659999999999999,
+        "response_recall_delta": 0.375,
+        "avg_retrieved_delta": 0.0,
+        "task_continuation_delta": 0.3333333333333333,
+        "blocker_preservation_delta": 1.0,
+        "decision_continuity_delta": 0.5,
+        "repeated_work_avoidance_delta": 0.3333333333333333
+      }
+    }
+  }
+}

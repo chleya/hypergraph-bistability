@@ -1,0 +1,15 @@
+# Roadmap Summary
+
+## Current Position
+The project is at a **stable alpha runtime** stage. A functional agent working-memory infrastructure exists under `src/hypergraph_bistability/` with `stable_v1` as the formal runtime. The system includes a structured agent turn pipeline, session persistence, working-set/query layer, and offline-safe vector fallback. All formal regressions (product, long-task, conflict) are green, validated with both sandbox and real MiniMax runs.
+
+## Three-Stage Roadmap
+
+| Stage | Focus | Goal |
+|-------|-------|------|
+| **1. Stabilize** | Memory management & retrieval | Predictable behavior, stable write/retrieval policies, measurable quality baselines |
+| **2. Practicalize** | Interfaces & continuity | Practical integration APIs, multi-context support, procedure-aware handoff/review/closeout |
+| **3. Productize** | Production hardening | Long-running assistants, coding/planning agents, team copilots, interpretable memory systems |
+
+## Next Step
+Continue the **Procedural Memory v1** capability push while maintaining regression separation across product, long-task, and conflict-heavy practical lines. Focus on hardening predictable behavior and practical interfaces for integration.

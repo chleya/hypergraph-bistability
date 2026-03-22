@@ -1,0 +1,1168 @@
+{
+  "runtime": {
+    "name": "llm_runtime",
+    "scenarios": [
+      {
+        "name": "layered_preferences",
+        "description": "The agent should combine multiple style preferences after unrelated turns.",
+        "turns": [
+          {
+            "user_input": "Now summarize how you should present the rollout plan back to me.",
+            "expected_retrievals": [
+              "prefer concise answers",
+              "bullet lists",
+              "production rollout"
+            ],
+            "retrieved_items": [
+              "I am planning a production rollout for a billing service.",
+              "Also remember that action items should be in bullet lists.",
+              "Remember that I prefer concise answers."
+            ],
+            "matched_expected": [
+              "prefer concise answers",
+              "bullet lists",
+              "production rollout"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I prefer concise answers.",
+              "Also remember that action items should be in bullet lists.",
+              "I am planning a production rollout for a billing service."
+            ],
+            "assistant_response": "**Rollout plan presentation summary:**\n\n- **Format:** Concise, structured sections\n- **Action items:** Bullet lists\n- **Scope:** Phased approach (canary \u2192 staged \u2192 full rollout)\n- **Risk mitigation:** Fallback plan and rollback procedure highlighted upfront\n- **Status updates:** Brief, regular checkpoints\n\nReady when you are \u2014 what aspect of the rollout do you want to tackle first?",
+            "expected_response_signals": [
+              "concise",
+              "bullet",
+              "rollout plan"
+            ],
+            "matched_response_signals": [
+              "concise",
+              "bullet",
+              "rollout plan"
+            ]
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 3,
+          "retrieved_hit_count": 3,
+          "recall": 1.0,
+          "precision_proxy": 1.0,
+          "response_signal_count": 3,
+          "response_signal_hits": 3,
+          "response_recall": 1.0
+        },
+        "artifact_graph": {
+          "node_count": 0,
+          "edge_count": 0,
+          "nodes": [],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "graph_observation": "artifact graph empty",
+          "suspected_cause": "no issue detected"
+        }
+      },
+      {
+        "name": "debugging_resume_with_preference",
+        "description": "The agent should resume a debugging issue while honoring a stored diagnostic preference.",
+        "turns": [
+          {
+            "user_input": "Return to the bug and tell me what to investigate first.",
+            "expected_retrievals": [
+              "root cause hypothesis first",
+              "flaky cache invalidation bug",
+              "stale profile data"
+            ],
+            "retrieved_items": [
+              "I am investigating a flaky cache invalidation bug in the user profile service.",
+              "The bug appears after deploys when stale profile data persists.",
+              "Also remind me to book train tickets tomorrow.",
+              "Remember that when debugging, I want the root cause hypothesis first."
+            ],
+            "matched_expected": [
+              "root cause hypothesis first",
+              "flaky cache invalidation bug",
+              "stale profile data"
+            ],
+            "matched_retrieved_items": [
+              "Remember that when debugging, I want the root cause hypothesis first.",
+              "I am investigating a flaky cache invalidation bug in the user profile service.",
+              "The bug appears after deploys when stale profile data persists."
+            ],
+            "assistant_response": "Root cause hypothesis: Investigate first: Check if cache key generation changed in recent deploys. Compare key construction (format, hashing, prefixes) between the deployed version and what's in cache from the previous version.",
+            "expected_response_signals": [
+              "root cause",
+              "cache invalidation",
+              "stale profile data"
+            ],
+            "matched_response_signals": [
+              "root cause"
+            ]
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 3,
+          "recall": 1.0,
+          "precision_proxy": 0.75,
+          "response_signal_count": 3,
+          "response_signal_hits": 1,
+          "response_recall": 0.333
+        },
+        "artifact_graph": {
+          "node_count": 1,
+          "edge_count": 0,
+          "nodes": [
+            {
+              "artifact_id": "hypothesis_8e14454a81",
+              "artifact_type": "hypothesis",
+              "linked_task": null,
+              "turn_index": 0
+            }
+          ],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "cache invalidation",
+            "stale profile data"
+          ],
+          "graph_observation": "hypothesis artifact present but source log missing",
+          "suspected_cause": "response omitted expected signals: cache invalidation, stale profile data"
+        }
+      },
+      {
+        "name": "coding_agent_resume",
+        "description": "The agent should resume a coding task after an unrelated interruption and honor formatting preferences.",
+        "turns": [
+          {
+            "user_input": "Back to the scheduler fix. What should I inspect first?",
+            "expected_retrievals": [
+              "short diff-style summary first",
+              "flaky retry loop",
+              "duplicate backoff state"
+            ],
+            "retrieved_items": [
+              "Understood. Duplicate backoff state after task resume suggests the backoff timer isn't being properly reset when a task is re-queued. Key areas to check: - Is backoff state stored in the task struct or scheduler struct? - Is the state being cleared/reset when a task moves from \"suspended\" back to \"pending\"? - Is there a race condition where resume and backoff update happen concurrently? What does the current backoff logic look like? Share the relevant code and I can provide a diff-style fix.",
+              "I am fixing a flaky retry loop in the worker scheduler.",
+              "The suspected problem is duplicate backoff state after task resume.",
+              "Noted. When providing code changes going forward, I'll lead with a short diff-style summary before any detailed explanation. (Preference logged: code change format \u2192 diff-style summary first)",
+              "Also, suggest a lunch option near the office.",
+              "Diff-style summary: Understood. I'm tracking the flaky retry loop in the worker scheduler as the active issue. If you want to share the relevant code or describe the flaky behavior (e.g., timing issues, missed retries, duplicate processing), I can help diagnose or propose fixes. And when I provide any code changes, I'll start with a diff-style summary."
+            ],
+            "matched_expected": [
+              "flaky retry loop",
+              "duplicate backoff state"
+            ],
+            "matched_retrieved_items": [
+              "I am fixing a flaky retry loop in the worker scheduler.",
+              "Understood. Duplicate backoff state after task resume suggests the backoff timer isn't being properly reset when a task is re-queued. Key areas to check: - Is backoff state stored in the task struct or scheduler struct? - Is the state being cleared/reset when a task moves from \"suspended\" back to \"pending\"? - Is there a race condition where resume and backoff update happen concurrently? What does the current backoff logic look like? Share the relevant code and I can provide a diff-style fix."
+            ],
+            "assistant_response": "Diff-style summary:\n- Inspect the task state transition logic first (suspended \u2192 pending)\n\nSpecifically, look for:\n\n1. **The resume/schedule path** \u2014 find where tasks are moved from suspended back to pending and check if backoff state is cleared there\n2. **The backoff reset condition** \u2014 confirm there's a path that resets `backoff_start` or equivalent when a task is re-queued\n3. **Concurrent access** \u2014 check if `resume_task()` and `update_backoff()` touch the same fields without locking\n\nShare the relevant code sections (task struct, resume function, backoff update logic) and I can pinpoint the exact gap.",
+            "expected_response_signals": [
+              "diff-style",
+              "retry loop",
+              "backoff state"
+            ],
+            "matched_response_signals": [
+              "diff-style",
+              "backoff state"
+            ]
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 2,
+          "retrieved_count": 6,
+          "retrieved_hit_count": 2,
+          "recall": 0.667,
+          "precision_proxy": 0.333,
+          "response_signal_count": 3,
+          "response_signal_hits": 2,
+          "response_recall": 0.667
+        },
+        "artifact_graph": {
+          "node_count": 1,
+          "edge_count": 0,
+          "nodes": [
+            {
+              "artifact_id": "hypothesis_7e86f38fd9",
+              "artifact_type": "hypothesis",
+              "linked_task": null,
+              "turn_index": 2
+            }
+          ],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "short diff-style summary first"
+          ],
+          "missing_response_signals": [
+            "retry loop"
+          ],
+          "graph_observation": "hypothesis artifact present but source log missing",
+          "suspected_cause": "query overlap or kind scoring was too weak for: short diff-style summary first"
+        }
+      },
+      {
+        "name": "artifact_chain_resume",
+        "description": "The agent should recover logs, a debugging hypothesis, and a fix plan after an interruption.",
+        "turns": [
+          {
+            "user_input": "Return to the scheduler incident. What should I inspect first?",
+            "expected_retrievals": [
+              "retry loop overflow",
+              "duplicate scheduler state",
+              "patch dedupe"
+            ],
+            "retrieved_items": [
+              "**Plan noted:** inspect retry state restore \u2192 compare checkpoint IDs \u2192 patch dedupe before requeue. Ready to proceed. What data are you pulling for the inspection? - Scheduler state dump (pre/post-checkpoint)? - Specific backoff entry logs with timestamps? - Worker-7 checkpoint manifest or ID registry?",
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.",
+              "**Root cause hypothesis:** duplicate scheduler state is rehydrating the same backoff entry twice. **Evidence to validate:** - Check scheduler logs for duplicate entry creation timestamps - Verify idempotency key in the backoff entry matches the one causing overflow - Compare scheduler state snapshot (pre-checkpoint) vs rehydration (post-checkpoint) **If confirmed:** The fix is likely clearing the duplicate entry before resume, or adding a deduplication check in the scheduler's rehydration logic. **If disproved:** Fall back to checkpoint integrity checks (was the operation mid-flight when captured?)",
+              "Also remind me to order coffee beans.",
+              "**Issue recognized:** worker-7 retry loop overflow post-checkpoint-resume. This typically indicates one of: - Checkpoint state corrupted or references a task phase that fails deterministically - Idempotency key collision after resume (operation re-executed but not re-entrant) - Resource exhaustion that persists across resume (e.g., connection pool depleted) **Immediate diagnostics needed:** ``` 1. Checkpoint timestamp vs last successful operation in worker-7 2. Retry counter at overflow (is it 5? 10? 3?) 3. Which operation/step fails on retry? 4. Worker-7 logs around the resume point ``` **Quick checks:** - Was the checkpoint taken during a partial commit? - Any other workers experiencing similar overflows on resume, or isolated to worker-7? - Downstream dependency state (is the service worker-7 talks to healthy)? If the same operation fails on every retry, the checkpoint likely captured a state where that operation is no longer valid.",
+              "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice."
+            ],
+            "matched_expected": [
+              "retry loop overflow",
+              "duplicate scheduler state",
+              "patch dedupe"
+            ],
+            "matched_retrieved_items": [
+              "**Issue recognized:** worker-7 retry loop overflow post-checkpoint-resume. This typically indicates one of: - Checkpoint state corrupted or references a task phase that fails deterministically - Idempotency key collision after resume (operation re-executed but not re-entrant) - Resource exhaustion that persists across resume (e.g., connection pool depleted) **Immediate diagnostics needed:** ``` 1. Checkpoint timestamp vs last successful operation in worker-7 2. Retry counter at overflow (is it 5? 10? 3?) 3. Which operation/step fails on retry? 4. Worker-7 logs around the resume point ``` **Quick checks:** - Was the checkpoint taken during a partial commit? - Any other workers experiencing similar overflows on resume, or isolated to worker-7? - Downstream dependency state (is the service worker-7 talks to healthy)? If the same operation fails on every retry, the checkpoint likely captured a state where that operation is no longer valid.",
+              "**Root cause hypothesis:** duplicate scheduler state is rehydrating the same backoff entry twice. **Evidence to validate:** - Check scheduler logs for duplicate entry creation timestamps - Verify idempotency key in the backoff entry matches the one causing overflow - Compare scheduler state snapshot (pre-checkpoint) vs rehydration (post-checkpoint) **If confirmed:** The fix is likely clearing the duplicate entry before resume, or adding a deduplication check in the scheduler's rehydration logic. **If disproved:** Fall back to checkpoint integrity checks (was the operation mid-flight when captured?)",
+              "**Plan noted:** inspect retry state restore \u2192 compare checkpoint IDs \u2192 patch dedupe before requeue. Ready to proceed. What data are you pulling for the inspection? - Scheduler state dump (pre/post-checkpoint)? - Specific backoff entry logs with timestamps? - Worker-7 checkpoint manifest or ID registry?"
+            ],
+            "assistant_response": "**Returning to the scheduler incident.**\n\nBased on the current hypothesis (duplicate scheduler state rehydrating the same backoff entry twice), the first inspection should be the **scheduler state dump \u2014 comparing pre-checkpoint snapshot vs. post-checkpoint rehydration**.\n\nSpecifically, look for:\n- Duplicate backoff entry creation timestamps\n- Matching idempotency keys in entries that shouldn't coexist\n\nIf the dump isn't accessible yet, the quickest proxy is checking **worker-7 logs around the resume point** for duplicate entry creation events.\n\nWhat data source is accessible right now?",
+            "expected_response_signals": [
+              "retry state restore",
+              "checkpoint ids",
+              "dedupe"
+            ],
+            "matched_response_signals": []
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 6,
+          "retrieved_hit_count": 3,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        },
+        "artifact_graph": {
+          "node_count": 4,
+          "edge_count": 1,
+          "nodes": [
+            {
+              "artifact_id": "log_43c01c8272",
+              "artifact_type": "log",
+              "linked_task": "retry loop",
+              "turn_index": 0
+            },
+            {
+              "artifact_id": "hypothesis_8f6ae46b7c",
+              "artifact_type": "hypothesis",
+              "linked_task": "worker scheduler",
+              "turn_index": 1
+            },
+            {
+              "artifact_id": "plan_851fbd998b",
+              "artifact_type": "plan",
+              "linked_task": "worker scheduler",
+              "turn_index": 2
+            },
+            {
+              "artifact_id": "hypothesis_3911fa1426",
+              "artifact_type": "hypothesis",
+              "linked_task": "worker scheduler",
+              "turn_index": 4
+            }
+          ],
+          "edges": [
+            {
+              "source": "hypothesis_8f6ae46b7c",
+              "target": "plan_851fbd998b",
+              "relation_type": "tests",
+              "linked_task": "worker scheduler"
+            }
+          ]
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "retry state restore",
+            "checkpoint ids",
+            "dedupe"
+          ],
+          "graph_observation": "relation chain recovered with 1 edge(s)",
+          "suspected_cause": "retrieved artifacts were available but the response did not use them explicitly"
+        }
+      },
+      {
+        "name": "artifact_relation_chain",
+        "description": "The agent should preserve the relation chain from log to hypothesis to plan for the same task.",
+        "turns": [
+          {
+            "user_input": "Return to the profile-sync incident and continue the plan.",
+            "expected_retrievals": [
+              "times out after redis reconnect",
+              "stale cursor state",
+              "cursor reset"
+            ],
+            "retrieved_items": [
+              "Got it. Plan: inspect cursor reset, verify reconnect ordering, then patch stale cursor cleanup. **Verification steps:** 1. **Find cursor state location** \u2014 where is the cursor/offset stored (class attribute, instance variable, closure)? 2. **Find reconnect handler** \u2014 is there an `on_reconnect()`, `connection_error_handler`, or equivalent? What's the ordering: ``` reconnect \u2192 reset cursor \u2192 resume scan or reconnect \u2192 resume scan (cursor unchanged) ``` 3. **Patch pattern:** ```python def on_reconnect(self): self._cursor = None # or self._cursor = 0 self._sync_offset = None ``` Do you have the relevant code sections you want to trace through, or should I help locate the cursor state and reconnect handler?",
+              "Plan: inspect cursor reset, verify reconnect ordering, then patch stale cursor cleanup.",
+              "Hypothesis: the reconnect path leaves stale cursor state in the sync worker.",
+              "**Root cause hypothesis:** The reconnect path leaves stale cursor state in the sync worker. **To validate this:** 1. **Confirm stale state persists:** Check if the worker reuses the same cursor object after reconnect vs. creating a new one. 2. **Trace the reconnect flow:** - Does `on_reconnect()` or equivalent reset the cursor to `None`/`nil`? - Is there a `SCAN` operation using a saved cursor that is now invalid on the new connection? 3. **Look for this pattern:** ```python # Bad: cursor survives reconnect cursor = redis.scan_iter(...) # cursor captured # ... reconnect happens ... redis.scan_iter(cursor=cursor) # stale cursor, different connection # Good: cursor reset on reconnect cursor = None # ... reconnect happens ... cursor = redis.scan_iter(...) # fresh iteration ``` 4. **Check Redis response:** If using `SCAN` with a stale cursor, Redis may return an error or empty results, causing the sync to hang waiting for data that never comes. **Quick test:** Force a fresh iteration (set cursor to `0` / start fresh) on reconnect and see if the timeout still occurs. Does the reconnect handler explicitly reset any cursor/offset/position state?",
+              "**Issue:** `profile-sync` job timeout after Redis reconnect. **Questions:** 1. Is this the first reconnect since deployment, or intermittent? 2. What's the timeout value set on the job? 3. Is the job timing out during re-authentication or during the actual sync operation? 4. Any Redis cluster/sentinel configuration involved? **Immediate checks:** - Redis `timeout` setting vs job timeout value - Connection pool exhaustion during reconnect - Any `CLIENT KILL` events in Redis logs coinciding with reconnects What does the job log show at the point of timeout\u2014any partial progress or errors before the timeout fires?",
+              "Log: profile-sync job times out after redis reconnect."
+            ],
+            "matched_expected": [
+              "times out after redis reconnect",
+              "stale cursor state",
+              "cursor reset"
+            ],
+            "matched_retrieved_items": [
+              "Log: profile-sync job times out after redis reconnect.",
+              "Hypothesis: the reconnect path leaves stale cursor state in the sync worker.",
+              "Got it. Plan: inspect cursor reset, verify reconnect ordering, then patch stale cursor cleanup. **Verification steps:** 1. **Find cursor state location** \u2014 where is the cursor/offset stored (class attribute, instance variable, closure)? 2. **Find reconnect handler** \u2014 is there an `on_reconnect()`, `connection_error_handler`, or equivalent? What's the ordering: ``` reconnect \u2192 reset cursor \u2192 resume scan or reconnect \u2192 resume scan (cursor unchanged) ``` 3. **Patch pattern:** ```python def on_reconnect(self): self._cursor = None # or self._cursor = 0 self._sync_offset = None ``` Do you have the relevant code sections you want to trace through, or should I help locate the cursor state and reconnect handler?"
+            ],
+            "assistant_response": "Continuing the `profile-sync` reconnect investigation.\n\n**Remaining steps:**\n1. Locate cursor state in the sync worker\n2. Locate reconnect handler\n3. Verify ordering and apply patch\n\nDo you have the relevant code sections, or should I help search for:\n- The cursor/scan iteration pattern (`scan_iter`, `cursor`, `offset`)\n- Reconnect handlers (`on_reconnect`, `connection_error_handler`, `retry_handler`)",
+            "expected_response_signals": [
+              "cursor reset",
+              "reconnect ordering",
+              "stale cursor cleanup"
+            ],
+            "matched_response_signals": []
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 6,
+          "retrieved_hit_count": 3,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        },
+        "artifact_graph": {
+          "node_count": 4,
+          "edge_count": 3,
+          "nodes": [
+            {
+              "artifact_id": "log_84e906201b",
+              "artifact_type": "log",
+              "linked_task": "user profile service",
+              "turn_index": 0
+            },
+            {
+              "artifact_id": "hypothesis_0c080119b9",
+              "artifact_type": "hypothesis",
+              "linked_task": "user profile service",
+              "turn_index": 1
+            },
+            {
+              "artifact_id": "plan_a3531cdec1",
+              "artifact_type": "plan",
+              "linked_task": "user profile service",
+              "turn_index": 2
+            },
+            {
+              "artifact_id": "plan_5181432172",
+              "artifact_type": "plan",
+              "linked_task": "user profile service",
+              "turn_index": 2
+            }
+          ],
+          "edges": [
+            {
+              "source": "log_84e906201b",
+              "target": "hypothesis_0c080119b9",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "hypothesis_0c080119b9",
+              "target": "plan_a3531cdec1",
+              "relation_type": "tests",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "hypothesis_0c080119b9",
+              "target": "plan_5181432172",
+              "relation_type": "tests",
+              "linked_task": "user profile service"
+            }
+          ]
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "cursor reset",
+            "reconnect ordering",
+            "stale cursor cleanup"
+          ],
+          "graph_observation": "relation chain recovered with 3 edge(s)",
+          "suspected_cause": "retrieved artifacts were available but the response did not use them explicitly"
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 15,
+      "matched_count": 14,
+      "retrieved_count": 25,
+      "retrieved_hit_count": 14,
+      "recall": 0.933,
+      "precision_proxy": 0.56,
+      "response_signal_count": 15,
+      "response_signal_hits": 6,
+      "response_recall": 0.4
+    }
+  },
+  "recent_history_baseline": {
+    "name": "recent_history_baseline",
+    "scenarios": [
+      {
+        "name": "layered_preferences",
+        "description": "The agent should combine multiple style preferences after unrelated turns.",
+        "turns": [
+          {
+            "user_input": "Now summarize how you should present the rollout plan back to me.",
+            "expected_retrievals": [
+              "prefer concise answers",
+              "bullet lists",
+              "production rollout"
+            ],
+            "retrieved_items": [
+              "Also remember that action items should be in bullet lists.",
+              "[baseline] Also remember that action items should be in bullet lists.",
+              "I am planning a production rollout for a billing service.",
+              "[baseline] I am planning a production rollout for a billing service."
+            ],
+            "matched_expected": [
+              "bullet lists",
+              "production rollout"
+            ],
+            "matched_retrieved_items": [
+              "Also remember that action items should be in bullet lists.",
+              "I am planning a production rollout for a billing service."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "recall": 0.667,
+          "precision_proxy": 0.5,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "prefer concise answers"
+          ],
+          "missing_response_signals": [],
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "query overlap or kind scoring was too weak for: prefer concise answers"
+        }
+      },
+      {
+        "name": "debugging_resume_with_preference",
+        "description": "The agent should resume a debugging issue while honoring a stored diagnostic preference.",
+        "turns": [
+          {
+            "user_input": "Return to the bug and tell me what to investigate first.",
+            "expected_retrievals": [
+              "root cause hypothesis first",
+              "flaky cache invalidation bug",
+              "stale profile data"
+            ],
+            "retrieved_items": [
+              "Remember that when debugging, I want the root cause hypothesis first.",
+              "[baseline] Remember that when debugging, I want the root cause hypothesis first.",
+              "I am investigating a flaky cache invalidation bug in the user profile service.",
+              "[baseline] I am investigating a flaky cache invalidation bug in the user profile service."
+            ],
+            "matched_expected": [
+              "root cause hypothesis first",
+              "flaky cache invalidation bug"
+            ],
+            "matched_retrieved_items": [
+              "Remember that when debugging, I want the root cause hypothesis first.",
+              "I am investigating a flaky cache invalidation bug in the user profile service."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "recall": 0.667,
+          "precision_proxy": 0.5,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "stale profile data"
+          ],
+          "missing_response_signals": [],
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "query overlap or kind scoring was too weak for: stale profile data"
+        }
+      },
+      {
+        "name": "coding_agent_resume",
+        "description": "The agent should resume a coding task after an unrelated interruption and honor formatting preferences.",
+        "turns": [
+          {
+            "user_input": "Back to the scheduler fix. What should I inspect first?",
+            "expected_retrievals": [
+              "short diff-style summary first",
+              "flaky retry loop",
+              "duplicate backoff state"
+            ],
+            "retrieved_items": [
+              "I am fixing a flaky retry loop in the worker scheduler.",
+              "[baseline] I am fixing a flaky retry loop in the worker scheduler.",
+              "Remember that when giving code changes, I want a short diff-style summary first.",
+              "[baseline] Remember that when giving code changes, I want a short diff-style summary first."
+            ],
+            "matched_expected": [
+              "short diff-style summary first",
+              "flaky retry loop"
+            ],
+            "matched_retrieved_items": [
+              "Remember that when giving code changes, I want a short diff-style summary first.",
+              "I am fixing a flaky retry loop in the worker scheduler."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "recall": 0.667,
+          "precision_proxy": 0.5,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "duplicate backoff state"
+          ],
+          "missing_response_signals": [],
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "query overlap or kind scoring was too weak for: duplicate backoff state"
+        }
+      },
+      {
+        "name": "artifact_chain_resume",
+        "description": "The agent should recover logs, a debugging hypothesis, and a fix plan after an interruption.",
+        "turns": [
+          {
+            "user_input": "Return to the scheduler incident. What should I inspect first?",
+            "expected_retrievals": [
+              "retry loop overflow",
+              "duplicate scheduler state",
+              "patch dedupe"
+            ],
+            "retrieved_items": [
+              "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+              "[baseline] Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue.",
+              "[baseline] Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+            ],
+            "matched_expected": [
+              "duplicate scheduler state",
+              "patch dedupe"
+            ],
+            "matched_retrieved_items": [
+              "Hypothesis: duplicate scheduler state is rehydrating the same backoff entry twice.",
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "recall": 0.667,
+          "precision_proxy": 0.5,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "retry loop overflow"
+          ],
+          "missing_response_signals": [],
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "query overlap or kind scoring was too weak for: retry loop overflow"
+        }
+      },
+      {
+        "name": "artifact_relation_chain",
+        "description": "The agent should preserve the relation chain from log to hypothesis to plan for the same task.",
+        "turns": [
+          {
+            "user_input": "Return to the profile-sync incident and continue the plan.",
+            "expected_retrievals": [
+              "times out after redis reconnect",
+              "stale cursor state",
+              "cursor reset"
+            ],
+            "retrieved_items": [
+              "Log: profile-sync job times out after redis reconnect.",
+              "[baseline] Log: profile-sync job times out after redis reconnect.",
+              "Hypothesis: the reconnect path leaves stale cursor state in the sync worker.",
+              "[baseline] Hypothesis: the reconnect path leaves stale cursor state in the sync worker."
+            ],
+            "matched_expected": [
+              "times out after redis reconnect",
+              "stale cursor state"
+            ],
+            "matched_retrieved_items": [
+              "Log: profile-sync job times out after redis reconnect.",
+              "Hypothesis: the reconnect path leaves stale cursor state in the sync worker."
+            ],
+            "assistant_response": "",
+            "expected_response_signals": null,
+            "matched_response_signals": null
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 2,
+          "retrieved_count": 4,
+          "retrieved_hit_count": 2,
+          "recall": 0.667,
+          "precision_proxy": 0.5,
+          "response_signal_count": 0,
+          "response_signal_hits": 0,
+          "response_recall": 0.0
+        },
+        "analysis": {
+          "stage_failure": "retrieval",
+          "missing_expected": [
+            "cursor reset"
+          ],
+          "missing_response_signals": [],
+          "graph_observation": "no artifact graph available",
+          "suspected_cause": "query overlap or kind scoring was too weak for: cursor reset"
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 15,
+      "matched_count": 10,
+      "retrieved_count": 20,
+      "retrieved_hit_count": 10,
+      "recall": 0.667,
+      "precision_proxy": 0.5,
+      "response_signal_count": 15,
+      "response_signal_hits": 0,
+      "response_recall": 0.0
+    }
+  },
+  "llm_runtime": {
+    "name": "llm_runtime",
+    "scenarios": [
+      {
+        "name": "layered_preferences",
+        "description": "The agent should combine multiple style preferences after unrelated turns.",
+        "turns": [
+          {
+            "user_input": "Now summarize how you should present the rollout plan back to me.",
+            "expected_retrievals": [
+              "prefer concise answers",
+              "bullet lists",
+              "production rollout"
+            ],
+            "retrieved_items": [
+              "Got it. Planning a production rollout for a billing service. Key considerations to confirm: - **Rollback plan** \u2014 What's the rollback trigger and procedure? - **Deployment strategy** \u2014 Blue/green, canary, or phased rollout? - **Monitoring** \u2014 What metrics/alerts indicate success vs. failure? - **Data impact** \u2014 Any migrations or schema changes involved? - **Stakeholders** \u2014 Who needs to sign off before go-live? What's your current blocker or where do you need help?",
+              "Also remember that action items should be in bullet lists.",
+              "I am planning a production rollout for a billing service.",
+              "Got it. Preferences updated: - Concise answers - Action items in bullet lists",
+              "Remember that I prefer concise answers."
+            ],
+            "matched_expected": [
+              "prefer concise answers",
+              "bullet lists",
+              "production rollout"
+            ],
+            "matched_retrieved_items": [
+              "Remember that I prefer concise answers.",
+              "Also remember that action items should be in bullet lists.",
+              "Got it. Planning a production rollout for a billing service. Key considerations to confirm: - **Rollback plan** \u2014 What's the rollback trigger and procedure? - **Deployment strategy** \u2014 Blue/green, canary, or phased rollout? - **Monitoring** \u2014 What metrics/alerts indicate success vs. failure? - **Data impact** \u2014 Any migrations or schema changes involved? - **Stakeholders** \u2014 Who needs to sign off before go-live? What's your current blocker or where do you need help?"
+            ],
+            "assistant_response": "Based on the retrieved context, here's how I'll present the rollout plan:\n\n**Structure:**\n- Concise, direct answers\n- Action items and decisions in bullet lists\n- Sections aligned to the key considerations:\n\n  - Rollback plan (trigger + procedure)\n  - Deployment strategy (blue/green, canary, or phased)\n  - Monitoring setup (success/failure metrics)\n  - Data impact (migrations, schema changes)\n  - Stakeholder sign-off requirements\n\n**Format:**\n- Brief framing statement per section\n- Bullet points for decisions/checklist items\n- No unnecessary detail unless you ask\n\n**When complete, ask:**\n\"What's your current blocker or where do you need help?\"\n\nReady when you are \u2014 what do you have so far for the billing service rollout?",
+            "expected_response_signals": [
+              "concise",
+              "bullet",
+              "rollout plan"
+            ],
+            "matched_response_signals": [
+              "concise",
+              "bullet",
+              "rollout plan"
+            ]
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 5,
+          "retrieved_hit_count": 3,
+          "recall": 1.0,
+          "precision_proxy": 0.6,
+          "response_signal_count": 3,
+          "response_signal_hits": 3,
+          "response_recall": 1.0
+        },
+        "artifact_graph": {
+          "node_count": 1,
+          "edge_count": 0,
+          "nodes": [
+            {
+              "artifact_id": "plan_540325dbd0",
+              "artifact_type": "plan",
+              "linked_task": "production rollout",
+              "turn_index": 4
+            }
+          ],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "none",
+          "missing_expected": [],
+          "missing_response_signals": [],
+          "graph_observation": "artifact context recovered with 1 node(s)",
+          "suspected_cause": "no issue detected"
+        }
+      },
+      {
+        "name": "debugging_resume_with_preference",
+        "description": "The agent should resume a debugging issue while honoring a stored diagnostic preference.",
+        "turns": [
+          {
+            "user_input": "Return to the bug and tell me what to investigate first.",
+            "expected_retrievals": [
+              "root cause hypothesis first",
+              "flaky cache invalidation bug",
+              "stale profile data"
+            ],
+            "retrieved_items": [
+              "I am investigating a flaky cache invalidation bug in the user profile service.",
+              "**Root cause hypothesis:** Cache warming or instance restart after deploy is repopulating stale entries before the invalidation signal propagates, or invalidation events are dropped during the deploy window. Likely sub-hypotheses: 1. Cache warm-up populates before DB update is complete 2. Stale TTLs survive across deploys 3. Pub/sub invalidation messages are dropped during rolling restart Which behavior matches\u2014stale data clears within minutes (TTL expiry), or persists indefinitely until manual flush?",
+              "Got it. I'll remember: **book train tickets tomorrow**. Back to the cache bug\u2014did you observe which behavior? Stale data expiring after a few minutes, or hanging until manual intervention?",
+              "Also remind me to book train tickets tomorrow.",
+              "Remember that when debugging, I want the root cause hypothesis first.",
+              "The bug appears after deploys when stale profile data persists."
+            ],
+            "matched_expected": [
+              "root cause hypothesis first",
+              "flaky cache invalidation bug",
+              "stale profile data"
+            ],
+            "matched_retrieved_items": [
+              "Remember that when debugging, I want the root cause hypothesis first.",
+              "I am investigating a flaky cache invalidation bug in the user profile service.",
+              "The bug appears after deploys when stale profile data persists."
+            ],
+            "assistant_response": "**Root cause hypothesis:** Cache warming or instance restart after deploy repopulates stale entries before invalidation propagates, or pub/sub messages are dropped during rolling restart.\n\n**First investigation:** Check if stale data clears after a few minutes (TTL expiry) or persists until manual flush.\n\n- If it auto-clears \u2192 examine TTL values and cache warm-up logic (pre-population race condition)\n- If it persists \u2192 trace invalidation event delivery during deploy window (pub/sub dropout or ordering issue)\n\n**Concrete next step:** Look at the cache warm-up code path. Is it populated from the DB before or after the invalidation subscription is active? Also check TTLs on the affected keys\u2014confirm they're not longer than your deploy window.",
+            "expected_response_signals": [
+              "root cause",
+              "cache invalidation",
+              "stale profile data"
+            ],
+            "matched_response_signals": [
+              "root cause"
+            ]
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 6,
+          "retrieved_hit_count": 3,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 1,
+          "response_recall": 0.333
+        },
+        "artifact_graph": {
+          "node_count": 2,
+          "edge_count": 0,
+          "nodes": [
+            {
+              "artifact_id": "hypothesis_8e14454a81",
+              "artifact_type": "hypothesis",
+              "linked_task": null,
+              "turn_index": 0
+            },
+            {
+              "artifact_id": "hypothesis_2f339a3236",
+              "artifact_type": "hypothesis",
+              "linked_task": "cache invalidation",
+              "turn_index": 4
+            }
+          ],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "cache invalidation",
+            "stale profile data"
+          ],
+          "graph_observation": "multiple artifacts stored but no relation edges recovered",
+          "suspected_cause": "response omitted expected signals: cache invalidation, stale profile data"
+        }
+      },
+      {
+        "name": "coding_agent_resume",
+        "description": "The agent should resume a coding task after an unrelated interruption and honor formatting preferences.",
+        "turns": [
+          {
+            "user_input": "Back to the scheduler fix. What should I inspect first?",
+            "expected_retrievals": [
+              "short diff-style summary first",
+              "flaky retry loop",
+              "duplicate backoff state"
+            ],
+            "retrieved_items": [
+              "I am fixing a flaky retry loop in the worker scheduler.",
+              "The suspected problem is duplicate backoff state after task resume.",
+              "I'd recommend a lunch spot, but I don't have your office location stored. What's your general area or zip code? (Or if you prefer, just say \"I'm in [city] downtown\" and I'll suggest something fitting.)",
+              "Right - if backoff state isn't cleared on resume, the task could re-enter with an already-decremented delay, causing premature or skipped retries. What have you tried so far? A reset of the backoff counter in the resume path, or something else?",
+              "Also, suggest a lunch option near the office.",
+              "Remember that when giving code changes, I want a short diff-style summary first."
+            ],
+            "matched_expected": [
+              "short diff-style summary first",
+              "flaky retry loop",
+              "duplicate backoff state"
+            ],
+            "matched_retrieved_items": [
+              "Remember that when giving code changes, I want a short diff-style summary first.",
+              "I am fixing a flaky retry loop in the worker scheduler.",
+              "The suspected problem is duplicate backoff state after task resume."
+            ],
+            "assistant_response": "Diff-style summary:\nThe resume path - specifically check where/whether backoff state is cleared when a task resumes. Look for:\n\n1. The `resume()` or equivalent function in your scheduler\n2. Any backoff counter/delay fields on the task struct\n3. Whether those fields are reset, or if the task inherits stale state from before suspension\n\nThat's your most likely culprit given the duplicate state hypothesis. Want to share the relevant code snippet?",
+            "expected_response_signals": [
+              "diff-style",
+              "retry loop",
+              "backoff state"
+            ],
+            "matched_response_signals": [
+              "diff-style",
+              "backoff state"
+            ]
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 6,
+          "retrieved_hit_count": 3,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 2,
+          "response_recall": 0.667
+        },
+        "artifact_graph": {
+          "node_count": 1,
+          "edge_count": 0,
+          "nodes": [
+            {
+              "artifact_id": "hypothesis_7e86f38fd9",
+              "artifact_type": "hypothesis",
+              "linked_task": null,
+              "turn_index": 2
+            }
+          ],
+          "edges": []
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "retry loop"
+          ],
+          "graph_observation": "hypothesis artifact present but source log missing",
+          "suspected_cause": "response omitted expected signals: retry loop"
+        }
+      },
+      {
+        "name": "artifact_chain_resume",
+        "description": "The agent should recover logs, a debugging hypothesis, and a fix plan after an interruption.",
+        "turns": [
+          {
+            "user_input": "Return to the scheduler incident. What should I inspect first?",
+            "expected_retrievals": [
+              "retry loop overflow",
+              "duplicate scheduler state",
+              "patch dedupe"
+            ],
+            "retrieved_items": [
+              "**Coffee beans \u2014 noted.** I'll flag this in my personal context. Back to the worker-7 issue \u2014 which step first?",
+              "**Active issue acknowledged:** worker-7 retry loop overflow post-checkpoint resume. **Typical causes:** 1. **State desync** \u2014 resumed worker inherits stale retry counter from checkpoint, hits max retries immediately 2. **Partial checkpoint** \u2014 downstream task state incomplete, causing loop-bound failures on retry 3. **Resource contention** \u2014 resumed worker re-queues ops that another worker already claimed, triggering retry-then-conflict cycle **Quick diagnostic:** - Log the retry counter value at resume time vs. at overflow - Check if `worker-7`'s checkpoint timestamp aligns with the job's last successful global checkpoint **If desync confirmed:** Zero the retry counter on resume or implement idempotency keys to prevent duplicate dispatch. Want me to dig into a specific cause (checkpoint format, retry library config, or job scheduler integration)?",
+              "**Plan acknowledged.** Sequence: 1. **Inspect retry state restore** \u2014 log the retry counter and backoff key immediately on resume, before any requeue 2. **Compare checkpoint IDs** \u2014 verify `worker-7`'s checkpoint ID vs. global checkpoint ID; any delta indicates stale state 3. **Patch dedupe before requeue** \u2014 either zero duplicates on rehydrate or add idempotency key validation at dispatch Ready to dig into step 1 (trace the restore path), step 2 (checkpoint ID schema), or step 3 (dedupe patch)?",
+              "Also remind me to order coffee beans.",
+              "**Hypothesis confirmed in context:** duplicate scheduler state rehydrating same backoff entry. **Validation steps:** 1. Trace the backoff entry's scheduler queue ID \u2014 if two entries share the same ID, it's a dedup failure 2. Log `scheduler_state_version` at checkpoint write vs. resume read \u2014 mismatch indicates stale state re-entry 3. Check if the job's scheduler uses a shared namespace (Redis key, DB row) that could race on restore **Mitigation:** - On resume, run a dedup pass: `SELECT DISTINCT backoff_key, MIN(retry_count) FROM scheduler_state WHERE job_id = X` - Or assign a UUID to each backoff entry at creation \u2014 reject any entry with a duplicate UUID on rehydrate **Quick confirm:** Does `worker-7`'s overflow log show two identical `backoff_key` values back-to-back?",
+              "Plan: inspect retry state restore, compare checkpoint IDs, then patch dedupe before requeue."
+            ],
+            "matched_expected": [
+              "retry loop overflow",
+              "duplicate scheduler state",
+              "patch dedupe"
+            ],
+            "matched_retrieved_items": [
+              "**Active issue acknowledged:** worker-7 retry loop overflow post-checkpoint resume. **Typical causes:** 1. **State desync** \u2014 resumed worker inherits stale retry counter from checkpoint, hits max retries immediately 2. **Partial checkpoint** \u2014 downstream task state incomplete, causing loop-bound failures on retry 3. **Resource contention** \u2014 resumed worker re-queues ops that another worker already claimed, triggering retry-then-conflict cycle **Quick diagnostic:** - Log the retry counter value at resume time vs. at overflow - Check if `worker-7`'s checkpoint timestamp aligns with the job's last successful global checkpoint **If desync confirmed:** Zero the retry counter on resume or implement idempotency keys to prevent duplicate dispatch. Want me to dig into a specific cause (checkpoint format, retry library config, or job scheduler integration)?",
+              "**Hypothesis confirmed in context:** duplicate scheduler state rehydrating same backoff entry. **Validation steps:** 1. Trace the backoff entry's scheduler queue ID \u2014 if two entries share the same ID, it's a dedup failure 2. Log `scheduler_state_version` at checkpoint write vs. resume read \u2014 mismatch indicates stale state re-entry 3. Check if the job's scheduler uses a shared namespace (Redis key, DB row) that could race on restore **Mitigation:** - On resume, run a dedup pass: `SELECT DISTINCT backoff_key, MIN(retry_count) FROM scheduler_state WHERE job_id = X` - Or assign a UUID to each backoff entry at creation \u2014 reject any entry with a duplicate UUID on rehydrate **Quick confirm:** Does `worker-7`'s overflow log show two identical `backoff_key` values back-to-back?",
+              "**Plan acknowledged.** Sequence: 1. **Inspect retry state restore** \u2014 log the retry counter and backoff key immediately on resume, before any requeue 2. **Compare checkpoint IDs** \u2014 verify `worker-7`'s checkpoint ID vs. global checkpoint ID; any delta indicates stale state 3. **Patch dedupe before requeue** \u2014 either zero duplicates on rehydrate or add idempotency key validation at dispatch Ready to dig into step 1 (trace the restore path), step 2 (checkpoint ID schema), or step 3 (dedupe patch)?"
+            ],
+            "assistant_response": "**Step 1 \u2014 Inspect retry state restore.**\n\nLog these immediately on resume, before any requeue:\n- `retry_counter` (current value vs. expected max)\n- `backoff_key` (for duplicate detection)\n- `scheduler_state_version` (write timestamp vs. read timestamp)\n\nIf the counter is already at max on resume, that's your desync confirmation.",
+            "expected_response_signals": [
+              "retry state restore",
+              "checkpoint ids",
+              "dedupe"
+            ],
+            "matched_response_signals": [
+              "retry state restore"
+            ]
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 6,
+          "retrieved_hit_count": 3,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 1,
+          "response_recall": 0.333
+        },
+        "artifact_graph": {
+          "node_count": 4,
+          "edge_count": 1,
+          "nodes": [
+            {
+              "artifact_id": "log_43c01c8272",
+              "artifact_type": "log",
+              "linked_task": "retry loop",
+              "turn_index": 0
+            },
+            {
+              "artifact_id": "hypothesis_8f6ae46b7c",
+              "artifact_type": "hypothesis",
+              "linked_task": "worker scheduler",
+              "turn_index": 1
+            },
+            {
+              "artifact_id": "hypothesis_68dbff310d",
+              "artifact_type": "hypothesis",
+              "linked_task": "worker scheduler",
+              "turn_index": 1
+            },
+            {
+              "artifact_id": "plan_851fbd998b",
+              "artifact_type": "plan",
+              "linked_task": "worker scheduler",
+              "turn_index": 2
+            }
+          ],
+          "edges": [
+            {
+              "source": "hypothesis_68dbff310d",
+              "target": "plan_851fbd998b",
+              "relation_type": "tests",
+              "linked_task": "worker scheduler"
+            }
+          ]
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "checkpoint ids",
+            "dedupe"
+          ],
+          "graph_observation": "relation chain recovered with 1 edge(s)",
+          "suspected_cause": "retrieved artifacts were available but the response did not use them explicitly"
+        }
+      },
+      {
+        "name": "artifact_relation_chain",
+        "description": "The agent should preserve the relation chain from log to hypothesis to plan for the same task.",
+        "turns": [
+          {
+            "user_input": "Return to the profile-sync incident and continue the plan.",
+            "expected_retrievals": [
+              "times out after redis reconnect",
+              "stale cursor state",
+              "cursor reset"
+            ],
+            "retrieved_items": [
+              "Plan: inspect cursor reset, verify reconnect ordering, then patch stale cursor cleanup.",
+              "Hypothesis: the reconnect path leaves stale cursor state in the sync worker.",
+              "**Issue acknowledged:** profile-sync job timing out post-redis reconnect. Quick diagnostics to narrow this down: 1. **Timing pattern** \u2014 Does it fail on the *first* sync after reconnect, or only after some duration? (Session/state mismatch vs. persistent connection issue) 2. **Timeout config** \u2014 What's the current `timeout`/`connect_timeout` value for the Redis client? If it's too close to your reconnect window, the client may give up before the server is ready. 3. **Redis version / client library** \u2014 Any recent upgrades? (e.g., redis-py behavior changed in 4.x around connection pool handling) 4. **Error message** \u2014 `TimeoutError` on the job itself, or an exception from the Redis client? (affects whether it's a client-side timeout vs. a server-side block) 5. **Pattern** \u2014 Is this reproducible, or only under load/reconnect storms? The most common culprits: client tries to reuse a stale socket from before the reconnect, or the server is slow to accept connections during `redis-server` restart. A quick test is forcing a `connection_pool.reset()` or explicit `client.ping()` immediately after reconnect to verify the channel is healthy before the job runs.",
+              "**Root cause hypothesis:** the reconnect path leaves stale cursor state in the sync worker. To verify or disprove this: 1. **Inspect cursor state at reconnect time** \u2014 Log the cursor value immediately before and after `connection_pool.reset()` or your reconnect handler. If it's non-zero, that's your culprit. 2. **Check the reconnect path** \u2014 Does the sync worker call `SCAN` with a saved cursor after reconnect? If so, the cursor may be pointing to a position in an old keyspace that no longer exists or has shifted. 3. **Isolate the variable** \u2014 After reconnect, force a fresh cursor by either: - Explicitly starting a new `SCAN` iteration (cursor=0) - Using `KEYS` or `SCAN 0` as a sanity check before the job runs 4. **Log the failure point** \u2014 If the timeout occurs on the *first* `SCAN` call post-reconnect, cursor state is the likely cause. If it's later, it could be a pagination issue or server-side slow command. Can you confirm whether the timeout hits on the first sync operation after reconnect, and what the cursor value looks like in the reconnect handler?",
+              "**Plan acknowledged.** Execute in that order: 1. **Inspect cursor reset** \u2014 log cursor value pre/post `reset()` call 2. **Verify reconnect ordering** \u2014 ensure cursor state is cleared *before* the worker resumes, not after 3. **Patch stale cursor cleanup** \u2014 null/zero the cursor in the reconnect handler, then validate with a test reconnect cycle Ready to review logs or code snippets when you have them.",
+              "Log: profile-sync job times out after redis reconnect."
+            ],
+            "matched_expected": [
+              "times out after redis reconnect",
+              "stale cursor state",
+              "cursor reset"
+            ],
+            "matched_retrieved_items": [
+              "Log: profile-sync job times out after redis reconnect.",
+              "Hypothesis: the reconnect path leaves stale cursor state in the sync worker.",
+              "Plan: inspect cursor reset, verify reconnect ordering, then patch stale cursor cleanup."
+            ],
+            "assistant_response": "**Continuing the profile-sync incident plan.**\n\nWe're at step 1 \u2014 need to inspect the cursor state during the reconnect cycle.\n\n**What's needed:**\n\n1. **Log output from the reconnect handler** \u2014 specifically the cursor value before and after `reset()` or equivalent cleanup call\n2. **Confirm the reconnect ordering** \u2014 paste the snippet where reconnect is triggered and where the worker resumes SCAN iteration\n3. **Error/timing context** \u2014 does the timeout happen on the first SCAN post-reconnect, or later in the pagination loop?\n\nOnce you share the reconnect handler code or logs, we can identify whether the cursor is being carried over and patch accordingly.",
+            "expected_response_signals": [
+              "cursor reset",
+              "reconnect ordering",
+              "stale cursor cleanup"
+            ],
+            "matched_response_signals": [
+              "reconnect ordering"
+            ]
+          }
+        ],
+        "metrics": {
+          "expected_count": 3,
+          "matched_count": 3,
+          "retrieved_count": 6,
+          "retrieved_hit_count": 3,
+          "recall": 1.0,
+          "precision_proxy": 0.5,
+          "response_signal_count": 3,
+          "response_signal_hits": 1,
+          "response_recall": 0.333
+        },
+        "artifact_graph": {
+          "node_count": 4,
+          "edge_count": 2,
+          "nodes": [
+            {
+              "artifact_id": "log_84e906201b",
+              "artifact_type": "log",
+              "linked_task": "user profile service",
+              "turn_index": 0
+            },
+            {
+              "artifact_id": "log_7316ab44a3",
+              "artifact_type": "log",
+              "linked_task": "user profile service",
+              "turn_index": 0
+            },
+            {
+              "artifact_id": "hypothesis_0c080119b9",
+              "artifact_type": "hypothesis",
+              "linked_task": "user profile service",
+              "turn_index": 1
+            },
+            {
+              "artifact_id": "plan_a3531cdec1",
+              "artifact_type": "plan",
+              "linked_task": "user profile service",
+              "turn_index": 2
+            }
+          ],
+          "edges": [
+            {
+              "source": "log_7316ab44a3",
+              "target": "hypothesis_0c080119b9",
+              "relation_type": "derived_from",
+              "linked_task": "user profile service"
+            },
+            {
+              "source": "hypothesis_0c080119b9",
+              "target": "plan_a3531cdec1",
+              "relation_type": "tests",
+              "linked_task": "user profile service"
+            }
+          ]
+        },
+        "analysis": {
+          "stage_failure": "response",
+          "missing_expected": [],
+          "missing_response_signals": [
+            "cursor reset",
+            "stale cursor cleanup"
+          ],
+          "graph_observation": "relation chain recovered with 2 edge(s)",
+          "suspected_cause": "retrieved artifacts were available but the response did not use them explicitly"
+        }
+      }
+    ],
+    "metrics": {
+      "expected_count": 15,
+      "matched_count": 15,
+      "retrieved_count": 29,
+      "retrieved_hit_count": 15,
+      "recall": 1.0,
+      "precision_proxy": 0.517,
+      "response_signal_count": 15,
+      "response_signal_hits": 8,
+      "response_recall": 0.533
+    },
+    "used_real_llm": true
+  },
+  "comparison": {
+    "recall_delta": 0.266,
+    "precision_proxy_delta": 0.06000000000000005,
+    "response_recall_delta_vs_baseline": 0.4
+  }
+}
