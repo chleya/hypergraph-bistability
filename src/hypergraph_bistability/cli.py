@@ -207,7 +207,7 @@ def _chat_demo(session_path: str | None = None) -> None:
         print(f"Loaded session from {resolved_path}")
 
     print("Hypergraph Agent Terminal Demo")
-    print("Commands: /exit, /state, /graph, /save, /reset")
+    print("Commands: /exit, /state, /ws, /graph, /save, /reset")
 
     while True:
         try:
@@ -222,6 +222,9 @@ def _chat_demo(session_path: str | None = None) -> None:
             break
         if user_input == "/state":
             print(agent.visualize_state())
+            continue
+        if user_input == "/ws":
+            print(agent.visualize_working_set())
             continue
         if user_input == "/graph":
             print(agent.summarize_artifact_graph())

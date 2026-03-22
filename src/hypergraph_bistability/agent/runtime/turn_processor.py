@@ -35,6 +35,62 @@ class TurnProcessor:
         self.retrieval_policy = retrieval_policy or RetrievalPolicy()
         self.context_assembler = context_assembler
 
+    def _generate_working_set_context(self, agent) -> str:
+        """Generate working-set context string for prompt injection (JSON format)."""
+        import json
+        
+        try:
+            from hypergraph_bistability.agent.query import get_query_layer
+            query = get_query_layer(agent)
+            
+            ws_data = {}
+            
+            # Current task state
+            task_state = query.query_current_task_state()
+            if task_state.linked_task or task_state.blocker_count > 0 or task_state.active_decisions_count > 0 or task_state.active_procedures_count > 0:
+                ws_data["task"] = {
+                    "name": task_state.linked_task or None,
+                    "status": task_state.status or "idle",
+                    "phase": task_state.phase_summary or "none",
+                    "blockers": task_state.blocker_count,
+                    "decisions": task_state.active_decisions_count,
+                    "procedures": task_state.active_procedures_count,
+                }
+            
+            # Dominant conflict
+            conflict = query.query_dominant_conflict()
+            if conflict and (getattr(conflict, 'has_conflict', None) or getattr(conflict, 'status', None)):
+                ws_data["conflict"] = {
+                    "dominant": getattr(conflict, 'dominant_content', None) or getattr(conflict, 'dominant_hypothesis', None),
+                    "contradicted_count": len(getattr(conflict, 'contradicted_contents', []) or getattr(conflict, 'contradicted_hypotheses', [])),
+                }
+            
+            # Active decisions
+            decisions = query.query_decision_residue()
+            if decisions:
+                ws_data["decisions_detail"] = [
+                    {"content": d.decision_content[:100], "phase": getattr(d, 'phase', None)}
+                    for d in decisions[:3]
+                ]
+            
+            # Active procedures
+            procedures = query.query_applicable_procedures()
+            if procedures:
+                ws_data["procedures_detail"] = [
+                    {"content": p.procedure_content[:100], "phase": p.phase}
+                    for p in procedures[:3]
+                ]
+            
+            # Handoff readiness
+            if ws_data.get("task"):
+                blockers = ws_data["task"].get("blockers", 0)
+                ws_data["handoff_ready"] = blockers == 0 and ws_data["task"].get("status") == "completed"
+            
+            return json.dumps(ws_data, ensure_ascii=False, indent=2) if ws_data else ""
+            
+        except Exception:
+            return ""
+
     def process(
         self,
         *,
@@ -103,12 +159,17 @@ class TurnProcessor:
             return memory_context
 
         effective_input = f"{user_input}\n\n{suggestion}" if suggestion else user_input
+        
+        # Generate working-set context for the prompt
+        working_set_context = self._generate_working_set_context(agent)
+        
         messages = self.context_assembler.build_messages(
             system_prompt=agent.system_prompt,
             memory_context=memory_context,
             retrieved_items=retrieved,
             conversation_history=agent.conversation_history,
             user_input=effective_input,
+            working_set_context=working_set_context,
         )
         assistant_response = agent.generate_response(
             user_input=effective_input,

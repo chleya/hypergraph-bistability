@@ -587,13 +587,26 @@ This indicates your current "attention focus" - how distributed or focused your 
     def _extract_anthropic_text(self, response_body: Dict[str, Any]) -> str:
         content_blocks = response_body.get("content") or []
         text_parts: List[str] = []
+        thinking_parts: List[str] = []
+        
         for block in content_blocks:
             if not isinstance(block, dict):
                 continue
+            # Handle standard text type
             if block.get("type") == "text" and block.get("text"):
                 text_parts.append(str(block["text"]))
+            # Handle MiniMax thinking type
+            elif block.get("type") == "thinking" and block.get("thinking"):
+                thinking_parts.append(str(block["thinking"]))
+        
+        # Prefer text over thinking
         if text_parts:
             return "\n".join(text_parts).strip()
+        
+        # Fallback to thinking if no text (e.g., MiniMax with short responses)
+        if thinking_parts:
+            return "\n".join(thinking_parts).strip()
+        
         if response_body.get("error"):
             raise RuntimeError(str(response_body["error"]))
         raise RuntimeError(f"Anthropic response did not include text content: {response_body}")
@@ -2183,6 +2196,85 @@ This indicates your current "attention focus" - how distributed or focused your 
         lines.append("")
         lines.append(self.summarize_artifact_graph())
 
+        return "\n".join(lines)
+
+    def visualize_working_set(self) -> str:
+        """
+        Get a formatted view of the current working set using QueryLayer.
+        
+        Shows: current task, blockers, dominant conflict, active procedures,
+        and handoff readiness.
+        """
+        from hypergraph_bistability.agent.query import get_query_layer
+        
+        query = get_query_layer(self)
+        
+        lines = [
+            f"Working Set State for '{self.name}'",
+            "=" * 50,
+            ""
+        ]
+        
+        # Current task state
+        task_state = query.query_current_task_state()
+        lines.extend([
+            f"[TASK] {task_state.linked_task or '(none)'}",
+            f"  Status: {task_state.status} | Phase: {task_state.phase_summary}",
+            f"  Blockers: {task_state.blocker_count} | Decisions: {task_state.active_decisions_count} | Procedures: {task_state.active_procedures_count}",
+            ""
+        ])
+        
+        # Dominant conflict
+        conflict = query.query_dominant_conflict()
+        if conflict and conflict.has_conflict:
+            lines.extend([
+                "[CONFLICT] Dominant:",
+                f"  {conflict.dominant_hypothesis or '(none)'}",
+                f"  Contradicted: {len(conflict.contradicted_hypotheses)} hypotheses",
+                ""
+            ])
+        else:
+            lines.append("[OK] No active conflicts")
+            lines.append("")
+        
+        # Active decisions
+        decisions = query.query_decision_residue()
+        if decisions:
+            lines.append(f"[DECISIONS] Active ({len(decisions)}):")
+            for d in decisions[:3]:
+                lines.append(f"  - {d.decision_content[:60]}...")
+            if len(decisions) > 3:
+                lines.append(f"  ... and {len(decisions) - 3} more")
+            lines.append("")
+        
+        # Active procedures
+        procedures = query.query_applicable_procedures()
+        if procedures:
+            lines.append(f"[PROCEDURES] Active ({len(procedures)}):")
+            for p in procedures[:3]:
+                lines.append(f"  - [{p.phase}] {p.procedure_content[:50]}...")
+            if len(procedures) > 3:
+                lines.append(f"  ... and {len(procedures) - 3} more")
+            lines.append("")
+        
+        # Handoff readiness
+        handoff = query.query_handoff_bundle()
+        ready_count = len(handoff.ready_signals) if handoff else 0
+        blockers_count = len(handoff.blockers) if handoff else 0
+        lines.extend([
+            "[HANDOFF] Readiness:",
+            f"  Ready signals: {ready_count} | Blockers: {blockers_count} | Evidence: {len(handoff.evidence) if handoff else 0}",
+            ""
+        ])
+        
+        # Memory stats
+        stats = query.query_memory_stats()
+        summary = query.query_hypergraph_summary()
+        lines.extend([
+            "[STATS]",
+            f"  Turns: {stats['conversation_turns']} | Nodes: {summary['node_count']} | Hyperedges: {summary['hyperedge_count']}",
+        ])
+        
         return "\n".join(lines)
 
     @staticmethod

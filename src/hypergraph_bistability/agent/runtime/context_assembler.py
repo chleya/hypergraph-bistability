@@ -18,15 +18,22 @@ class ContextAssembler:
         retrieved_items: List[RetrievedMemory],
         conversation_history: List[Dict[str, str]],
         user_input: str,
+        working_set_context: str = "",
     ) -> List[Dict[str, str]]:
         extra_context = ""
         if retrieved_items:
             extra_context = f"\n\nRetrieved memory:\n{self._format_retrieved_sections(retrieved_items)}"
+        
+        # Add working-set context if available
+        ws_context = ""
+        if working_set_context:
+            ws_context = f"\n\n```json\n{working_set_context}\n```" if working_set_context else ""
         response_contract = (
             "\n\nResponse contract:\n"
             "- Do not output <think> tags or hidden reasoning.\n"
             "- If retrieved memory is relevant, use it explicitly in the answer.\n"
             "- Prioritize recalled preferences, tasks, and active issues over generic advice.\n"
+            "- If working-set JSON is provided, use its task/decisions/procedures data to inform your response.\n"
             "- If the user is resuming prior work, explicitly name the recalled task or issue before asking follow-up questions.\n"
             "- Do not give a purely generic clarifying question when a relevant task or issue was retrieved.\n"
             "- Keep the answer concise unless the user asks for detail."
@@ -37,7 +44,7 @@ class ContextAssembler:
         return [
             {
                 "role": "system",
-                "content": f"{system_prompt}\n\nCurrent memory state:\n{memory_context}{extra_context}{response_contract}",
+                "content": f"{system_prompt}\n\nCurrent memory state:\n{memory_context}{extra_context}{ws_context}{response_contract}",
             },
             *conversation_history[-5:],
             {"role": "user", "content": user_input},
