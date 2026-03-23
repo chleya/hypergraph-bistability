@@ -1549,11 +1549,19 @@ This indicates your current "attention focus" - how distributed or focused your 
     def get_working_set(self, linked_task: Optional[str] = None) -> Dict[str, Any]:
         """Derive a minimal working-set view from the current hypergraph state."""
         hypergraph_view = self.get_hypergraph_view()
-        resolved_task = linked_task or self._resolve_current_task(hypergraph_view)
+        # Priority: explicit task > stored task > resolved from hypergraph
+        # This ensures task continuity is preserved across turns
+        stored_task = getattr(self, '_current_linked_task', '')
         
-        # Store current linked_task for persistence
-        if resolved_task:
-            self._current_linked_task = resolved_task
+        # If explicit task is passed, always store it
+        if linked_task:
+            self._current_linked_task = linked_task
+            resolved_task = linked_task
+        else:
+            resolved_task = stored_task or self._resolve_current_task(hypergraph_view)
+            # Store resolved task for future continuity
+            if resolved_task:
+                self._current_linked_task = resolved_task
         
         nodes = [
             node for node in hypergraph_view.get("nodes", [])
