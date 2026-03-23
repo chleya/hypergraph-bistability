@@ -1553,8 +1553,15 @@ This indicates your current "attention focus" - how distributed or focused your 
         # This ensures task continuity is preserved across turns
         stored_task = getattr(self, '_current_linked_task', '')
         
-        # If explicit task is passed, always store it
+        # If explicit task is passed, always store it AND invalidate old snapshot if different
         if linked_task:
+            # If switching to a different task, invalidate old snapshot to prevent cross-task pollution
+            old_snapshot = getattr(self, '_handoff_snapshot', {})
+            old_snapshot_task = old_snapshot.get("linked_task", "")
+            if old_snapshot_task and old_snapshot_task != linked_task:
+                logger.info(f"Task switch detected ({old_snapshot_task} -> {linked_task}), invalidating old snapshot")
+                self._handoff_snapshot = {}
+            
             self._current_linked_task = linked_task
             resolved_task = linked_task
         else:
@@ -1715,27 +1722,51 @@ This indicates your current "attention focus" - how distributed or focused your 
     def query_handoff_bundle(self, linked_task: Optional[str] = None) -> Dict[str, Any]:
         """Return a compact handoff bundle derived from the current working set.
         
-        If runtime state is sparse (no linked_task, empty nodes), fall back to
-        persisted handoff_snapshot from last save to maintain continuity.
+        Fallback to persisted snapshot ONLY when:
+        1. No linked_task anchor in runtime AND
+        2. We're in restore phase (has persisted snapshot) AND  
+        3. Snapshot task matches current task anchor (or no anchor at all)
+        
+        Never fallback when:
+        - Runtime has fresh linked_task
+        - Snapshot is for a different task (prevents cross-task pollution)
+        - Snapshot is incomplete/stale
         """
         working_set = self.get_working_set(linked_task)
-        
-        # Check if runtime state is sparse - need fallback to persisted snapshot
-        runtime_sparse = (
-            not working_set.get("linked_task") or
-            len(working_set.get("active_nodes", [])) == 0 or
-            len(working_set.get("active_blockers", [])) == 0
-        )
-        
-        # Try to get persisted snapshot as fallback
         persisted = getattr(self, '_handoff_snapshot', {})
         
-        if runtime_sparse and persisted:
-            # Use persisted snapshot for continuity when runtime is sparse
-            logger.info("Using persisted handoff_snapshot for continuity (runtime state sparse)")
-            # Merge: use persisted but preserve current task if available
+        # Check if we should use fallback: only when NO anchor in runtime
+        runtime_has_anchor = bool(working_set.get("linked_task"))
+        
+        # Check snapshot relevance: only use if task matches or no runtime anchor
+        snapshot_task = persisted.get("linked_task", "")
+        current_task = working_set.get("linked_task", "")
+        
+        # Only use snapshot if: no runtime anchor OR task matches
+        task_relevant = not runtime_has_anchor or (snapshot_task and snapshot_task == current_task)
+        
+        # Minimum completeness check: snapshot must have meaningful data
+        snapshot_has_content = bool(
+            persisted.get("linked_task") and (
+                persisted.get("next_steps") or 
+                persisted.get("blockers") or 
+                persisted.get("active_decisions") or
+                persisted.get("evidence")
+            )
+        )
+        
+        should_fallback = (
+            not runtime_has_anchor and 
+            persisted and 
+            task_relevant and 
+            snapshot_has_content
+        )
+        
+        if should_fallback:
+            # Log fallback for debugging (NOT in return structure)
+            logger.info(f"Falling back to persisted snapshot for task: {snapshot_task}")
             return {
-                "linked_task": working_set.get("linked_task") or persisted.get("linked_task", ""),
+                "linked_task": snapshot_task,
                 "dominant_conflict": persisted.get("dominant_conflict"),
                 "active_decisions": persisted.get("active_decisions", []),
                 "applicable_procedures": persisted.get("applicable_procedures", []),
@@ -1743,7 +1774,6 @@ This indicates your current "attention focus" - how distributed or focused your 
                 "evidence": persisted.get("evidence", []),
                 "next_steps": persisted.get("next_steps", []),
                 "ready_signals": persisted.get("ready_signals", []),
-                "_fallback": True,  # Mark as fallback for debugging
             }
         
         # Normal path: derive from current runtime state

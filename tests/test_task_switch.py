@@ -72,16 +72,6 @@ class TestTaskSwitch:
         
         # Set task
         agent._current_linked_task = "persisted_task"
-        agent._handoff_snapshot = {
-            "linked_task": "persisted_task",
-            "blockers": ["blocker1"],
-            "next_steps": ["step1"],
-            "active_decisions": [],
-            "applicable_procedures": [],
-            "evidence": [],
-            "dominant_conflict": None,
-            "ready_signals": [],
-        }
         
         # Save
         with tempfile.NamedTemporaryFile(delete=False, suffix='.json') as f:
@@ -97,11 +87,6 @@ class TestTaskSwitch:
             # Task should be restored
             assert agent2._current_linked_task == "persisted_task"
             
-            # Query handoff should return persisted data
-            bundle = agent2.query_handoff_bundle()
-            assert bundle["linked_task"] == "persisted_task"
-            assert bundle["blockers"] == ["blocker1"]
-            
         finally:
             # Cleanup
             if os.path.exists(filepath):
@@ -110,19 +95,17 @@ class TestTaskSwitch:
             if os.path.exists(history):
                 os.remove(history)
                 
-    def test_fallback_uses_persisted_when_sparse(self):
-        """When runtime state is sparse, should fallback to persisted snapshot."""
+    def test_fallback_requires_no_runtime_anchor(self):
+        """Fallback only when NO linked_task in runtime, not just empty nodes."""
         from hypergraph_bistability.agent.hypergraph_agent import HypergraphAgent
-        import tempfile
-        import os
         
-        # Create agent with persisted snapshot
+        # Create agent with persisted snapshot for task_A
         agent = HypergraphAgent(k=4, L=2, name='test_fallback')
         agent.llm_api_key = 'test'
         
-        # Set persisted snapshot
+        # Set persisted snapshot for task_A
         agent._handoff_snapshot = {
-            "linked_task": "old_task",
+            "linked_task": "task_A",
             "blockers": ["old_blocker"],
             "next_steps": ["old_step"],
             "active_decisions": ["old_decision"],
@@ -132,15 +115,96 @@ class TestTaskSwitch:
             "ready_signals": ["signal1"],
         }
         
-        # Query handoff when runtime is sparse (no current task)
-        # Since _current_linked_task is empty and hypergraph is empty
+        # Query handoff when runtime has task_B (fresh anchor)
+        agent._current_linked_task = "task_B"
         bundle = agent.query_handoff_bundle()
         
-        # Should fallback to persisted
-        assert bundle.get("_fallback") == True
-        assert bundle["blockers"] == ["old_blocker"]
-        assert bundle["next_steps"] == ["old_step"]
-        assert bundle["active_decisions"] == ["old_decision"]
+        # Should NOT fallback - runtime has fresh anchor
+        assert bundle["linked_task"] == "task_B"
+        
+    def test_fallback_blocked_for_different_task(self):
+        """Fallback blocked when snapshot task differs from runtime task."""
+        from hypergraph_bistability.agent.hypergraph_agent import HypergraphAgent
+        
+        # Create agent with persisted snapshot for task_A
+        agent = HypergraphAgent(k=4, L=2, name='test_diff_task')
+        agent.llm_api_key = 'test'
+        
+        # Set persisted snapshot for task_A
+        agent._handoff_snapshot = {
+            "linked_task": "task_A",
+            "blockers": ["old_blocker"],
+            "next_steps": ["old_step"],
+            "active_decisions": [],
+            "applicable_procedures": [],
+            "evidence": [],
+            "dominant_conflict": None,
+            "ready_signals": [],
+        }
+        
+        # Set current task to task_B (different from snapshot)
+        agent._current_linked_task = "task_B"
+        
+        # Query handoff - should NOT use snapshot from different task
+        bundle = agent.query_handoff_bundle()
+        
+        # Should return task_B, not task_A's snapshot
+        assert bundle["linked_task"] == "task_B"
+        
+    def test_task_switch_invalidates_old_snapshot(self):
+        """Switching to new task should invalidate old snapshot."""
+        from hypergraph_bistability.agent.hypergraph_agent import HypergraphAgent
+        
+        agent = HypergraphAgent(k=4, L=2, name='test_switch')
+        agent.llm_api_key = 'test'
+        
+        # Set initial task with snapshot
+        agent._current_linked_task = "task_A"
+        agent._handoff_snapshot = {
+            "linked_task": "task_A",
+            "blockers": ["blocker_A"],
+            "next_steps": [],
+            "active_decisions": [],
+            "applicable_procedures": [],
+            "evidence": [],
+            "dominant_conflict": None,
+            "ready_signals": [],
+        }
+        
+        # Switch to new task
+        agent.get_working_set(linked_task="task_B")
+        
+        # Old snapshot should be invalidated
+        assert agent._handoff_snapshot == {}
+        
+    def test_fallback_uses_snapshot_when_no_runtime_anchor(self):
+        """Fallback uses snapshot when runtime has NO anchor at all."""
+        from hypergraph_bistability.agent.hypergraph_agent import HypergraphAgent
+        
+        agent = HypergraphAgent(k=4, L=2, name='test_no_anchor')
+        agent.llm_api_key = 'test'
+        
+        # Set persisted snapshot but NO runtime anchor
+        agent._handoff_snapshot = {
+            "linked_task": "previous_task",
+            "blockers": ["blocker1"],
+            "next_steps": ["step1"],
+            "active_decisions": ["decision1"],
+            "applicable_procedures": [],
+            "evidence": [],
+            "dominant_conflict": None,
+            "ready_signals": [],
+        }
+        
+        # No runtime task set
+        agent._current_linked_task = ""
+        
+        # Query handoff - should use snapshot since no runtime anchor
+        bundle = agent.query_handoff_bundle()
+        
+        # Should use persisted snapshot
+        assert bundle["linked_task"] == "previous_task"
+        assert bundle["blockers"] == ["blocker1"]
 
 
 if __name__ == "__main__":
