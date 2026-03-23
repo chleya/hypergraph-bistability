@@ -12,7 +12,7 @@
 | 3 | 评测主线固定 | ✅ | 3 条正式门禁已定义 |
 | 4 | 文档状态管理 | ✅ | current/specs/history 已建立 |
 | 5 | 根目录产物归位 | ✅ | JSON/DB 已在 results/artifacts |
-| 6 | Memory 抽象统一 | ⏳ | 4 层职责需明确 |
+| 6 | Memory 抽象统一 | ✅ | 4 层职责已明确 |
 | 7 | Query Layer 正式接口 | ⏳ | 需升格为稳定 API |
 | 8 | 大文件拆分 | ⏳ | hypergraph_agent.py 需拆分 |
 | 9 | 研究 vs 产品分开表述 | ⏳ | 文档需区分层次 |
@@ -119,7 +119,16 @@ from core import Y       # → from hypergraph_bistability.core import Y
 
 ## 3. 已实现功能
 
-### Memory Pipeline
+### Memory Pipeline (4 层抽象)
+
+| 抽象层 | 职责 | 代码位置 |
+|--------|------|----------|
+| **AgentMemory** | 在线运行态，LLM 集成 | memory/agent_memory.py, memory/llm_memory.py |
+| **DurableMemory** | 持久化记忆对象层 | memory/durable_memory.py |
+| **UnifiedNode** | 统一知识/技能节点 | memory/unified_node.py |
+| **IntegratedAgentMemory** | 组合入口 | memory/integrated_memory.py |
+
+#### Policies (策略层)
 
 | 功能 | 状态 | 代码位置 |
 |------|------|----------|
@@ -127,9 +136,6 @@ from core import Y       # → from hypergraph_bistability.core import Y
 | Retrieval Policy | ✅ | memory/policies/retrieval_policy.py |
 | Decay Policy | ✅ | memory/policies/decay_policy.py |
 | Promotion Policy | ✅ | memory/policies/promotion_policy.py |
-| Working Memory | ✅ | memory/unified_node.py (Layer 0) |
-| Episodic Memory | ✅ | memory/durable_memory.py (Layer 1) |
-| Durable Memory | ✅ | memory/durable_memory.py (Layer 2) |
 
 ### Query Layer
 
