@@ -22,12 +22,12 @@
 - → 新增: persistence/ (会话管理)
 - → 新增: query/ (工作集查询 - 已在 agent/query.py)
 | 9 | 研究 vs 产品分开表述 | ✅ | 已区分三层表述 |
-| 10 | MiniMax/Windows 封装 | ⏳ 需新建 integration/ 模块 |
+| 10 | MiniMax/Windows 封装 | ✅ integrations/ 模块已存在 |
 
-**计划**:
-- 新建: integrations/ 目录
-- 封装: PowerShell fallback, 编码处理, 错误诊断
-- 独立测试: integration surface
+**现状**:
+- integrations/llm.py: LLM 代理适配
+- integrations/embeddings.py: 向量嵌入适配
+- 需补充: PowerShell fallback, 编码处理, 错误诊断
 
 ---
 
