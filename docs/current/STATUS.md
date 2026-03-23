@@ -3,9 +3,28 @@
 > Last updated: 2026-03-23
 > 状态: ✅ Current
 
+## 0. 收敛任务清单 (2026-03-23)
+
+| # | 任务 | 状态 | 说明 |
+|---|------|------|------|
+| 1 | 项目身份收窄为一句话 | ⏳ | 定义唯一主线描述 |
+| 2 | 唯一真相层 | ✅ | src/hypergraph_bistability/ 已确认 |
+| 3 | 评测主线固定 | ⏳ | 3 条正式门禁 |
+| 4 | 文档状态管理 | ✅ | current/specs/history 已建立 |
+| 5 | 根目录产物归位 | ✅ | JSON/DB 已在 results/artifacts |
+| 6 | Memory 抽象统一 | ⏳ | 4 层职责需明确 |
+| 7 | Query Layer 正式接口 | ⏳ | 需升格为稳定 API |
+| 8 | 大文件拆分 | ⏳ | hypergraph_agent.py 需拆分 |
+| 9 | 研究 vs 产品分开表述 | ⏳ | 文档需区分层次 |
+| 10 | MiniMax/Windows 封装 | ⏳ | 需独立 integration 模块 |
+
+---
+
 ## 1. 项目概述
 
-### 定位
+### 定位 (一句话)
+
+> **这是一个以 stable_v1 为主线的 agent working-memory runtime，研究代码是配套验证层。**
 
 - **研究层**: 超图竞争动力学 + 复杂性重建理论
 - **产品层**: Agent 工作记忆基础设施
