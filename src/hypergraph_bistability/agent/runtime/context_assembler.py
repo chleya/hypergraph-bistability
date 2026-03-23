@@ -41,7 +41,31 @@ class ContextAssembler:
             "next_step_reference": False,
             "decision_reference": False,
             "content_quality": "good",  # good/weak/bad
+            "is_generic_template": False,
         }
+        
+        # ===== Check for generic templates FIRST - these are automatic fails =====
+        generic_template_patterns = [
+            "based on your input",
+            "here's my recommendation",
+            "[focused mode",
+            "focused mode,", 
+            "i can help with",
+            "i'd be happy to",
+            "certainly!",
+            "of course!",
+            "great question",
+            "thanks for asking",
+            "as requested",
+            "let me know if you need",
+        ]
+        
+        for pattern in generic_template_patterns:
+            if pattern in response_lower:
+                result["is_generic_template"] = True
+                result["status"] = "fail"
+                result["reason"] = "generic_template_detected"
+                return result
         
         # ===== Check if there's anything to validate against =====
         has_task = bool(handoff_bundle.get("linked_task"))
@@ -80,60 +104,85 @@ class ContextAssembler:
             # else "good"
         
         # ===== Task reference check =====
+        # FIXED: Be stricter - must match full task phrase OR at least 1 significant word (or 2 if available)
         if has_task:
             linked_task = handoff_bundle.get("linked_task", "")
-            task_words = linked_task.lower().replace("_", " ").split()
-            # Must match at least one significant word from task name
-            result["task_reference"] = any(
-                tw in response_lower for tw in task_words if len(tw) > 3
-            )
+            task_lower = linked_task.lower().replace("_", " ")
+            task_words = [w for w in task_lower.split() if len(w) > 3]
+            
+            # Must either:
+            # 1. Match full task phrase in response, OR
+            # 2. Match at least 1 significant word (if only 1 exists), or 2 (if 2+ exist)
+            exact_match = task_lower in response_lower
+            word_matches = sum(1 for tw in task_words if tw in response_lower)
+            min_required = 1 if len(task_words) <= 1 else 2
+            result["task_reference"] = exact_match or word_matches >= min_required
         
         # ===== Blocker reference check =====
+        # FIXED: Be stricter - require matching specific blocker content, not just generic words
         if has_blockers:
             blockers = handoff_bundle.get("blockers", [])
             blocker_keywords = set()
+            blocker_phrases = []  # Store full phrases for exact matching
             for blocker in blockers:
                 content = blocker if isinstance(blocker, str) else blocker.get("content", "")
                 if content:
+                    blocker_phrases.append(content.lower())
                     # Extract significant words (length > 4, not common words)
                     for w in content.lower().split():
-                        if len(w) > 4 and w not in {"which", "what", "where", "when", "there", "their", "these", "those"}:
+                        if len(w) > 4 and w not in {"which", "what", "where", "when", "there", "their", "these", "those", "about", "could", "would", "should", "might"}:
                             blocker_keywords.add(w)
             
-            # Must match at least 2 keywords from blockers
-            matched = sum(1 for kw in list(blocker_keywords)[:10] if kw in response_lower)
-            result["blocker_reference"] = matched >= 2
+            # Must match at least 2 keywords OR at least 1 exact phrase from blockers
+            exact_phrase_match = any(phrase in response_lower for phrase in blocker_phrases)
+            keyword_matches = sum(1 for kw in list(blocker_keywords)[:10] if kw in response_lower)
+            result["blocker_reference"] = exact_phrase_match or keyword_matches >= 2
         
         # ===== Next step reference check =====
+        # FIXED: Same stricter logic as blockers
         if has_next_steps:
             next_steps = handoff_bundle.get("next_steps", [])
             step_keywords = set()
+            step_phrases = []
             for step in next_steps:
                 content = step if isinstance(step, str) else step.get("content", "")
                 if content:
+                    step_phrases.append(content.lower())
                     for w in content.lower().split():
-                        if len(w) > 4 and w not in {"which", "what", "where", "when", "there", "their", "these", "those"}:
+                        if len(w) > 4 and w not in {"which", "what", "where", "when", "there", "their", "these", "those", "about", "could", "would", "should", "might"}:
                             step_keywords.add(w)
             
-            matched = sum(1 for kw in list(step_keywords)[:10] if kw in response_lower)
-            result["next_step_reference"] = matched >= 2
+            exact_phrase_match = any(phrase in response_lower for phrase in step_phrases)
+            keyword_matches = sum(1 for kw in list(step_keywords)[:10] if kw in response_lower)
+            result["next_step_reference"] = exact_phrase_match or keyword_matches >= 2
         
         # ===== Decision reference check =====
+        # FIXED: Same stricter logic as blockers
         if has_decisions:
             decisions = handoff_bundle.get("active_decisions", [])
             decision_keywords = set()
+            decision_phrases = []
             for decision in decisions:
                 content = decision if isinstance(decision, str) else decision.get("content", "")
                 if content:
+                    decision_phrases.append(content.lower())
                     for w in content.lower().split():
-                        if len(w) > 4 and w not in {"which", "what", "where", "when", "there", "their", "these", "those"}:
+                        if len(w) > 4 and w not in {"which", "what", "where", "when", "there", "their", "these", "those", "about", "could", "would", "should", "might"}:
                             decision_keywords.add(w)
             
-            matched = sum(1 for kw in list(decision_keywords)[:10] if kw in response_lower)
-            result["decision_reference"] = matched >= 2
+            exact_phrase_match = any(phrase in response_lower for phrase in decision_phrases)
+            keyword_matches = sum(1 for kw in list(decision_keywords)[:10] if kw in response_lower)
+            result["decision_reference"] = exact_phrase_match or keyword_matches >= 2
         
         # ===== Determine final status =====
-        # Count how many elements were referenced
+        # FIXED: Stricter criteria - strong_pass requires task + at least one substantive reference
+        has_task_ref = result["task_reference"]
+        has_substantive_ref = (
+            result["blocker_reference"] or 
+            result["next_step_reference"] or 
+            result["decision_reference"]
+        )
+        
         references = [
             result["task_reference"],
             result["blocker_reference"],
@@ -148,17 +197,22 @@ class ContextAssembler:
         elif reference_count == 0:
             result["status"] = "fail"
             result["reason"] = "no_reference_found"
-        elif reference_count == 1:
-            # Only one element referenced - weak pass
+        elif reference_count == 1 or not has_substantive_ref:
+            # Only task reference or no substantive reference = weak pass
             result["status"] = "weak_pass"
-            result["reason"] = f"single_element_reference"
-        elif reference_count >= 2:
+            result["reason"] = f"insufficient_continuity_{reference_count}_elements"
+        elif has_task_ref and has_substantive_ref:
+            # Must have BOTH task AND at least one substantive reference for strong_pass
             if result["content_quality"] == "good":
                 result["status"] = "strong_pass"
-                result["reason"] = f"multiple_references_{reference_count}_elements"
+                result["reason"] = f"task_plus_substantive_{reference_count}_elements"
             else:
                 result["status"] = "weak_pass"
-                result["reason"] = f"multiple_references_{reference_count}_elements_weak_content"
+                result["reason"] = f"task_plus_substantive_{reference_count}_elements_weak_content"
+        else:
+            # Has substantive but no task - still weak
+            result["status"] = "weak_pass"
+            result["reason"] = f"no_task_reference_{reference_count}_elements"
         
         return result
 
