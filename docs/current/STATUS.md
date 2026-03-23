@@ -21,7 +21,7 @@
 - → 新增: graph/ (图构建 + 图视图)
 - → 新增: persistence/ (会话管理)
 - → 新增: query/ (工作集查询 - 已在 agent/query.py)
-| 9 | 研究 vs 产品分开表述 | ⏳ | 文档需区分层次 |
+| 9 | 研究 vs 产品分开表述 | ✅ | 已区分三层表述 |
 | 10 | MiniMax/Windows 封装 | ⏳ | 需独立 integration 模块 |
 
 ---
@@ -35,7 +35,7 @@
 - **研究层**: 超图竞争动力学 + 复杂性重建理论
 - **产品层**: Agent 工作记忆基础设施
 
-### 核心理论贡献
+### 核心理论贡献 (Validated Mechanism)
 
 | 理论 | 状态 | 描述 |
 |------|------|------|
@@ -43,6 +43,18 @@
 | 阶跃-响应循环 | ✅ | 差异响应机制，复杂度守恒 |
 | 原地重建 | ✅ | 96.4% 核心结构为新生成，非输运 |
 | 多稳态扩展 | ✅ | N_att = 2^{k×L}, λ_c ≈ 0.70/k² |
+
+### Runtime 能力 (Runtime-Enabled Capability)
+
+- Query Layer 工作集查询
+- Working Set Context Injection
+- Continuity Metrics 评估
+
+### 产品行为 (Production-Ready Behavior)
+
+- stable_v1 runtime
+- CLI 接口
+- Product/Long-task/Conflict 回归测试
 
 ### 产品验收
 
