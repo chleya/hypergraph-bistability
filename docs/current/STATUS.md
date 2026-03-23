@@ -9,7 +9,7 @@
 |---|------|------|------|
 | 1 | 项目身份收窄为一句话 | ⏳ | 定义唯一主线描述 |
 | 2 | 唯一真相层 | ✅ | src/hypergraph_bistability/ 已确认 |
-| 3 | 评测主线固定 | ⏳ | 3 条正式门禁 |
+| 3 | 评测主线固定 | ✅ | 3 条正式门禁已定义 |
 | 4 | 文档状态管理 | ✅ | current/specs/history 已建立 |
 | 5 | 根目录产物归位 | ✅ | JSON/DB 已在 results/artifacts |
 | 6 | Memory 抽象统一 | ⏳ | 4 层职责需明确 |
@@ -153,15 +153,36 @@ from core import Y       # → from hypergraph_bistability.core import Y
 | MiniMax 集成 | ✅ | scripts/ |
 | Query API CLI (/ws) | ✅ | cli.py |
 
-### Evaluation
+### Evaluation (评测主线)
 
-| 功能 | 状态 | 代码位置 |
-|------|------|----------|
-| Continuity Metrics | ✅ | evals/metrics.py |
-| Practical Regression | ✅ | evals/scenarios.py |
-| Product Regression | ✅ | evals/runner.py |
-| Long-Task Regression | ✅ | evals/runner.py |
-| Conflict Regression | ✅ | evals/runner.py |
+#### 正式门禁 (3 条)
+
+| 回归测试 | CLI 命令 | 状态 |
+|----------|----------|------|
+| Product Regression | `run-product-regression` | ✅ |
+| Long-Task Regression | `run-long-task-regression` | ✅ |
+| Conflict Practical Regression | `run-conflict-regression` | ✅ |
+
+#### Sidecar (降级)
+
+以下不再是正式门禁，仅供实验验证：
+
+| 回归测试 | CLI 命令 | 说明 |
+|----------|----------|------|
+| Continuity Regression | `run-continuity-regression` | 已合并到 product |
+| Practical Sidecar | `run-practical-sidecar-regression` | 实验性质 |
+| Conflict Sidecar | `run-conflict-sidecar-regression` | 实验性质 |
+| Practical Robustness | `run-practical-robustness-regression` | 实验性质 |
+| Mechanism Experiment | `run-mechanism-experiment` | 纯研究 |
+
+#### 运行命令
+
+```bash
+# 正式门禁
+python -m hypergraph_bistability.cli run-product-regression
+python -m hypergraph_bistability.cli run-long-task-regression
+python -m hypergraph_bistability.cli run-conflict-regression
+```
 
 ---
 
