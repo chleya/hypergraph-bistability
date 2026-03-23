@@ -14,128 +14,153 @@ class ContextAssembler:
         self,
         response: str,
         handoff_bundle: Dict[str, Any],
-        require_task_reference: bool = True,
-    ) -> Dict[str, bool]:
-        """Validate that response references key elements from handoff bundle.
+    ) -> Dict[str, Any]:
+        """Validate that response demonstrates meaningful continuity with handoff bundle.
+        
+        Returns a structured result with three-state classification:
+        - not_applicable: No handoff data to validate against
+        - weak_pass: Some continuity but very shallow (keyword matches only)
+        - strong_pass: Substantive continuity (specific details, next actions)
+        - fail: No meaningful continuity detected
         
         Args:
             response: The LLM response to validate
             handoff_bundle: The handoff bundle containing continuity data
-            require_task_reference: If True, task name must be referenced
             
         Returns:
-            Dict with validation results for each element type
+            Dict with status, reason, and detailed scores
         """
         response_lower = response.lower()
+        words = response_lower.split()
         
-        results = {}
+        result = {
+            "status": "fail",  # Default to fail
+            "reason": "",
+            "task_reference": False,
+            "blocker_reference": False,
+            "next_step_reference": False,
+            "decision_reference": False,
+            "content_quality": "good",  # good/weak/bad
+        }
+        
+        # ===== Check if there's anything to validate against =====
+        has_task = bool(handoff_bundle.get("linked_task"))
+        has_blockers = bool(handoff_bundle.get("blockers"))
+        has_next_steps = bool(handoff_bundle.get("next_steps"))
+        has_decisions = bool(handoff_bundle.get("active_decisions"))
+        
+        if not any([has_task, has_blockers, has_next_steps, has_decisions]):
+            result["status"] = "not_applicable"
+            result["reason"] = "no_continuity_material"
+            return result
         
         # ===== Weak content detection =====
-        # Detect placeholder/weak content that doesn't provide actual value
         weak_patterns = [
             "tbd", "to be determined", "to be decided",
-            "look into it", "looking into it", "will look",
+            "look into", "looking into", "will look",
             "need to", "need more", "require more",
             "pending", "in progress", "to do",
             "not sure", "unsure", "don't know",
             "later", "after", "before",
             "will do", "going to", "plan to",
+            "we should", "let's", "let us",
+            "maybe", "perhaps", "possibly",
         ]
         
-        # Check if response is mostly weak content
-        weak_count = sum(1 for pattern in weak_patterns if pattern in response_lower)
-        words = response_lower.split()
+        # Count weak patterns
+        weak_count = sum(1 for p in weak_patterns if p in response_lower)
         significant_words = [w for w in words if len(w) > 4]
         
-        # If more than 30% of significant words are weak patterns, flag it
-        results["has_weak_content"] = weak_count < len(significant_words) * 0.3 if significant_words else False
+        if significant_words:
+            weak_ratio = weak_count / len(significant_words)
+            if weak_ratio > 0.4:
+                result["content_quality"] = "bad"
+            elif weak_ratio > 0.2:
+                result["content_quality"] = "weak"
+            # else "good"
         
-        # ===== Task reference =====
-        linked_task = handoff_bundle.get("linked_task", "")
-        if linked_task:
-            task_mentioned = linked_task.lower() in response_lower or any(
-                word in response_lower for word in linked_task.lower().replace("_", " ").split()
+        # ===== Task reference check =====
+        if has_task:
+            linked_task = handoff_bundle.get("linked_task", "")
+            task_words = linked_task.lower().replace("_", " ").split()
+            # Must match at least one significant word from task name
+            result["task_reference"] = any(
+                tw in response_lower for tw in task_words if len(tw) > 3
             )
-            results["task_reference"] = task_mentioned
-        else:
-            results["task_reference"] = True  # No task to reference
         
-        # ===== Blocker reference - handle both string and dict formats =====
-        blockers = handoff_bundle.get("blockers", [])
-        if blockers:
-            blocker_referenced = False
+        # ===== Blocker reference check =====
+        if has_blockers:
+            blockers = handoff_bundle.get("blockers", [])
+            blocker_keywords = set()
             for blocker in blockers:
-                # Handle both string and dict formats
-                if isinstance(blocker, str):
-                    content = blocker
-                elif isinstance(blocker, dict):
-                    content = blocker.get("content", "")
-                else:
-                    continue
-                    
+                content = blocker if isinstance(blocker, str) else blocker.get("content", "")
                 if content:
-                    # Check if any significant word from blocker appears
-                    key_words = [w for w in content.lower().split() if len(w) > 4]
-                    blocker_referenced = any(word in response_lower for word in key_words[:3])
-                    if blocker_referenced:
-                        break
-            results["blocker_reference"] = blocker_referenced
-        else:
-            results["blocker_reference"] = True
+                    # Extract significant words (length > 4, not common words)
+                    for w in content.lower().split():
+                        if len(w) > 4 and w not in {"which", "what", "where", "when", "there", "their", "these", "those"}:
+                            blocker_keywords.add(w)
+            
+            # Must match at least 2 keywords from blockers
+            matched = sum(1 for kw in list(blocker_keywords)[:10] if kw in response_lower)
+            result["blocker_reference"] = matched >= 2
         
-        # ===== Next step reference - handle both string and dict formats =====
-        next_steps = handoff_bundle.get("next_steps", [])
-        if next_steps:
-            step_referenced = False
+        # ===== Next step reference check =====
+        if has_next_steps:
+            next_steps = handoff_bundle.get("next_steps", [])
+            step_keywords = set()
             for step in next_steps:
-                if isinstance(step, str):
-                    content = step
-                elif isinstance(step, dict):
-                    content = step.get("content", "")
-                else:
-                    continue
-                    
+                content = step if isinstance(step, str) else step.get("content", "")
                 if content:
-                    key_words = [w for w in content.lower().split() if len(w) > 4]
-                    step_referenced = any(word in response_lower for word in key_words[:3])
-                    if step_referenced:
-                        break
-            results["next_step_reference"] = step_referenced
-        else:
-            results["next_step_reference"] = True
+                    for w in content.lower().split():
+                        if len(w) > 4 and w not in {"which", "what", "where", "when", "there", "their", "these", "those"}:
+                            step_keywords.add(w)
+            
+            matched = sum(1 for kw in list(step_keywords)[:10] if kw in response_lower)
+            result["next_step_reference"] = matched >= 2
         
-        # ===== Decision reference - handle both string and dict formats =====
-        decisions = handoff_bundle.get("active_decisions", [])
-        if decisions:
-            decision_referenced = False
+        # ===== Decision reference check =====
+        if has_decisions:
+            decisions = handoff_bundle.get("active_decisions", [])
+            decision_keywords = set()
             for decision in decisions:
-                if isinstance(decision, str):
-                    content = decision
-                elif isinstance(decision, dict):
-                    content = decision.get("content", "")
-                else:
-                    continue
-                    
+                content = decision if isinstance(decision, str) else decision.get("content", "")
                 if content:
-                    key_words = [w for w in content.lower().split() if len(w) > 4]
-                    decision_referenced = any(word in response_lower for word in key_words[:3])
-                    if decision_referenced:
-                        break
-            results["decision_reference"] = decision_referenced
-        else:
-            results["decision_reference"] = True
+                    for w in content.lower().split():
+                        if len(w) > 4 and w not in {"which", "what", "where", "when", "there", "their", "these", "those"}:
+                            decision_keywords.add(w)
+            
+            matched = sum(1 for kw in list(decision_keywords)[:10] if kw in response_lower)
+            result["decision_reference"] = matched >= 2
         
-        # ===== Overall pass/fail =====
-        # Must have: no weak content AND at least one of (task, blocker, next_step, decision) referenced
-        has_any_reference = (
-            results.get("task_reference", False) or
-            results.get("blocker_reference", False) or
-            results.get("next_step_reference", False) or
-            results.get("decision_reference", False)
-        )
-        results["passed"] = results.get("has_weak_content", True) and has_any_reference
+        # ===== Determine final status =====
+        # Count how many elements were referenced
+        references = [
+            result["task_reference"],
+            result["blocker_reference"],
+            result["next_step_reference"],
+            result["decision_reference"],
+        ]
+        reference_count = sum(references)
         
-        return results
+        if result["content_quality"] == "bad":
+            result["status"] = "fail"
+            result["reason"] = "too_much_weak_content"
+        elif reference_count == 0:
+            result["status"] = "fail"
+            result["reason"] = "no_reference_found"
+        elif reference_count == 1:
+            # Only one element referenced - weak pass
+            result["status"] = "weak_pass"
+            result["reason"] = f"single_element_reference"
+        elif reference_count >= 2:
+            if result["content_quality"] == "good":
+                result["status"] = "strong_pass"
+                result["reason"] = f"multiple_references_{reference_count}_elements"
+            else:
+                result["status"] = "weak_pass"
+                result["reason"] = f"multiple_references_{reference_count}_elements_weak_content"
+        
+        return result
 
     def build_messages(
         self,

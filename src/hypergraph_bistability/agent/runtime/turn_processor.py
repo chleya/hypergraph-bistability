@@ -54,24 +54,32 @@ class TurnProcessor:
         
         # Skip if no working set context (empty string)
         if not working_set_context:
-            self._last_handoff_validation = {"skipped": "no_working_set_context"}
+            self._last_handoff_validation = {"status": "not_applicable", "reason": "no_working_set_context"}
             return
         
         # Skip if response is empty (shouldn't happen but just in case)
         if not assistant_response:
-            self._last_handoff_validation = {"skipped": "empty_response"}
+            self._last_handoff_validation = {"status": "not_applicable", "reason": "empty_response"}
             return
         
         try:
             # Parse the working set context
             ws_data = json.loads(working_set_context)
             
-            # Skip if the parsed context is empty (no task, no blockers, etc.)
+            # Skip if the parsed context is empty - but this is now "not_applicable", not pass!
             if not ws_data or not ws_data.get("task"):
-                self._last_handoff_validation = {"skipped": "empty_working_set_data"}
-                return
+                # Has no task but might have blockers/decisions/evidence - still validate if present
+                has_continuity_material = (
+                    ws_data.get("blockers") or 
+                    ws_data.get("active_decisions") or 
+                    ws_data.get("applicable_procedures")
+                )
+                if not has_continuity_material:
+                    self._last_handoff_validation = {"status": "not_applicable", "reason": "empty_handoff_data"}
+                    return
+                # Fall through to validate if there are continuity materials but no task
         except json.JSONDecodeError:
-            self._last_handoff_validation = {"skipped": "invalid_json"}
+            self._last_handoff_validation = {"status": "not_applicable", "reason": "invalid_json"}
             return
         
         # Get handoff bundle from agent
@@ -86,17 +94,19 @@ class TurnProcessor:
             
             self._last_handoff_validation = result
             
-            # Log warning if validation failed
-            if not result.get("passed", True):
+            # Log warning for failures and weak passes
+            status = result.get("status", "fail")
+            if status in ["fail", "weak_pass"]:
                 logger.warning(
-                    f"Handoff continuity validation failed: "
+                    f"Handoff continuity {status}: {result.get('reason', 'unknown')}, "
                     f"task={result.get('task_reference')}, "
                     f"blocker={result.get('blocker_reference')}, "
                     f"next_step={result.get('next_step_reference')}, "
-                    f"decision={result.get('decision_reference')}"
+                    f"decision={result.get('decision_reference')}, "
+                    f"quality={result.get('content_quality')}"
                 )
         else:
-            self._last_handoff_validation = {"skipped": "no_context_assembler"}
+            self._last_handoff_validation = {"status": "not_applicable", "reason": "no_context_assembler"}
 
     def _generate_working_set_context(self, agent) -> str:
         """Generate working-set context string for prompt injection (JSON format)."""
