@@ -1,0 +1,269 @@
+{
+  "schema_version": 2,
+  "system_prompt": "You are an AI assistant with a unique memory system based on physics.\n\nYour memory is organized as a k?L matrix where:\n- k groups represent different aspects (work, personal, technical, etc.)\n- L layers represent different dimensions (current context, preferences, etc.)\n\nYour responses should:\n1. Be concise and helpful\n2. Draw on the active memory contexts when relevant\n3. Adapt your level of detail based on the topic\n4. Use concrete remembered details when they are relevant to the user's request\n5. Never reveal hidden reasoning, chain-of-thought, or <think> tags\n6. If retrieved memory includes preferences, follow them in the answer style\n7. If retrieved memory includes an active task or issue, mention it directly rather than replying generically\n8. When a retrieved preference implies an explicit response format, follow that format literally\n9. Prefer explicit recalled phrases like \"Root cause hypothesis:\" or \"Diff-style summary:\" when the memory contract calls for them\n\nMemory state is shown in parentheses like (?=0.02, r=0.5, regime=moderate-coupling).\nThis indicates your current \"attention focus\" - how distributed or focused your responses are.\n",
+  "conversation_history": [
+    {
+      "role": "user",
+      "content": "Task: implement API rate limiter"
+    },
+    {
+      "role": "assistant",
+      "content": "[Focused mode, \u03bb=0.0371] Based on your input, here's my recommendation: ..."
+    },
+    {
+      "role": "user",
+      "content": "Blocker: need to understand rate limit patterns"
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "Decision: use token bucket algorithm"
+    },
+    {
+      "role": "assistant",
+      "content": "[Focused mode, \u03bb=0.0371] Based on your input, here's my recommendation: ..."
+    }
+  ],
+  "turn_log": [
+    {
+      "user_input": "Task: implement API rate limiter",
+      "assistant_response": "[Focused mode, \u03bb=0.0371] Based on your input, here's my recommendation: ...",
+      "memory_context": "[Memory State: neutral]\nActive contexts: group_3: Task: implement API rate limiter\n(\u03bb=0.037, \u03bb_c\u22480.044, r=0.85, regime=approaching-critical)",
+      "conflict_level": 0.0,
+      "retrieved_items": [],
+      "retrieved_detail": [],
+      "writes": [
+        {
+          "should_write": true,
+          "group": 3,
+          "layer": 0,
+          "importance": 0.4625,
+          "kind": "task",
+          "reason": "user:task",
+          "content": "Task: implement API rate limiter",
+          "activate": true,
+          "artifact_type": null,
+          "artifact_id": null,
+          "linked_task": null,
+          "relation_type": null,
+          "parent_artifact_id": null,
+          "node_type": "task",
+          "hyperedge_type": "task_hyperedge",
+          "hyperedge_id": "task_hyperedge_ee6017e508",
+          "confidence_tag": "verified",
+          "task_phase": "analysis",
+          "procedure_type": null,
+          "reusability_class": "instance_only"
+        }
+      ],
+      "controller_state": {
+        "mode": "focused",
+        "lambda_ratio": 0.85,
+        "lambda_value": 0.037136499999999996,
+        "mu": 0.0,
+        "turns": 1,
+        "topic_changes": 0,
+        "avg_conflict": 0.0,
+        "pending_decision": false,
+        "is_oscillating": false,
+        "pending_questions": 0
+      }
+    },
+    {
+      "user_input": "Blocker: need to understand rate limit patterns",
+      "assistant_response": "",
+      "memory_context": "[Memory State: neutral]\nActive contexts: group_0: Blocker: need to understand rate limit patterns, group_1, group_2, group_3: Task: implement API rate limiter\n(\u03bb=0.013, \u03bb_c\u22480.044, r=0.30, regime=multi-attractor)",
+      "conflict_level": 0.0,
+      "retrieved_items": [
+        "Task: implement API rate limiter"
+      ],
+      "retrieved_detail": [
+        {
+          "source": "turn_log",
+          "content": "Task: implement API rate limiter",
+          "score": 0.9724999999999999,
+          "kind": "task",
+          "group": 3,
+          "layer": 0,
+          "artifact_type": null,
+          "artifact_id": null,
+          "linked_task": null,
+          "relation_type": null,
+          "parent_artifact_id": null,
+          "node_type": "task",
+          "hyperedge_type": "task_hyperedge",
+          "hyperedge_id": "task_hyperedge_ee6017e508",
+          "hyperedge_status": "active",
+          "confidence_tag": "verified",
+          "task_phase": "analysis",
+          "procedure_type": null,
+          "reusability_class": "instance_only"
+        }
+      ],
+      "writes": [
+        {
+          "should_write": true,
+          "group": 0,
+          "layer": 0,
+          "importance": 0.48750000000000004,
+          "kind": "task",
+          "reason": "user:task",
+          "content": "Blocker: need to understand rate limit patterns",
+          "activate": true,
+          "artifact_type": null,
+          "artifact_id": null,
+          "linked_task": null,
+          "relation_type": null,
+          "parent_artifact_id": null,
+          "node_type": "task",
+          "hyperedge_type": "task_hyperedge",
+          "hyperedge_id": "task_hyperedge_967bc693e0",
+          "confidence_tag": "verified",
+          "task_phase": "analysis",
+          "procedure_type": null,
+          "reusability_class": "instance_only"
+        }
+      ],
+      "controller_state": {
+        "mode": "exploratory",
+        "lambda_ratio": 0.3,
+        "lambda_value": 0.013106999999999999,
+        "mu": 0.0,
+        "turns": 2,
+        "topic_changes": 0,
+        "avg_conflict": 0.0,
+        "pending_decision": false,
+        "is_oscillating": false,
+        "pending_questions": 0
+      }
+    },
+    {
+      "user_input": "Decision: use token bucket algorithm",
+      "assistant_response": "[Focused mode, \u03bb=0.0371] Based on your input, here's my recommendation: ...",
+      "memory_context": "[Memory State: neutral]\nActive contexts: group_0: Blocker: need to understand rate limit patterns, group_1, group_2: Decision: use token bucket algorithm, group_3: Task: implement API rate limiter\n(\u03bb=0.037, \u03bb_c\u22480.044, r=0.85, regime=approaching-critical)",
+      "conflict_level": 0.15,
+      "retrieved_items": [
+        "Blocker: need to understand rate limit patterns",
+        "Task: implement API rate limiter"
+      ],
+      "retrieved_detail": [
+        {
+          "source": "turn_log",
+          "content": "Blocker: need to understand rate limit patterns",
+          "score": 0.7375,
+          "kind": "task",
+          "group": 0,
+          "layer": 0,
+          "artifact_type": null,
+          "artifact_id": null,
+          "linked_task": null,
+          "relation_type": null,
+          "parent_artifact_id": null,
+          "node_type": "task",
+          "hyperedge_type": "task_hyperedge",
+          "hyperedge_id": "task_hyperedge_967bc693e0",
+          "hyperedge_status": "active",
+          "confidence_tag": "verified",
+          "task_phase": "analysis",
+          "procedure_type": null,
+          "reusability_class": "instance_only"
+        },
+        {
+          "source": "turn_log",
+          "content": "Task: implement API rate limiter",
+          "score": 0.6725000000000001,
+          "kind": "task",
+          "group": 3,
+          "layer": 0,
+          "artifact_type": null,
+          "artifact_id": null,
+          "linked_task": null,
+          "relation_type": null,
+          "parent_artifact_id": null,
+          "node_type": "task",
+          "hyperedge_type": "task_hyperedge",
+          "hyperedge_id": "task_hyperedge_ee6017e508",
+          "hyperedge_status": "active",
+          "confidence_tag": "verified",
+          "task_phase": "analysis",
+          "procedure_type": null,
+          "reusability_class": "instance_only"
+        }
+      ],
+      "writes": [
+        {
+          "should_write": true,
+          "group": 2,
+          "layer": 0,
+          "importance": 0.2125,
+          "kind": "fact",
+          "reason": "user:fact",
+          "content": "Decision: use token bucket algorithm",
+          "activate": true,
+          "artifact_type": "decision",
+          "artifact_id": "decision_1a078628f7",
+          "linked_task": null,
+          "relation_type": null,
+          "parent_artifact_id": null,
+          "node_type": "decision",
+          "hyperedge_type": "decision_hyperedge",
+          "hyperedge_id": "decision_hyperedge_52adc8048c",
+          "confidence_tag": "tentative",
+          "task_phase": "decision",
+          "procedure_type": null,
+          "reusability_class": "instance_only"
+        }
+      ],
+      "controller_state": {
+        "mode": "focused",
+        "lambda_ratio": 0.85,
+        "lambda_value": 0.037136499999999996,
+        "mu": 0.0,
+        "turns": 3,
+        "topic_changes": 0,
+        "avg_conflict": 0.049999999999999996,
+        "pending_decision": false,
+        "is_oscillating": false,
+        "pending_questions": 0
+      }
+    }
+  ],
+  "controller_state": {
+    "mode": "focused",
+    "lambda_ratio": 0.85,
+    "lambda_value": 0.037136499999999996,
+    "mu": 0.0,
+    "turns": 3,
+    "topic_changes": 0,
+    "avg_conflict": 0.049999999999999996,
+    "pending_decision": false,
+    "is_oscillating": false,
+    "pending_questions": 0
+  },
+  "current_linked_task": "",
+  "handoff_snapshot": {
+    "linked_task": null,
+    "dominant_conflict": null,
+    "active_decisions": [
+      {
+        "linked_task": null,
+        "status": "active",
+        "dominant_decision_node_id": "decision_1a078628f7",
+        "dominant_decision_content": "Decision: use token bucket algorithm",
+        "constraint_count": 0,
+        "alternative_count": 0,
+        "rationale_count": 0
+      }
+    ],
+    "applicable_procedures": [],
+    "blockers": [],
+    "evidence": [],
+    "next_steps": [
+      "Decision: use token bucket algorithm"
+    ],
+    "ready_signals": []
+  }
+}

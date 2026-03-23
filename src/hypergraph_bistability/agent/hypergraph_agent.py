@@ -102,6 +102,10 @@ class HypergraphAgent:
         self.group_labels = group_labels or [f"group_{i}" for i in range(k)]
         self.layer_labels = layer_labels or [f"layer_{l}" for l in range(L)]
         
+        # Continuity anchor - linked_task persistence
+        self._current_linked_task: str = ""
+        self._handoff_snapshot: Dict[str, Any] = {}
+        
         api_key = llm_api_key or os.environ.get("OPENAI_API_KEY") or os.environ.get("ANTHROPIC_API_KEY")
         self.llm_api_key = api_key
         self.llm_base_url = llm_base_url
@@ -1546,7 +1550,11 @@ This indicates your current "attention focus" - how distributed or focused your 
         """Derive a minimal working-set view from the current hypergraph state."""
         hypergraph_view = self.get_hypergraph_view()
         resolved_task = linked_task or self._resolve_current_task(hypergraph_view)
-
+        
+        # Store current linked_task for persistence
+        if resolved_task:
+            self._current_linked_task = resolved_task
+        
         nodes = [
             node for node in hypergraph_view.get("nodes", [])
             if self._node_matches_task(node, resolved_task)
@@ -2121,11 +2129,26 @@ This indicates your current "attention focus" - how distributed or focused your 
 
     def get_session_state(self) -> SessionState:
         """Return the structured session state for persistence or inspection."""
+        # Get current linked_task - either from stored state or derive from hypergraph
+        current_task = getattr(self, '_current_linked_task', None)
+        if not current_task:
+            # Try to derive from hypergraph
+            try:
+                hview = self.memory.hypergraph.read()
+                current_task = self._resolve_current_task(hview) or ""
+            except:
+                current_task = ""
+        
+        # Get handoff snapshot for continuity
+        handoff = self.query_handoff_bundle() if hasattr(self, 'memory') else {}
+        
         return SessionState(
             system_prompt=self.system_prompt,
             conversation_history=list(self.conversation_history),
             turn_log=list(self.turn_log),
             controller_state=self.controller.get_state_summary(),
+            current_linked_task=current_task,
+            handoff_snapshot=handoff,
         )
     
     def save(self, filepath: Optional[str] = None) -> str:
@@ -2158,6 +2181,17 @@ This indicates your current "attention focus" - how distributed or focused your 
                 self.conversation_history = session_state.conversation_history
                 self.system_prompt = session_state.system_prompt or self._default_system_prompt()
                 self.turn_log = session_state.turn_log
+                
+                # Restore continuity anchor - linked_task
+                if session_state.current_linked_task:
+                    self._current_linked_task = session_state.current_linked_task
+                    logger.info(f"Restored linked_task: {session_state.current_linked_task}")
+                
+                # Restore handoff snapshot
+                if session_state.handoff_snapshot:
+                    self._handoff_snapshot = session_state.handoff_snapshot
+                    logger.info(f"Restored handoff snapshot with {len(session_state.handoff_snapshot)} fields")
+                
                 controller_state = session_state.controller_state
                 if "lambda_ratio" in controller_state:
                     self.controller.target_lambda_ratio = controller_state["lambda_ratio"]

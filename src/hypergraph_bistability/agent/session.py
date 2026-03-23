@@ -15,6 +15,9 @@ class SessionState:
     conversation_history: List[Dict[str, str]] = field(default_factory=list)
     turn_log: List[Dict[str, Any]] = field(default_factory=list)
     controller_state: Dict[str, Any] = field(default_factory=dict)
+    # Continuity anchor - explicit task tracking for handoff
+    current_linked_task: str = ""
+    handoff_snapshot: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to a plain dictionary for JSON serialization."""
@@ -29,4 +32,6 @@ class SessionState:
             conversation_history=list(data.get("conversation_history", [])),
             turn_log=list(data.get("turn_log", [])),
             controller_state=dict(data.get("controller_state", {})),
+            current_linked_task=data.get("current_linked_task", ""),
+            handoff_snapshot=dict(data.get("handoff_snapshot", {})),
         )
