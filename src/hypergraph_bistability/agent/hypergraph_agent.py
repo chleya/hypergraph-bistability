@@ -1723,27 +1723,41 @@ This indicates your current "attention focus" - how distributed or focused your 
         """Return a compact handoff bundle derived from the current working set.
         
         Fallback to persisted snapshot ONLY when:
-        1. No linked_task anchor in runtime AND
+        1. No linked_task anchor in runtime OR runtime has no resume material AND
         2. We're in restore phase (has persisted snapshot) AND  
         3. Snapshot task matches current task anchor (or no anchor at all)
         
         Never fallback when:
-        - Runtime has fresh linked_task
+        - Runtime has fresh linked_task AND has resume material (blockers/next_steps/decisions/procedures)
         - Snapshot is for a different task (prevents cross-task pollution)
         - Snapshot is incomplete/stale
         """
         working_set = self.get_working_set(linked_task)
         persisted = getattr(self, '_handoff_snapshot', {})
         
-        # Check if we should use fallback: only when NO anchor in runtime
+        # Check runtime has anchor AND resume material
         runtime_has_anchor = bool(working_set.get("linked_task"))
         
-        # Check snapshot relevance: only use if task matches or no runtime anchor
+        # Check if runtime has meaningful continuity material (beyond just task name)
+        has_resume_material = bool(
+            working_set.get("active_blockers") or
+            working_set.get("next_step_candidates") or
+            working_set.get("active_decisions") or
+            working_set.get("applicable_procedures")
+        )
+        
+        # Runtime is sufficient only if it has BOTH anchor AND resume material
+        runtime_sufficient = runtime_has_anchor and has_resume_material
+        
+        # Check snapshot relevance: only use if tasks match
+        # Fallback only allowed when: same task OR (no runtime anchor AND snapshot exists)
         snapshot_task = persisted.get("linked_task", "")
         current_task = working_set.get("linked_task", "")
         
-        # Only use snapshot if: no runtime anchor OR task matches
-        task_relevant = not runtime_has_anchor or (snapshot_task and snapshot_task == current_task)
+        # Task relevant if: same task OR (runtime insufficient AND snapshot exists for different task is OK for continuity)
+        same_task = snapshot_task and snapshot_task == current_task
+        different_task_allowed = not runtime_has_anchor and snapshot_task
+        task_relevant = same_task or different_task_allowed
         
         # Minimum completeness check: snapshot must have meaningful data
         snapshot_has_content = bool(
@@ -1756,14 +1770,14 @@ This indicates your current "attention focus" - how distributed or focused your 
         )
         
         should_fallback = (
-            not runtime_has_anchor and 
+            not runtime_sufficient and 
             persisted and 
             task_relevant and 
             snapshot_has_content
         )
         
         if should_fallback:
-            # Log fallback for debugging (NOT in return structure)
+            # Log fallback for debugging
             logger.info(f"Falling back to persisted snapshot for task: {snapshot_task}")
             return {
                 "linked_task": snapshot_task,
@@ -1803,6 +1817,90 @@ This indicates your current "attention focus" - how distributed or focused your 
             "evidence": evidence,
             "next_steps": next_steps,
             "ready_signals": self._derive_handoff_ready_signals(active_nodes),
+        }
+
+    def query_handoff_diagnostics(self, linked_task: Optional[str] = None) -> Dict[str, Any]:
+        """Return diagnostic info about handoff state - for debugging only.
+        
+        This is NOT part of the formal handoff contract - it's for internal debugging.
+        Returns:
+        - runtime_state: what's in the current working set
+        - persisted_state: what's in the handoff snapshot
+        - fallback_eligibility: whether fallback could trigger
+        - fallback_decision: whether fallback actually triggered
+        - reasons: why fallback was or wasn't used
+        """
+        working_set = self.get_working_set(linked_task)
+        persisted = getattr(self, '_handoff_snapshot', {})
+        
+        # Runtime state analysis
+        runtime_has_anchor = bool(working_set.get("linked_task"))
+        has_resume_material = bool(
+            working_set.get("active_blockers") or
+            working_set.get("next_step_candidates") or
+            working_set.get("active_decisions") or
+            working_set.get("applicable_procedures")
+        )
+        runtime_sufficient = runtime_has_anchor and has_resume_material
+        
+        # Snapshot state analysis
+        snapshot_task = persisted.get("linked_task", "")
+        snapshot_has_content = bool(
+            persisted.get("linked_task") and (
+                persisted.get("next_steps") or 
+                persisted.get("blockers") or 
+                persisted.get("active_decisions") or
+                persisted.get("evidence")
+            )
+        )
+        
+        # Determine fallback eligibility
+        current_task = working_set.get("linked_task", "")
+        task_relevant = not runtime_sufficient or (snapshot_task and snapshot_task == current_task)
+        
+        fallback_eligible = (
+            not runtime_sufficient and 
+            persisted and 
+            task_relevant and 
+            snapshot_has_content
+        )
+        
+        # Determine if fallback actually triggered (by checking return value)
+        # This is a simplified check - in real flow we'd need to track this
+        runtime_has_data = (
+            working_set.get("active_blockers") or
+            working_set.get("next_step_candidates") or
+            working_set.get("active_decisions") or
+            working_set.get("applicable_procedures") or
+            working_set.get("active_nodes")
+        )
+        
+        return {
+            "runtime": {
+                "has_anchor": runtime_has_anchor,
+                "has_resume_material": has_resume_material,
+                "is_sufficient": runtime_sufficient,
+                "linked_task": working_set.get("linked_task", ""),
+                "blocker_count": len(working_set.get("active_blockers", [])),
+                "next_step_count": len(working_set.get("next_step_candidates", [])),
+                "decision_count": len(working_set.get("active_decisions", [])),
+                "procedure_count": len(working_set.get("applicable_procedures", [])),
+                "node_count": len(working_set.get("active_nodes", [])),
+            },
+            "persisted": {
+                "exists": bool(persisted),
+                "has_task": bool(snapshot_task),
+                "has_content": snapshot_has_content,
+                "linked_task": snapshot_task,
+            },
+            "fallback_eligible": fallback_eligible,
+            "fallback_decision": not runtime_sufficient and bool(persisted),
+            "reasons": {
+                "no_runtime_anchor": not runtime_has_anchor,
+                "no_resume_material": not has_resume_material,
+                "task_relevant": task_relevant,
+                "snapshot_has_content": snapshot_has_content,
+            }
         }
 
     def _resolve_current_task(self, hypergraph_view: Dict[str, List[Dict[str, Any]]]) -> Optional[str]:
