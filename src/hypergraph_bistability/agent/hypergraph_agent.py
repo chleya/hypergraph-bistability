@@ -1743,7 +1743,7 @@ This indicates your current "attention focus" - how distributed or focused your 
             working_set.get("active_blockers") or
             working_set.get("next_step_candidates") or
             working_set.get("active_decisions") or
-            working_set.get("applicable_procedures")
+            working_set.get("active_procedures")  # Fixed: was applicable_procedures
         )
         
         # Runtime is sufficient only if it has BOTH anchor AND resume material
@@ -1839,7 +1839,7 @@ This indicates your current "attention focus" - how distributed or focused your 
             working_set.get("active_blockers") or
             working_set.get("next_step_candidates") or
             working_set.get("active_decisions") or
-            working_set.get("applicable_procedures")
+            working_set.get("active_procedures")  # Fixed: was applicable_procedures
         )
         runtime_sufficient = runtime_has_anchor and has_resume_material
         
@@ -1884,7 +1884,7 @@ This indicates your current "attention focus" - how distributed or focused your 
                 "blocker_count": len(working_set.get("active_blockers", [])),
                 "next_step_count": len(working_set.get("next_step_candidates", [])),
                 "decision_count": len(working_set.get("active_decisions", [])),
-                "procedure_count": len(working_set.get("applicable_procedures", [])),
+                "procedure_count": len(working_set.get("active_procedures", [])),  # Fixed: was applicable_procedures
                 "node_count": len(working_set.get("active_nodes", [])),
             },
             "persisted": {
