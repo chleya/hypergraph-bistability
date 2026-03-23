@@ -42,13 +42,14 @@ class TurnProcessor:
         assistant_response: str,
         working_set_context: str,
     ) -> None:
-        """Validate that response references handoff bundle elements.
+        """Validate that response demonstrates meaningful continuity with handoff bundle.
         
-        This is an optional validation that logs warnings but doesn't block.
-        Results are stored in self._last_handoff_validation for inspection.
+        Logs warnings for failures/weak passes and records to file for later analysis.
         """
         import json
         import logging
+        import os
+        from datetime import datetime
         
         logger = logging.getLogger(__name__)
         
@@ -91,22 +92,50 @@ class TurnProcessor:
                 response=assistant_response,
                 handoff_bundle=handoff_bundle,
             )
-            
-            self._last_handoff_validation = result
-            
-            # Log warning for failures and weak passes
-            status = result.get("status", "fail")
-            if status in ["fail", "weak_pass"]:
-                logger.warning(
-                    f"Handoff continuity {status}: {result.get('reason', 'unknown')}, "
-                    f"task={result.get('task_reference')}, "
-                    f"blocker={result.get('blocker_reference')}, "
-                    f"next_step={result.get('next_step_reference')}, "
-                    f"decision={result.get('decision_reference')}, "
-                    f"quality={result.get('content_quality')}"
-                )
         else:
-            self._last_handoff_validation = {"status": "not_applicable", "reason": "no_context_assembler"}
+            result = {"status": "not_applicable", "reason": "no_context_assembler"}
+        
+        self._last_handoff_validation = result
+        
+        # Get status for logging
+        status = result.get("status", "fail")
+        
+        # Log warning for failures and weak passes
+        if status in ["fail", "weak_pass"]:
+            logger.warning(
+                f"Handoff continuity {status}: {result.get('reason', 'unknown')}, "
+                f"task={result.get('task_reference')}, "
+                f"blocker={result.get('blocker_reference')}, "
+                f"next_step={result.get('next_step_reference')}, "
+                f"decision={result.get('decision_reference')}, "
+                f"quality={result.get('content_quality')}"
+            )
+        
+        # Log to file for later analysis
+        try:
+            # Find project root
+            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+            log_dir = os.path.join(project_root, "logs")
+            os.makedirs(log_dir, exist_ok=True)
+            log_file = os.path.join(log_dir, "handoff_validation.jsonl")
+            
+            log_entry = {
+                "timestamp": datetime.now().isoformat(),
+                "status": status,
+                "reason": result.get("reason", ""),
+                "task_reference": result.get("task_reference", False),
+                "blocker_reference": result.get("blocker_reference", False),
+                "next_step_reference": result.get("next_step_reference", False),
+                "decision_reference": result.get("decision_reference", False),
+                "content_quality": result.get("content_quality", "unknown"),
+                "response_length": len(assistant_response),
+                "response_preview": assistant_response[:200] if assistant_response else "",
+            }
+            
+            with open(log_file, "a", encoding="utf-8") as f:
+                f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
+        except Exception:
+            pass  # Don't fail validation if file logging fails
 
     def _generate_working_set_context(self, agent) -> str:
         """Generate working-set context string for prompt injection (JSON format)."""
