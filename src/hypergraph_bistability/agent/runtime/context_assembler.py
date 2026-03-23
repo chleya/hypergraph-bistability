@@ -40,12 +40,19 @@ class ContextAssembler:
         else:
             results["task_reference"] = True  # No task to reference
         
-        # 2. Blocker reference
+        # 2. Blocker reference - handle both string and dict formats
         blockers = handoff_bundle.get("blockers", [])
         if blockers:
             blocker_referenced = False
             for blocker in blockers:
-                content = blocker.get("content", "")
+                # Handle both string and dict formats
+                if isinstance(blocker, str):
+                    content = blocker
+                elif isinstance(blocker, dict):
+                    content = blocker.get("content", "")
+                else:
+                    continue
+                    
                 if content:
                     # Check if any significant word from blocker appears
                     key_words = [w for w in content.lower().split() if len(w) > 4]
@@ -56,12 +63,18 @@ class ContextAssembler:
         else:
             results["blocker_reference"] = True
         
-        # 3. Next step reference
+        # 3. Next step reference - handle both string and dict formats
         next_steps = handoff_bundle.get("next_steps", [])
         if next_steps:
             step_referenced = False
             for step in next_steps:
-                content = step.get("content", "")
+                if isinstance(step, str):
+                    content = step
+                elif isinstance(step, dict):
+                    content = step.get("content", "")
+                else:
+                    continue
+                    
                 if content:
                     key_words = [w for w in content.lower().split() if len(w) > 4]
                     step_referenced = any(word in response_lower for word in key_words[:3])
@@ -71,12 +84,18 @@ class ContextAssembler:
         else:
             results["next_step_reference"] = True
         
-        # 4. Decision reference
+        # 4. Decision reference - handle both string and dict formats
         decisions = handoff_bundle.get("active_decisions", [])
         if decisions:
             decision_referenced = False
             for decision in decisions:
-                content = decision.get("content", "")
+                if isinstance(decision, str):
+                    content = decision
+                elif isinstance(decision, dict):
+                    content = decision.get("content", "")
+                else:
+                    continue
+                    
                 if content:
                     key_words = [w for w in content.lower().split() if len(w) > 4]
                     decision_referenced = any(word in response_lower for word in key_words[:3])

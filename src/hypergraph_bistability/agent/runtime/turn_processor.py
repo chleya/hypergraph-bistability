@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from hypergraph_bistability.memory.policies import RetrievalPolicy, WritePolicy
 
@@ -34,6 +34,69 @@ class TurnProcessor:
         self.write_policy = write_policy or WritePolicy()
         self.retrieval_policy = retrieval_policy or RetrievalPolicy()
         self.context_assembler = context_assembler
+        self._last_handoff_validation: Dict[str, Any] = {}
+
+    def _validate_handoff_continuity(
+        self,
+        agent,
+        assistant_response: str,
+        working_set_context: str,
+    ) -> None:
+        """Validate that response references handoff bundle elements.
+        
+        This is an optional validation that logs warnings but doesn't block.
+        Results are stored in self._last_handoff_validation for inspection.
+        """
+        import json
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        
+        # Skip if no working set context (empty string)
+        if not working_set_context:
+            self._last_handoff_validation = {"skipped": "no_working_set_context"}
+            return
+        
+        # Skip if response is empty (shouldn't happen but just in case)
+        if not assistant_response:
+            self._last_handoff_validation = {"skipped": "empty_response"}
+            return
+        
+        try:
+            # Parse the working set context
+            ws_data = json.loads(working_set_context)
+            
+            # Skip if the parsed context is empty (no task, no blockers, etc.)
+            if not ws_data or not ws_data.get("task"):
+                self._last_handoff_validation = {"skipped": "empty_working_set_data"}
+                return
+        except json.JSONDecodeError:
+            self._last_handoff_validation = {"skipped": "invalid_json"}
+            return
+        
+        # Get handoff bundle from agent
+        handoff_bundle = agent.query_handoff_bundle()
+        
+        # Validate using context assembler
+        if self.context_assembler:
+            result = self.context_assembler.validate_handoff_continuity(
+                response=assistant_response,
+                handoff_bundle=handoff_bundle,
+            )
+            
+            self._last_handoff_validation = result
+            
+            # Log warning if validation failed
+            if not result.get("passed", True):
+                logger.warning(
+                    f"Handoff continuity validation failed: "
+                    f"task={result.get('task_reference')}, "
+                    f"blocker={result.get('blocker_reference')}, "
+                    f"next_step={result.get('next_step_reference')}, "
+                    f"decision={result.get('decision_reference')}"
+                )
+        else:
+            self._last_handoff_validation = {"skipped": "no_context_assembler"}
 
     def _generate_working_set_context(self, agent) -> str:
         """Generate working-set context string for prompt injection (JSON format)."""
@@ -177,6 +240,9 @@ class TurnProcessor:
             messages=messages,
             retrieved_items=retrieved,
         )
+
+        # Optional: Validate handoff continuity (log warning if failed, don't block)
+        self._validate_handoff_continuity(agent, assistant_response, working_set_context)
 
         agent.conversation_history.append({"role": "user", "content": user_input})
         agent.conversation_history.append({"role": "assistant", "content": assistant_response})
