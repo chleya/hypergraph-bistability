@@ -1,0 +1,23 @@
+﻿
+================================================================================
+STRONG_PASS CHANGES ANALYSIS
+================================================================================
+
+Old strong_pass count: 2
+
+  round1_007: STAYED strong_pass (human=strong_pass)
+
+  round1_011: became weak_pass (human=strong_pass)
+    task_ref: True
+    blocker_high_conf: False
+    next_step_high_conf: False
+
+
+Summary:
+  Old strong -> stayed strong: 1
+  Old strong -> became weak/fail: 1
+
+----------------------------------------
+New strong_pass samples:
+  round1_003: NEW strong (human=weak_pass)
+  round1_007: STAYED strong (human=strong_pass)

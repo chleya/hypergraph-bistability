@@ -70,10 +70,11 @@ class TurnProcessor:
             # Skip if the parsed context is empty - but this is now "not_applicable", not pass!
             if not ws_data or not ws_data.get("task"):
                 # Has no task but might have blockers/decisions/evidence - still validate if present
+                # FIX: Check correct schema paths
                 has_continuity_material = (
-                    ws_data.get("blockers") or 
-                    ws_data.get("active_decisions") or 
-                    ws_data.get("applicable_procedures")
+                    ws_data.get("task", {}).get("blockers", 0) > 0 or 
+                    ws_data.get("decisions_detail") or 
+                    ws_data.get("procedures_detail")
                 )
                 if not has_continuity_material:
                     self._last_handoff_validation = {"status": "not_applicable", "reason": "empty_handoff_data"}

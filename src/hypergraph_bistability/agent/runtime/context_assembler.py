@@ -119,7 +119,7 @@ class ContextAssembler:
             result["task_reference"] = exact_match or word_matches >= min_required
         
         # ===== Blocker reference check =====
-        # FIXED: Be stricter - require matching specific blocker content, not just generic words
+        # FIXED: Track both exact phrase match (high confidence) and keyword match
         if has_blockers:
             blockers = handoff_bundle.get("blockers", [])
             blocker_keywords = set()
@@ -137,9 +137,11 @@ class ContextAssembler:
             exact_phrase_match = any(phrase in response_lower for phrase in blocker_phrases)
             keyword_matches = sum(1 for kw in list(blocker_keywords)[:10] if kw in response_lower)
             result["blocker_reference"] = exact_phrase_match or keyword_matches >= 2
+            # High confidence = exact phrase match (not just keyword)
+            result["blocker_high_confidence"] = exact_phrase_match
         
         # ===== Next step reference check =====
-        # FIXED: Same stricter logic as blockers
+        # FIXED: Same as blockers - track exact phrase match for high confidence
         if has_next_steps:
             next_steps = handoff_bundle.get("next_steps", [])
             step_keywords = set()
@@ -155,9 +157,11 @@ class ContextAssembler:
             exact_phrase_match = any(phrase in response_lower for phrase in step_phrases)
             keyword_matches = sum(1 for kw in list(step_keywords)[:10] if kw in response_lower)
             result["next_step_reference"] = exact_phrase_match or keyword_matches >= 2
+            # High confidence = exact phrase match (not just keyword)
+            result["next_step_high_confidence"] = exact_phrase_match
         
         # ===== Decision reference check =====
-        # FIXED: Same stricter logic as blockers
+        # FIXED: Same as blockers - track exact phrase match for high confidence
         if has_decisions:
             decisions = handoff_bundle.get("active_decisions", [])
             decision_keywords = set()
@@ -173,6 +177,8 @@ class ContextAssembler:
             exact_phrase_match = any(phrase in response_lower for phrase in decision_phrases)
             keyword_matches = sum(1 for kw in list(decision_keywords)[:10] if kw in response_lower)
             result["decision_reference"] = exact_phrase_match or keyword_matches >= 2
+            # High confidence = exact phrase match (not just keyword)
+            result["decision_high_confidence"] = exact_phrase_match
         
         # ===== Determine final status =====
         # FIXED: Stricter criteria - strong_pass requires task + at least one substantive reference
@@ -202,13 +208,25 @@ class ContextAssembler:
             result["status"] = "weak_pass"
             result["reason"] = f"insufficient_continuity_{reference_count}_elements"
         elif has_task_ref and has_substantive_ref:
-            # Must have BOTH task AND at least one substantive reference for strong_pass
-            if result["content_quality"] == "good":
+            # NEW: strong_pass now requires at least ONE high-confidence (exact phrase) reference
+            # This prevents false positives from generic keyword matches
+            has_high_confidence = (
+                result.get("blocker_high_confidence", False) or
+                result.get("next_step_high_confidence", False) or
+                result.get("decision_high_confidence", False)
+            )
+            
+            if has_high_confidence and result["content_quality"] == "good":
                 result["status"] = "strong_pass"
-                result["reason"] = f"task_plus_substantive_{reference_count}_elements"
-            else:
+                result["reason"] = f"task_plus_high_confidence_{reference_count}_elements"
+            elif has_high_confidence:
+                # High confidence but weak content - still weak_pass
                 result["status"] = "weak_pass"
-                result["reason"] = f"task_plus_substantive_{reference_count}_elements_weak_content"
+                result["reason"] = f"high_confidence_phrase_{reference_count}_elements_weak_content"
+            else:
+                # No high confidence - downgrade to weak even if task + substantive exists
+                result["status"] = "weak_pass"
+                result["reason"] = f"task_plus_substantive_{reference_count}_elements_no_phrase_match"
         else:
             # Has substantive but no task - still weak
             result["status"] = "weak_pass"
