@@ -1713,8 +1713,40 @@ This indicates your current "attention focus" - how distributed or focused your 
         return results
 
     def query_handoff_bundle(self, linked_task: Optional[str] = None) -> Dict[str, Any]:
-        """Return a compact handoff bundle derived from the current working set."""
+        """Return a compact handoff bundle derived from the current working set.
+        
+        If runtime state is sparse (no linked_task, empty nodes), fall back to
+        persisted handoff_snapshot from last save to maintain continuity.
+        """
         working_set = self.get_working_set(linked_task)
+        
+        # Check if runtime state is sparse - need fallback to persisted snapshot
+        runtime_sparse = (
+            not working_set.get("linked_task") or
+            len(working_set.get("active_nodes", [])) == 0 or
+            len(working_set.get("active_blockers", [])) == 0
+        )
+        
+        # Try to get persisted snapshot as fallback
+        persisted = getattr(self, '_handoff_snapshot', {})
+        
+        if runtime_sparse and persisted:
+            # Use persisted snapshot for continuity when runtime is sparse
+            logger.info("Using persisted handoff_snapshot for continuity (runtime state sparse)")
+            # Merge: use persisted but preserve current task if available
+            return {
+                "linked_task": working_set.get("linked_task") or persisted.get("linked_task", ""),
+                "dominant_conflict": persisted.get("dominant_conflict"),
+                "active_decisions": persisted.get("active_decisions", []),
+                "applicable_procedures": persisted.get("applicable_procedures", []),
+                "blockers": persisted.get("blockers", []),
+                "evidence": persisted.get("evidence", []),
+                "next_steps": persisted.get("next_steps", []),
+                "ready_signals": persisted.get("ready_signals", []),
+                "_fallback": True,  # Mark as fallback for debugging
+            }
+        
+        # Normal path: derive from current runtime state
         conflict = self.query_dominant_conflict(linked_task)
         decisions = self.query_decision_residue(linked_task)
         procedures = self.query_applicable_procedures(linked_task)
