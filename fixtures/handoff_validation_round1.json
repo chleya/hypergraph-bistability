@@ -1,0 +1,373 @@
+{
+  "round": 1,
+  "description": "First round of manual validation of handoff continuity validator",
+  "created_at": "2026-03-23T13:42:00Z",
+  "validator_version": "2026-03-23-f2bd108",
+  "total_samples": 24,
+  "valid_samples": 24,
+  "samples": [
+    {
+      "sample_id": "round1_001",
+      "scene_type": "planning",
+      "user_prompt": "What should we work on next?",
+      "handoff_bundle": {
+        "linked_task": "Debug retry loop",
+        "blockers": ["stale cursor issue"],
+        "next_steps": ["inspect state machine"],
+        "active_decisions": [],
+        "applicable_procedures": []
+      },
+      "response": "Diff-style summary:\n- Inspect the retry loop state transitions.\n- Check duplicate backoff state after resume.",
+      "validator_status": "fail",
+      "validator_details": {
+        "task_reference": false,
+        "blocker_reference": false,
+        "next_step_reference": false,
+        "decision_reference": false,
+        "content_quality": "good"
+      },
+      "human_label": "fail",
+      "agreement": true,
+      "error_reason": "No handoff context provided to validator - correct fail"
+    },
+    {
+      "sample_id": "round1_002",
+      "scene_type": "chat",
+      "user_prompt": "What was I working on?",
+      "handoff_bundle": {
+        "linked_task": "Flaky deployment pipeline",
+        "blockers": [],
+        "next_steps": [],
+        "active_decisions": [],
+        "applicable_procedures": []
+      },
+      "response": "You were working on: flaky deployment pipeline; database migration step",
+      "validator_status": "weak_pass",
+      "validator_details": {
+        "task_reference": true,
+        "blocker_reference": false,
+        "next_step_reference": false,
+        "decision_reference": false,
+        "content_quality": "good",
+        "reason": "insufficient_continuity_1_elements"
+      },
+      "human_label": "weak_pass",
+      "agreement": true,
+      "error_reason": "Only task referenced, no blockers/next_steps in handoff - correct weak_pass"
+    },
+    {
+      "sample_id": "round1_003",
+      "scene_type": "research",
+      "user_prompt": "What checks should I run?",
+      "handoff_bundle": {
+        "linked_task": "Debug retry loop",
+        "blockers": ["dedupe patch issue"],
+        "next_steps": ["compare checkpoint IDs"],
+        "active_decisions": [],
+        "applicable_procedures": []
+      },
+      "response": "First checks:\n- Inspect retry loop state transitions.\n- Inspect retry state restore.\n- Compare checkpoint IDs before and after resume.\n- Confirm the dedupe patch point before requeue.",
+      "validator_status": "weak_pass",
+      "validator_details": {
+        "task_reference": true,
+        "blocker_reference": false,
+        "next_step_reference": false,
+        "decision_reference": false,
+        "content_quality": "good",
+        "reason": "insufficient_continuity_1_elements"
+      },
+      "human_label": "weak_pass",
+      "agreement": false,
+      "error_reason": "FALSE NEGATIVE: Response references 'checkpoint IDs' which matches next_step 'compare checkpoint IDs', but validator missed it due to shallow keyword matching"
+    },
+    {
+      "sample_id": "round1_004",
+      "scene_type": "chat",
+      "user_prompt": "Give me recommendations",
+      "handoff_bundle": {},
+      "response": "[Focused mode, λ=0.0574] Based on your input, here's my recommendation: ...",
+      "validator_status": "fail",
+      "validator_details": {
+        "task_reference": false,
+        "blocker_reference": false,
+        "next_step_reference": false,
+        "decision_reference": false,
+        "content_quality": "good",
+        "reason": "generic_template_detected"
+      },
+      "human_label": "fail",
+      "agreement": true,
+      "error_reason": "Generic template correctly detected - correct fail"
+    },
+    {
+      "sample_id": "round1_005",
+      "scene_type": "planning",
+      "user_prompt": "What's the status?",
+      "handoff_bundle": {
+        "linked_task": "Staging verification",
+        "blockers": [],
+        "next_steps": ["cite staging verification"],
+        "active_decisions": [],
+        "applicable_procedures": []
+      },
+      "response": "Incident handoff:\n- If the latest verification still holds, this is ready to hand off.\n\nNext checks:\n- Cite the latest staging verification in the handoff.",
+      "validator_status": "fail",
+      "validator_details": {
+        "task_reference": false,
+        "blocker_reference": false,
+        "next_step_reference": false,
+        "decision_reference": false,
+        "content_quality": "good"
+      },
+      "human_label": "weak_pass",
+      "agreement": false,
+      "error_reason": "FALSE NEGATIVE: Response contains 'staging verification' which matches linked_task 'Staging verification', but keyword matching is case-sensitive or doesn't handle substring properly"
+    },
+    {
+      "sample_id": "round1_006",
+      "scene_type": "chat",
+      "user_prompt": "What should I do?",
+      "handoff_bundle": {},
+      "response": "[Focused mode, λ=0.0574] Based on your input, here's my recommendation: ...",
+      "validator_status": "fail",
+      "validator_details": {
+        "task_reference": false,
+        "blocker_reference": false,
+        "next_step_reference": false,
+        "decision_reference": false,
+        "content_quality": "good",
+        "reason": "generic_template_detected"
+      },
+      "human_label": "fail",
+      "agreement": true,
+      "error_reason": "Generic template correctly detected"
+    },
+    {
+      "sample_id": "round1_007",
+      "scene_type": "planning",
+      "user_prompt": "What's the summary?",
+      "handoff_bundle": {
+        "linked_task": "Cursor cleanup",
+        "blockers": ["reconnect ordering"],
+        "next_steps": ["staging validation"],
+        "active_decisions": [],
+        "applicable_procedures": []
+      },
+      "response": "Verification summary:\n- Carry forward the stale cursor cleanup fix.\n- Verify reconnect ordering before closure.\n- Use the staging validation as the final closeout check.\n- If those checks stay clean,",
+      "validator_status": "strong_pass",
+      "validator_details": {
+        "task_reference": false,
+        "blocker_reference": true,
+        "next_step_reference": true,
+        "decision_reference": false,
+        "content_quality": "good",
+        "reason": "multiple_references_2_elements"
+      },
+      "human_label": "strong_pass",
+      "agreement": true,
+      "error_reason": "References both 'stale cursor cleanup' (matches linked_task) and 'reconnect ordering' (matches blocker), and 'staging validation' (matches next_step) - correct strong_pass"
+    },
+    {
+      "sample_id": "round1_008",
+      "scene_type": "chat",
+      "user_prompt": "Recommendations?",
+      "handoff_bundle": {},
+      "response": "[Focused mode, λ=0.0574] Based on your input, here's my recommendation: ...",
+      "validator_status": "fail",
+      "validator_details": {
+        "task_reference": false,
+        "blocker_reference": false,
+        "next_step_reference": false,
+        "decision_reference": false,
+        "content_quality": "good",
+        "reason": "generic_template_detected"
+      },
+      "human_label": "fail",
+      "agreement": true,
+      "error_reason": "Generic template correctly detected"
+    },
+    {
+      "sample_id": "round1_009",
+      "scene_type": "chat",
+      "user_prompt": "Summary?",
+      "handoff_bundle": {},
+      "response": "Diff-style summary:\n[Focused mode, λ=0.0574] Based on your input, here's my recommendation: ...",
+      "validator_status": "fail",
+      "validator_details": {
+        "task_reference": false,
+        "blocker_reference": false,
+        "next_step_reference": false,
+        "decision_reference": false,
+        "content_quality": "good",
+        "reason": "generic_template_detected"
+      },
+      "human_label": "fail",
+      "agreement": true,
+      "error_reason": "Generic template correctly detected"
+    },
+    {
+      "sample_id": "round1_010",
+      "scene_type": "chat",
+      "user_prompt": "What are we working on?",
+      "handoff_bundle": {
+        "linked_task": "Fix login bug",
+        "blockers": ["API timeout issue", "Missing error handling"],
+        "next_steps": ["Add retry logic", "Update error messages"],
+        "active_decisions": ["Use exponential backoff"],
+        "applicable_procedures": []
+      },
+      "response": "We are currently focused on fixing a login bug. The exact status and phase of this task are not specified in the provided memory context, so I cannot provide more details on that.",
+      "validator_status": "weak_pass",
+      "validator_details": {
+        "task_reference": true,
+        "blocker_reference": false,
+        "next_step_reference": false,
+        "decision_reference": false,
+        "content_quality": "good",
+        "reason": "insufficient_continuity_1_elements"
+      },
+      "human_label": "weak_pass",
+      "agreement": true,
+      "error_reason": "Mentions 'login bug' but doesn't continue with blockers/next_steps - correct weak_pass"
+    },
+    {
+      "sample_id": "round1_011",
+      "scene_type": "planning",
+      "user_prompt": "How do we proceed?",
+      "handoff_bundle": {
+        "linked_task": "Fix login bug",
+        "blockers": ["API timeout issue", "Missing error handling"],
+        "next_steps": ["Add retry logic", "Update error messages"],
+        "active_decisions": ["Use exponential backoff"],
+        "applicable_procedures": []
+      },
+      "response": "To proceed with the current task of fixing the login bug, we should first identify the specific issue causing the bug. We might need to:\n\n1. Review the error logs to understand the exact nature of the",
+      "validator_status": "strong_pass",
+      "validator_details": {
+        "task_reference": true,
+        "blocker_reference": true,
+        "next_step_reference": false,
+        "decision_reference": false,
+        "content_quality": "good",
+        "reason": "multiple_references_2_elements"
+      },
+      "human_label": "strong_pass",
+      "agreement": true,
+      "error_reason": "References 'login bug' (task), 'error logs' (related to 'API timeout' blocker), mentions specific issue - correct strong_pass"
+    },
+    {
+      "sample_id": "round1_012",
+      "scene_type": "planning",
+      "user_prompt": "What next?",
+      "handoff_bundle": {
+        "linked_task": "Fix login bug",
+        "blockers": ["API timeout issue"],
+        "next_steps": [],
+        "active_decisions": [],
+        "applicable_procedures": []
+      },
+      "response": "We are currently working on fixing a login bug. The status of this task is unknown, and we haven't reached any decisions or performed any procedures yet.",
+      "validator_status": "fail",
+      "validator_details": {
+        "task_reference": false,
+        "blocker_reference": false,
+        "next_step_reference": false,
+        "decision_reference": false,
+        "content_quality": "good"
+      },
+      "human_label": "fail",
+      "agreement": false,
+      "error_reason": "FALSE NEGATIVE: Response contains 'login bug' which should match linked_task 'Fix login bug', but task matching logic requires exact phrase or significant word match"
+    },
+    {
+      "sample_id": "round1_013",
+      "scene_type": "planning",
+      "user_prompt": "What should we do?",
+      "handoff_bundle": {
+        "linked_task": "Fix login bug",
+        "blockers": [],
+        "next_steps": [],
+        "active_decisions": [],
+        "applicable_procedures": []
+      },
+      "response": "Since the task status is currently unknown and no decisions or procedures have been performed, the next steps should involve:\n\n1. Identifying the specific issue causing the login bug.\n2. Determining i",
+      "validator_status": "fail",
+      "validator_details": {
+        "task_reference": false,
+        "blocker_reference": false,
+        "next_step_reference": false,
+        "decision_reference": false,
+        "content_quality": "good"
+      },
+      "human_label": "fail",
+      "agreement": false,
+      "error_reason": "FALSE NEGATIVE: Same issue - 'login bug' not matching 'Fix login bug' due to keyword filtering"
+    },
+    {
+      "sample_id": "round1_014",
+      "scene_type": "chat",
+      "user_prompt": "What are we doing?",
+      "handoff_bundle": {
+        "linked_task": "Fix login bug",
+        "blockers": [],
+        "next_steps": [],
+        "active_decisions": [],
+        "applicable_procedures": []
+      },
+      "response": "We are currently working on fixing a login bug.",
+      "validator_status": "weak_pass",
+      "validator_details": {
+        "task_reference": true,
+        "blocker_reference": false,
+        "next_step_reference": false,
+        "decision_reference": false,
+        "content_quality": "good",
+        "reason": "insufficient_continuity_1_elements"
+      },
+      "human_label": "weak_pass",
+      "agreement": true,
+      "error_reason": "Mentions task but no blockers/next_steps - correct weak_pass"
+    },
+    {
+      "sample_id": "round1_015",
+      "scene_type": "planning",
+      "user_prompt": "Next steps?",
+      "handoff_bundle": {
+        "linked_task": "Fix login bug",
+        "blockers": [],
+        "next_steps": [],
+        "active_decisions": [],
+        "applicable_procedures": []
+      },
+      "response": "Next, we should identify the root cause of the login bug, outline a plan to address it, and assign tasks to team members accordingly.",
+      "validator_status": "weak_pass",
+      "validator_details": {
+        "task_reference": true,
+        "blocker_reference": false,
+        "next_step_reference": false,
+        "decision_reference": false,
+        "content_quality": "good",
+        "reason": "insufficient_continuity_1_elements"
+      },
+      "human_label": "marginal",
+      "agreement": true,
+      "error_reason": "Mentions 'login bug' and 'identify root cause' (vague next_step) but no specific blockers/next_steps - boundary case, marginal"
+    }
+  ],
+  "summary": {
+    "total": 15,
+    "fail": 6,
+    "weak_pass": 6,
+    "strong_pass": 3,
+    "marginal": 1,
+    "agreement_rate": "73% (11/15)",
+    "false_negatives": 4,
+    "false_positives": 0,
+    "root_causes": [
+      "Task keyword matching too strict (requires exact match or 2+ significant words, 'fix' filtered out)",
+      "Shallow keyword matching (missing 'checkpoint IDs' match)",
+      "Case sensitivity in phrase matching",
+      "No substring matching for task references"
+    ]
+  }
+}
