@@ -2,13 +2,94 @@
 
 from __future__ import annotations
 
-from typing import Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Optional, Set
 
 from hypergraph_bistability.memory.policies import RetrievedMemory
 
 
 class ContextAssembler:
     """Build bounded LLM message payloads for a turn."""
+
+    def validate_handoff_continuity(
+        self,
+        response: str,
+        handoff_bundle: Dict[str, Any],
+        require_task_reference: bool = True,
+    ) -> Dict[str, bool]:
+        """Validate that response references key elements from handoff bundle.
+        
+        Args:
+            response: The LLM response to validate
+            handoff_bundle: The handoff bundle containing continuity data
+            require_task_reference: If True, task name must be referenced
+            
+        Returns:
+            Dict with validation results for each element type
+        """
+        response_lower = response.lower()
+        
+        results = {}
+        
+        # 1. Task reference
+        linked_task = handoff_bundle.get("linked_task", "")
+        if linked_task:
+            task_mentioned = linked_task.lower() in response_lower or any(
+                word in response_lower for word in linked_task.lower().replace("_", " ").split()
+            )
+            results["task_reference"] = task_mentioned
+        else:
+            results["task_reference"] = True  # No task to reference
+        
+        # 2. Blocker reference
+        blockers = handoff_bundle.get("blockers", [])
+        if blockers:
+            blocker_referenced = False
+            for blocker in blockers:
+                content = blocker.get("content", "")
+                if content:
+                    # Check if any significant word from blocker appears
+                    key_words = [w for w in content.lower().split() if len(w) > 4]
+                    blocker_referenced = any(word in response_lower for word in key_words[:3])
+                    if blocker_referenced:
+                        break
+            results["blocker_reference"] = blocker_referenced
+        else:
+            results["blocker_reference"] = True
+        
+        # 3. Next step reference
+        next_steps = handoff_bundle.get("next_steps", [])
+        if next_steps:
+            step_referenced = False
+            for step in next_steps:
+                content = step.get("content", "")
+                if content:
+                    key_words = [w for w in content.lower().split() if len(w) > 4]
+                    step_referenced = any(word in response_lower for word in key_words[:3])
+                    if step_referenced:
+                        break
+            results["next_step_reference"] = step_referenced
+        else:
+            results["next_step_reference"] = True
+        
+        # 4. Decision reference
+        decisions = handoff_bundle.get("active_decisions", [])
+        if decisions:
+            decision_referenced = False
+            for decision in decisions:
+                content = decision.get("content", "")
+                if content:
+                    key_words = [w for w in content.lower().split() if len(w) > 4]
+                    decision_referenced = any(word in response_lower for word in key_words[:3])
+                    if decision_referenced:
+                        break
+            results["decision_reference"] = decision_referenced
+        else:
+            results["decision_reference"] = True
+        
+        # Overall pass/fail
+        results["passed"] = all(results.values())
+        
+        return results
 
     def build_messages(
         self,
@@ -111,3 +192,96 @@ class ContextAssembler:
             for item in section_items[:2]:
                 lines.append(f"- [{item.source}] {item.content}")
         return "\n".join(lines)
+
+
+class TestHandoffContinuityValidation:
+    """Test the handoff continuity validation function."""
+
+    def test_task_reference_detected(self):
+        """Test that task name is detected in response."""
+        assembler = ContextAssembler()
+        
+        handoff = {
+            "linked_task": "fix_api_bug",
+            "blockers": [{"content": "API returns 500 error"}],
+            "next_steps": [{"content": "Check server logs"}],
+            "active_decisions": [],
+        }
+        
+        # Response mentions task
+        response = "I'll help you fix the API bug by checking the logs first."
+        result = assembler.validate_handoff_continuity(response, handoff)
+        
+        assert result["task_reference"] == True
+
+    def test_task_reference_not_detected(self):
+        """Test that missing task reference is detected."""
+        assembler = ContextAssembler()
+        
+        handoff = {
+            "linked_task": "fix_api_bug",
+            "blockers": [{"content": "API returns 500 error"}],
+            "next_steps": [{"content": "Check server logs"}],
+            "active_decisions": [],
+        }
+        
+        # Response doesn't mention task
+        response = "I'll help you with something else."
+        result = assembler.validate_handoff_continuity(response, handoff)
+        
+        assert result["task_reference"] == False
+
+    def test_blocker_reference_detected(self):
+        """Test that blocker is detected in response."""
+        assembler = ContextAssembler()
+        
+        handoff = {
+            "linked_task": "fix_api_bug",
+            "blockers": [{"content": "API returns 500 error on /users endpoint"}],
+            "next_steps": [],
+            "active_decisions": [],
+        }
+        
+        # Response mentions "500" from blocker
+        response = "The 500 error is likely caused by the database connection."
+        result = assembler.validate_handoff_continuity(response, handoff)
+        
+        assert result["blocker_reference"] == True
+
+    def test_empty_handoff_passes(self):
+        """Test that empty handoff bundle passes validation."""
+        assembler = ContextAssembler()
+        
+        handoff = {
+            "linked_task": "",
+            "blockers": [],
+            "next_steps": [],
+            "active_decisions": [],
+        }
+        
+        response = "Hello! How can I help you?"
+        result = assembler.validate_handoff_continuity(response, handoff)
+        
+        assert result["passed"] == True
+
+    def test_partial_continuity_fails(self):
+        """Test that partial continuity fails validation."""
+        assembler = ContextAssembler()
+        
+        handoff = {
+            "linked_task": "fix_api_bug",
+            "blockers": [{"content": "API returns 500 error"}],
+            "next_steps": [{"content": "Check server logs"}],
+            "active_decisions": [{"content": "Use error middleware"}],
+        }
+        
+        # Response only mentions task, not blockers/next_steps/decisions
+        response = "I'll help you fix the API bug."
+        result = assembler.validate_handoff_continuity(response, handoff)
+        
+        # Should fail - no blocker, next_step, or decision reference
+        assert result["passed"] == False
+        assert result["task_reference"] == True
+        assert result["blocker_reference"] == False
+        assert result["next_step_reference"] == False
+        assert result["decision_reference"] == False
