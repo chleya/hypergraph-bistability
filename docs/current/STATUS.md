@@ -13,7 +13,7 @@
 | 4 | 文档状态管理 | ✅ | current/specs/history 已建立 |
 | 5 | 根目录产物归位 | ✅ | JSON/DB 已在 results/artifacts |
 | 6 | Memory 抽象统一 | ✅ | 4 层职责已明确 |
-| 7 | Query Layer 正式接口 | ⏳ | 需升格为稳定 API |
+| 7 | Query Layer 正式接口 | ✅ | 已标记为正式产品接口 |
 | 8 | 大文件拆分 | ⏳ | hypergraph_agent.py 需拆分 |
 | 9 | 研究 vs 产品分开表述 | ⏳ | 文档需区分层次 |
 | 10 | MiniMax/Windows 封装 | ⏳ | 需独立 integration 模块 |
@@ -137,17 +137,27 @@ from core import Y       # → from hypergraph_bistability.core import Y
 | Decay Policy | ✅ | memory/policies/decay_policy.py |
 | Promotion Policy | ✅ | memory/policies/promotion_policy.py |
 
-### Query Layer
+### Query Layer (正式接口)
 
-| 功能 | 状态 | 代码位置 |
+Query Layer 是项目的"产品接口"，作为稳定 API 经营。
+
+| 接口 | 职责 | 代码位置 |
 |------|------|----------|
-| WorkingSet | ✅ | agent/query.py |
-| TaskState | ✅ | agent/query.py |
-| ConflictInfo | ✅ | agent/query.py |
-| DecisionResidue | ✅ | agent/query.py |
-| ProcedureInfo | ✅ | agent/query.py |
-| HandoffBundle | ✅ | agent/query.py |
-| Working Set Context Injection | ✅ | turn_processor.py |
+| **WorkingSet** | 当前工作集快照 | agent/query.py |
+| **TaskState** | 任务状态 | agent/query.py |
+| **ConflictInfo** | 冲突信息 | agent/query.py |
+| **DecisionResidue** | 决策残留 | agent/query.py |
+| **ProcedureInfo** | 过程信息 | agent/query.py |
+| **HandoffBundle** | 交接包 | agent/query.py |
+| **QueryLayer** | 统一查询入口 | agent/query.py |
+| Working Set Context Injection | 自动注入到 prompt | turn_processor.py |
+
+#### CLI 接口
+
+```bash
+# 查询工作集状态
+python -m hypergraph_bistability.cli /ws
+```
 
 ### Runtime
 
