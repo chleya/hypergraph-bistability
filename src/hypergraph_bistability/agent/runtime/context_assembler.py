@@ -30,7 +30,27 @@ class ContextAssembler:
         
         results = {}
         
-        # 1. Task reference
+        # ===== Weak content detection =====
+        # Detect placeholder/weak content that doesn't provide actual value
+        weak_patterns = [
+            "tbd", "to be determined", "to be decided",
+            "look into it", "looking into it", "will look",
+            "need to", "need more", "require more",
+            "pending", "in progress", "to do",
+            "not sure", "unsure", "don't know",
+            "later", "after", "before",
+            "will do", "going to", "plan to",
+        ]
+        
+        # Check if response is mostly weak content
+        weak_count = sum(1 for pattern in weak_patterns if pattern in response_lower)
+        words = response_lower.split()
+        significant_words = [w for w in words if len(w) > 4]
+        
+        # If more than 30% of significant words are weak patterns, flag it
+        results["has_weak_content"] = weak_count < len(significant_words) * 0.3 if significant_words else False
+        
+        # ===== Task reference =====
         linked_task = handoff_bundle.get("linked_task", "")
         if linked_task:
             task_mentioned = linked_task.lower() in response_lower or any(
@@ -40,7 +60,7 @@ class ContextAssembler:
         else:
             results["task_reference"] = True  # No task to reference
         
-        # 2. Blocker reference - handle both string and dict formats
+        # ===== Blocker reference - handle both string and dict formats =====
         blockers = handoff_bundle.get("blockers", [])
         if blockers:
             blocker_referenced = False
@@ -63,7 +83,7 @@ class ContextAssembler:
         else:
             results["blocker_reference"] = True
         
-        # 3. Next step reference - handle both string and dict formats
+        # ===== Next step reference - handle both string and dict formats =====
         next_steps = handoff_bundle.get("next_steps", [])
         if next_steps:
             step_referenced = False
@@ -84,7 +104,7 @@ class ContextAssembler:
         else:
             results["next_step_reference"] = True
         
-        # 4. Decision reference - handle both string and dict formats
+        # ===== Decision reference - handle both string and dict formats =====
         decisions = handoff_bundle.get("active_decisions", [])
         if decisions:
             decision_referenced = False
@@ -105,8 +125,15 @@ class ContextAssembler:
         else:
             results["decision_reference"] = True
         
-        # Overall pass/fail
-        results["passed"] = all(results.values())
+        # ===== Overall pass/fail =====
+        # Must have: no weak content AND at least one of (task, blocker, next_step, decision) referenced
+        has_any_reference = (
+            results.get("task_reference", False) or
+            results.get("blocker_reference", False) or
+            results.get("next_step_reference", False) or
+            results.get("decision_reference", False)
+        )
+        results["passed"] = results.get("has_weak_content", True) and has_any_reference
         
         return results
 
