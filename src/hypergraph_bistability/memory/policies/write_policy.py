@@ -78,6 +78,32 @@ class WritePolicy:
         "decision:",
         "commitment:",
         "note:",
+        # Additional important output patterns
+        "analysis:",
+        "finding:",
+        "conclusion:",
+        "recommendation:",
+        "observation:",
+        "insight:",
+        "action:",
+        "result:",
+        "implementation:",
+        "code:",
+        "fix:",
+    )
+    # Keywords that indicate important content (alternative to prefixes)
+    ASSISTANT_IMPORTANT_KEYWORDS = (
+        "important",
+        "critical",
+        "key insight",
+        "main finding",
+        "core issue",
+        "root cause",
+        "solution",
+        "implementation",
+        "refactor",
+        "optimize",
+        "bug fix",
     )
     LINKED_TASK_PATTERNS = (
         ("scheduler hotfix", ("hotfix", "scheduler dedupe", "retry policy", "rollback notes", "rollout window", "tonight's rollout")),
@@ -111,11 +137,13 @@ class WritePolicy:
         importance = self._estimate_importance(lowered)
         if role == "assistant" and self._is_low_value_assistant_output(lowered):
             return None
+        
+        # For assistant outputs: use importance as primary filter, not just prefix
+        # If importance >= 0.45, allow persistence even without prefix match
+        # This makes the logic less brittle - importance-based, not prefix-based
         if role == "assistant" and not self._is_persistable_assistant_output(lowered):
-            return None
-
-        if role == "assistant" and importance < 0.55:
-            return None
+            if importance < 0.45:  # Only skip if both prefix doesn't match AND importance is low
+                return None
         if role == "user" and importance < 0.2 and len(normalized) < 12:
             return None
 

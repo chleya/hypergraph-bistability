@@ -14,6 +14,14 @@ import numpy as np
 from typing import Dict, List, Optional, Tuple, Callable
 from dataclasses import dataclass, field
 from enum import Enum
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
 class CognitiveMode(Enum):

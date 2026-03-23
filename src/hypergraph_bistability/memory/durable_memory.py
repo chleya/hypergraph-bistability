@@ -459,8 +459,16 @@ class DurableMemoryManager:
         for mem in to_promote:
             self.store.promote(mem.id, 1)
         
-        # Fix: Update working_memory to reflect actual layer 0 contents
-        self.working_memory = [m for m in self.working_memory if m.layer == 0]
+        # Fix: Rebuild working_memory dict from store to reflect actual layer 0 contents
+        # Get current layer 0 memories from store
+        current_working = self.store.get_by_layer(0)
+        self.working_memory = {}
+        for mem in current_working:
+            # Find the content that maps to this memory_id
+            for content, mem_id in list(self.working_memory.items()):
+                if mem_id == mem.id:
+                    self.working_memory[content] = mem.id
+                    break
     
     def run_decay_cycle(
         self,

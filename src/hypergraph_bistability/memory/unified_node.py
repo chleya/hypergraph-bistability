@@ -430,26 +430,11 @@ class UnifiedNodeStore:
                 self._record_activation(node_id, success=False, feedback=0.0)
                 return (str(e), False)
         
-        # Try executing skill code directly
-        if node.skill_def.code:
-            try:
-                # Create execution context
-                exec_globals = {}
-                exec(node.skill_def.code, exec_globals)
-                
-                # Look for execute function
-                if "execute" in exec_globals:
-                    result = exec_globals["execute"](**kwargs)
-                    self._record_activation(node_id, success=True)
-                    return (result, True)
-                else:
-                    return ("Skill has no execute function", False)
-                    
-            except Exception as e:
-                self._record_activation(node_id, success=False, feedback=0.0)
-                return (str(e), False)
+        # SECURITY FIX: Removed exec-based code execution
+        # Only registered handlers are allowed to execute skills
+        # This prevents remote code execution (RCE) vulnerabilities
         
-        return (f"No handler or code found for skill {skill_name}", False)
+        return (f"No registered handler for skill {skill_name}", False)
         
         return ("No handler or code found for skill", False)
     

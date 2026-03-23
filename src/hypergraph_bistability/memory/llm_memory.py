@@ -14,9 +14,17 @@ from typing import Optional, List, Tuple, Dict, Callable
 from dataclasses import dataclass, field
 import json
 import os
+import logging
 from pathlib import Path
 
 from .agent_memory import CollapsController, _regime_name
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
 HIGH_THRESHOLD = 0.7
@@ -131,7 +139,7 @@ Respond with JSON object containing "level" (number 0.0-1.0) and "reasoning" (st
             return level, reasoning
                 
         except Exception as e:
-            print(f"LLM detection failed: {e}, falling back to keyword method")
+            logger.warning(f"LLM detection failed: {e}, falling back to keyword method")
             return self._detect_fallback(prompt)
     
     def _detect_fallback(self, prompt: str) -> Tuple[float, str]:
@@ -228,7 +236,7 @@ Respond with JSON object containing "group" (integer 0-{self.k-1}), "layer" (int
             return min(g, self.k-1), min(l, self.L-1)
             
         except Exception as e:
-            print(f"LLM slot finding failed: {e}")
+            logger.warning(f"LLM slot finding failed: {e}")
             return self._find_slot_keyword(content, action)
     
     def _find_slot_keyword(self, content: str, action: str) -> Tuple[int, int]:

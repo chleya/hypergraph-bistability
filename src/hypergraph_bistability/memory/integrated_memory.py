@@ -12,8 +12,16 @@ from typing import Optional, List, Dict, Any, Tuple
 from dataclasses import dataclass
 import json
 import os
+import logging
 
 from .llm_memory import AgentMemoryEnhanced
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 from .unified_node import (
     UnifiedNodeManager,
     NodeType,
@@ -89,9 +97,9 @@ class IntegratedAgentMemory:
         if self.config.enable_unified_nodes:
             try:
                 self.unified = UnifiedNodeManager(self.config.unified_db_path)
-                print(f"[IntegratedMemory] Unified nodes enabled: {self.config.unified_db_path}")
+                logger.info(f"Unified nodes enabled: {self.config.unified_db_path}")
             except Exception as e:
-                print(f"[IntegratedMemory] Warning: Failed to init unified nodes: {e}")
+                logger.warning(f"Failed to init unified nodes: {e}")
                 self.unified = None
         
         # Skill registry (for quick lookup)
@@ -318,17 +326,18 @@ class IntegratedAgentMemory:
         self.hypergraph.save(path)
         
         # Unified nodes are already persistent (SQLite)
-        print(f"[IntegratedMemory] State saved (hypergraph + unified nodes)")
+        logger.info("State saved (hypergraph + unified nodes)")
     
     def load(self, path: Optional[str] = None) -> None:
         """Load state from file."""
-        # Load hypergraph state
-        self.hypergraph.load(path)
+        # Load hypergraph state - AgentMemoryEnhanced.load returns a NEW instance
+        from hypergraph_bistability.memory.llm_memory import AgentMemoryEnhanced
+        self.hypergraph = AgentMemoryEnhanced.load(path)
         
         # Reload skill registry
         self._load_skill_registry()
         
-        print(f"[IntegratedMemory] State loaded")
+        logger.info("State loaded")
     
     def close(self) -> None:
         """Close all resources."""

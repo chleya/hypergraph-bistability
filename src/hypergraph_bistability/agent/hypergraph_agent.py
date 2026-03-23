@@ -31,10 +31,18 @@ import tempfile
 import time
 import urllib.error
 import urllib.request
+import logging
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 
 import numpy as np
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 from hypergraph_bistability.agent.runtime import ContextAssembler, TurnProcessor
 from hypergraph_bistability.agent.runtime_profile import get_runtime_profile
 from hypergraph_bistability.agent.session import SessionState
@@ -121,7 +129,7 @@ class HypergraphAgent:
                 )
                 self.embedding_mapper.set_group_labels(self.group_labels)
             except ImportError:
-                print("Warning: embedding_memory not available, falling back to slot-based")
+                logger.warning("embedding_memory not available, falling back to slot-based")
         
         from hypergraph_bistability.agent.adaptive_controller import AdaptiveController
         lc = self.memory.get_lambda_c() or 0.044
@@ -2343,41 +2351,6 @@ class HypergraphMemoryAgent:
         self.agent.reset_memory()
 
 
-def demo():
-    """Demo of HypergraphAgent."""
-    print("=" * 60)
-    print("HypergraphAgent Demo")
-    print("=" * 60)
-    
-    agent = HypergraphAgent(k=4, L=2, use_embeddings=False)
-    agent.group_labels = ["work", "personal", "technical", "creative"]
-    
-    print("\n1. Testing adaptive mode switching:")
-    
-    scenarios = [
-        "Let's brainstorm some startup ideas",
-        "I need to decide between job offers",
-        "Help me debug this Python code",
-        "Write me a short poem",
-    ]
-    
-    for input_text in scenarios:
-        response = agent.chat(input_text)
-        state = agent.get_memory_state()
-        print(f"\nInput: {input_text}")
-        print(f"Mode: {state['controller']['mode']}, λ={state['memory']['lambda']:.4f}")
-        print(f"Response: {response[:80]}...")
-    
-    print("\n" + agent.visualize_state())
-    
-    print("\n2. Testing conflict mitigation:")
-    response = agent.chat("I want to go to the beach but I also want to finish this project")
-    state = agent.get_memory_state()
-    print(f"\nInput: I want to go to the beach but I also want to finish this project")
-    print(f"Mode: {state['controller']['mode']}")
-    print(f"Response: {response[:100]}...")
-
-
-if __name__ == "__main__":
-    demo()
+# Demo moved to agent.demo module
+# Run with: python -m hypergraph_bistability.agent.demo
 
