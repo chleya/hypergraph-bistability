@@ -14,7 +14,13 @@
 | 5 | 根目录产物归位 | ✅ | JSON/DB 已在 results/artifacts |
 | 6 | Memory 抽象统一 | ✅ | 4 层职责已明确 |
 | 7 | Query Layer 正式接口 | ✅ | 已标记为正式产品接口 |
-| 8 | 大文件拆分 | ⏳ | hypergraph_agent.py 需拆分 |
+| 8 | 大文件拆分 | ⏳ hypergraph_agent.py (2356行) |
+
+**拆分计划**:
+- runtime/turn_processor.py + context_assembler.py (已有)
+- → 新增: graph/ (图构建 + 图视图)
+- → 新增: persistence/ (会话管理)
+- → 新增: query/ (工作集查询 - 已在 agent/query.py)
 | 9 | 研究 vs 产品分开表述 | ⏳ | 文档需区分层次 |
 | 10 | MiniMax/Windows 封装 | ⏳ | 需独立 integration 模块 |
 
