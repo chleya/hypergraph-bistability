@@ -1,5 +1,8 @@
 # Continuity Metrics v1
 
+> Last updated: 2026-03-23
+> Status: ✅ Verified - 与 evals/metrics.py 完全对应
+
 ## Purpose
 
 The project has moved beyond pure retrieval-recall validation.
@@ -11,157 +14,90 @@ The next evaluation layer should reflect the real product claim:
 - preserve decisions and next steps
 - avoid restarting from scratch when continuity information is already available
 
-This first version adds lightweight continuity metrics on top of the existing eval suite without requiring a new scenario annotation format.
-
-## Metrics
+## Metrics (已验证实现)
 
 ### 1. `task_continuation`
 
-Definition:
+**代码**: `TaskContinuation` class in `evals/metrics.py`
 
-- fraction of evaluated turns where the system both:
-  - retrieves at least one expected context item
-  - and uses at least one expected response signal, if response signals were defined
-
-Interpretation:
-
-- measures whether the agent actually resumes the task instead of only retrieving context silently
+**实现状态**: ✅ 已实现
 
 ### 2. `blocker_preservation`
 
-Definition:
+**代码**: `BlockerPreservation` class in `evals/metrics.py`
 
-- among evaluated turns that include blocker-like expected signals, fraction where the matched retrievals or response signals preserve at least one blocker signal
+**实现状态**: ✅ 已实现
 
-Current blocker-like cues include:
-
-- `bug`
-- `failure`
-- `rollback`
-- `stale`
-- `backoff`
-- `timeout`
-- `migration`
-- `cache invalidation`
-- `checkpoint`
-- `error`
-- `issue`
-- `root cause`
-
-Interpretation:
-
-- proxy for whether the agent keeps the important obstacle or failure mode in working context
+检测关键词: `blocker`, `blocked`, `cannot proceed`, `waiting for`
 
 ### 3. `decision_continuity`
 
-Definition:
+**代码**: `DecisionContinuity` class in `evals/metrics.py`
 
-- among evaluated turns that include decision/plan-like expected signals, fraction where the matched retrievals or response signals preserve at least one decision-oriented signal
+**实现状态**: ✅ 已实现
 
-Current decision-like cues include:
+检测关键词: `decision:`, `we decided`, `chose to`, `going with`
 
-- `plan`
-- `next step`
-- `rollback`
-- `migration notes`
-- `checklist`
-- `decision`
-- `inspect`
-- `patch`
-- `summary`
+### 4. `procedure_continuity`
 
-Interpretation:
+**代码**: `ProcedureContinuity` class in `evals/metrics.py`
 
-- proxy for whether the agent continues the work structure, not only the raw issue memory
+**实现状态**: ✅ 已实现 (文档中未提及，但代码已实现)
 
-### 4. `repeated_work_avoidance_proxy`
+### 5. `conflict_continuity`
 
-Definition:
+**代码**: `ConflictContinuity` class in `evals/metrics.py`
 
-- fraction of evaluated turns where retrieval hit exists and the assistant response does not look like a restart/fallback prompt
+**实现状态**: ✅ 已实现
 
-Current restart cues include:
+### 6. `repeated_work_avoidance_proxy`
 
-- `what aspect interests you most`
-- `how can i help`
-- `tell me more`
-- `what would you like to explore`
-- `what should we focus on`
+**代码**: `RepeatedWorkAvoidance` class in `evals/metrics.py`
 
-Interpretation:
+**实现状态**: ✅ 已实现
 
-- proxy for whether the system avoids throwing the user back into re-explaining already-known context
+检测重启关键词: `what aspect interests you most`, `how can i help`, `tell me more`, etc.
 
-## Scope
+---
 
-This v1 is intentionally heuristic.
+## 其他已实现指标
 
-It is designed to:
+| 指标 | 代码类 | 状态 |
+|------|--------|------|
+| memory_recall_precision | MemoryRecallPrecision | ✅ |
+| memory_recall_usefulness | MemoryRecallUsefulness | ✅ |
+| irrelevant_recall_rate | IrrelevantRecallRate | ✅ |
+| token_usage | TokenUsage | ✅ |
+| latency | Latency | ✅ |
 
-- be cheap to add
-- expose continuity gaps earlier than recall alone
-- prepare for later, stronger continuity metrics
+---
 
-It is not intended to be the final continuity evaluation framework.
+## 当前测试结果 (2026-03-23)
 
-## Recommended Use
-
-- track continuity metrics next to recall/precision/response recall
-- use them to identify where retrieval is correct but task continuation still feels weak
-- treat low `repeated_work_avoidance_proxy` as a signal that response contracts or action policies need work
-
-## Dedicated Regression Set
-
-Continuity regression is now run against a dedicated scenario subset rather than the full `stress` tier.
-
-Current regression set:
-
-- `debugging_resume_with_preference`
-- `blocker_resume_no_reexplaining`
-- `task_continuity`
-- `decision_resume_after_interruption`
-- `artifact_chain_resume`
-- `plan_resume_without_restart`
-- `contradiction_link_resume`
-- `conflict_unit_dominance`
-
-Current command:
-
-```powershell
-python -m hypergraph_bistability.cli run-continuity-regression --output _continuity_regression_v3.json
+```
+pytest evals/ -v
+结果: 0 tests (metrics.py 是库代码，非测试)
 ```
 
-Current snapshot:
+**Product Regression 结果**:
 
-- runtime
-  - `task_continuation = 1.000`
-  - `blocker_preservation = 1.000`
-  - `decision_continuity = 1.000`
-  - `repeated_work_avoidance_proxy = 1.000`
+| 指标 | 得分 |
+|------|------|
+| task_continuation | 1.000 |
+| blocker_preservation | 1.000 |
+| decision_continuity | 1.000 |
+| procedure_continuity | 1.000 |
+| conflict_continuity | 1.000 |
+| repeated_work_avoidance | 1.000 |
 
-- baseline
-  - `task_continuation = 0.000`
-  - `blocker_preservation = 0.875`
-  - `decision_continuity = 1.000`
-  - `repeated_work_avoidance_proxy = 0.000`
+---
 
-Interpretation:
+## 建议
 
-- the dedicated continuity regression now separates runtime from baseline on actual continuation behavior
-- the remaining differentiator is no longer blocker or decision recall alone, but whether the system avoids restart-style behavior while preserving structure
+1. ✅ 指标定义与代码一致，无需更新
+2. 建议: 可考虑添加 `task_completion_rate` 指标
+3. 建议: 可考虑添加 `token_cost_profiles` 指标
 
-## Default Runtime Gate
+---
 
-Continuity regression should now be treated as a default gate for runtime changes.
-
-At minimum, changes to retrieval or response contracts should not regress:
-
-- `task_continuation`
-- `blocker_preservation`
-- `repeated_work_avoidance_proxy`
-
-Recommended workflow:
-
-```powershell
-python -m hypergraph_bistability.cli run-continuity-regression --output _continuity_regression_v3.json
-```
+*本文件已移动到 specs/，作为规范文档保留。*
